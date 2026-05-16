@@ -5,7 +5,8 @@ import RunCraftModels
 import VDOTEngine
 
 @Reducer public struct TrainingPlan {
-    @ObservableState public struct State: Equatable {
+    @ObservableState public struct State {
+        public var hasGoal: Bool = false
         public var paceZones: PaceZones? = nil
         public var isLoadingVDOT: Bool = false
         @Presents public var destination: Destination.State? = nil
@@ -20,6 +21,7 @@ import VDOTEngine
 
     public enum Action {
         case onAppear
+        case createGoalButtonTapped
         case checkRaceGoalResponse(Result<Bool, any Error>)
         case fetchVDOTTapped
         case vdotFetchResponse(Result<Double, any Error>)
@@ -35,7 +37,7 @@ import VDOTEngine
         Reduce { state, action in
             switch action {
             case .onAppear:
-                return .run { send in
+                return .run { [database] send in
                     await send(.checkRaceGoalResponse(Result {
                         let count = try await database.read { db in
                             try RaceGoal.all.fetchCount(db)
@@ -44,21 +46,24 @@ import VDOTEngine
                     }))
                 }
 
+            case .createGoalButtonTapped:
+                state.destination = .setupRaceGoal(SetupRaceGoal.State())
+                return .none
+
             case let .checkRaceGoalResponse(.success(hasGoal)):
-                if !hasGoal {
-                    state.destination = .setupRaceGoal(SetupRaceGoal.State())
-                } else {
+                state.hasGoal = hasGoal
+                if hasGoal {
                     return .send(.fetchVDOTTapped)
                 }
                 return .none
 
             case .checkRaceGoalResponse(.failure):
-                state.destination = .setupRaceGoal(SetupRaceGoal.State())
+                state.hasGoal = false
                 return .none
 
             case .fetchVDOTTapped:
                 state.isLoadingVDOT = true
-                return .run { send in
+                return .run { [database] send in
                     await send(.vdotFetchResponse(Result {
                         let goal = try await database.read { db in
                             try RaceGoal.order { $0.createdAt.desc() }.fetchOne(db)

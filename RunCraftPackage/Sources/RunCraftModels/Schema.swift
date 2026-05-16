@@ -14,10 +14,10 @@ extension DependencyValues {
                 CREATE TABLE "raceGoals" (
                   "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
                   "name" TEXT NOT NULL DEFAULT '',
-                  "targetDate" REAL NOT NULL DEFAULT 0,
+                  "targetDate" TEXT NOT NULL DEFAULT '',
                   "distanceKm" REAL NOT NULL DEFAULT 0,
                   "currentVDOT" REAL NOT NULL DEFAULT 0,
-                  "createdAt" REAL NOT NULL DEFAULT 0
+                  "createdAt" TEXT NOT NULL DEFAULT ''
                 ) STRICT
                 """)
                 .execute(db)
@@ -28,7 +28,7 @@ extension DependencyValues {
                   "raceGoalId" TEXT NOT NULL REFERENCES "raceGoals"("id") ON DELETE CASCADE,
                   "weekNumber" INTEGER NOT NULL DEFAULT 1,
                   "phase" TEXT NOT NULL DEFAULT 'base',
-                  "startDate" REAL NOT NULL DEFAULT 0,
+                  "startDate" TEXT NOT NULL DEFAULT '',
                   "targetWeeklyKm" REAL NOT NULL DEFAULT 0
                 ) STRICT
                 """)
@@ -64,7 +64,7 @@ extension DependencyValues {
                   "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
                   "plannedSessionId" TEXT REFERENCES "plannedSessions"("id") ON DELETE SET NULL,
                   "hkWorkoutId" TEXT,
-                  "completedAt" REAL NOT NULL DEFAULT 0,
+                  "completedAt" TEXT NOT NULL DEFAULT '',
                   "actualDistanceKm" REAL NOT NULL DEFAULT 0,
                   "actualDurationSec" REAL NOT NULL DEFAULT 0,
                   "avgPaceSecPerKm" REAL NOT NULL DEFAULT 0,

@@ -2,7 +2,7 @@ import ComposableArchitecture
 import TrainingPlanFeature
 
 @Reducer public struct AppFeature {
-    @ObservableState public struct State: Equatable {
+    @ObservableState public struct State {
         public var selectedTab: Tab = .plan
         public var plan: TrainingPlan.State = .init()
         public var settings: Settings.State = .init()

@@ -1,23 +1,15 @@
 import AppFeature
-import ComposableArchitecture
-import RunCraftModels
 import SwiftUI
 
 @main
 struct RunCraftApp: App {
     init() {
-        prepareDependencies {
-            try! $0.bootstrapDatabase()
-        }
+        bootstrapApp()
     }
 
     var body: some Scene {
         WindowGroup {
-            AppView(
-                store: Store(initialState: AppFeature.State()) {
-                    AppFeature()
-                }
-            )
+            AppView(store: makeAppStore())
         }
     }
 }

@@ -96,7 +96,7 @@ public struct TrainingPlanGenerator {
                 sessionType: blueprint.type,
                 targetDistanceKm: blueprint.distanceKm,
                 targetDurationMin: blueprint.durationMin,
-                notes: blueprint.notes(zones: zones)
+                notes: blueprint.notes(zones)
             )
         }
     }

@@ -20,7 +20,7 @@ public enum RaceDistance: Sendable, Equatable, Codable {
         case .fiveK:           "5K"
         case .tenK:            "10K"
         case .halfMarathon:    "Half Marathon"
-        case .custom(let km):  "\(km, format: .number.precision(.fractionLength(0...1))) km"
+        case .custom(let km):  "\(km.formatted(.number.precision(.fractionLength(0...1)))) km"
         }
     }
 }

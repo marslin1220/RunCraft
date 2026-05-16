@@ -44,7 +44,7 @@ import HealthKitClient
                 return .none
 
             case .linkHealthKitTapped:
-                return .run { send in
+                return .run { [healthKitClient] send in
                     await send(.healthKitAuthResponse(Result {
                         try await healthKitClient.requestAuthorization()
                     }))

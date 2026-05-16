@@ -33,6 +33,7 @@ public struct SettingsView: View {
                             }
                             .buttonStyle(.borderedProminent)
                             .tint(Color(red: 0.8, green: 1.0, blue: 0.0))
+                            .foregroundStyle(.black)
                         }
                     }
                 }

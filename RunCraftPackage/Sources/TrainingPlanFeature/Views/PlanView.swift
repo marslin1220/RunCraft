@@ -3,6 +3,7 @@ import IssueReporting
 import RunCraftModels
 import SQLiteData
 import SwiftUI
+import VDOTEngine
 
 public struct PlanView: View {
     @Bindable public var store: StoreOf<TrainingPlan>
@@ -30,7 +31,7 @@ public struct PlanView: View {
                         }
                     } else {
                         EmptyPlanPrompt {
-                            store.send(.onAppear)
+                            store.send(.createGoalButtonTapped)
                         }
                     }
                 }
@@ -171,7 +172,7 @@ private struct WeekSessionsSection: View {
             }
         }
         .task(id: week.id) {
-            await withErrorReporting {
+            _ = await withErrorReporting {
                 try await $sessions.load(
                     PlannedSession
                         .where { $0.weekId.eq(week.id) }
