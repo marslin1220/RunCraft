@@ -7,6 +7,7 @@ let package = Package(
     platforms: [
         .iOS(.v17),
         .watchOS(.v10),
+        .macOS(.v13),
     ],
     products: [
         .library(name: "VDOTEngine", targets: ["VDOTEngine"]),
