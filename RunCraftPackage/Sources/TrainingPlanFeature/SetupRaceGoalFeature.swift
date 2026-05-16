@@ -9,18 +9,39 @@ import VDOTEngine
         public var goalName: String = ""
         public var targetDate: Date = Calendar.current.date(byAdding: .month, value: 4, to: Date()) ?? Date()
         public var distanceKm: Double = 21.0
+
+        // HealthKit auto-detection
         public var detectedVDOT: Double? = nil
         public var isDetectingVDOT: Bool = false
-        public var manualVDOTInput: String = ""
+
+        // Manual race time input
+        public var manualDistance: RaceDistanceQuery = .fiveK
+        public var manualMinutes: String = ""
+        public var manualSeconds: String = ""
 
         public var paceZones: PaceZones? {
             guard let v = effectiveVDOT else { return nil }
             return VDOTCalculator.paceZones(vdot: v)
         }
 
-        var effectiveVDOT: Double? {
+        /// HealthKit-detected takes priority; falls back to calculated from manual race time.
+        public var effectiveVDOT: Double? {
             if let v = detectedVDOT { return v }
-            return Double(manualVDOTInput).map { min(max($0, 30), 85) }
+            let mins = Int(manualMinutes) ?? 0
+            let secs = Int(manualSeconds) ?? 0
+            let totalSeconds = Double(mins * 60 + secs)
+            guard totalSeconds > 0 else { return nil }
+            let v = VDOTCalculator.vdot(distanceMeters: manualDistance.metres, timeSeconds: totalSeconds)
+            return v >= 30 ? v : nil
+        }
+
+        public var calculatedVDOT: Double? {
+            let mins = Int(manualMinutes) ?? 0
+            let secs = Int(manualSeconds) ?? 0
+            let totalSeconds = Double(mins * 60 + secs)
+            guard totalSeconds > 0 else { return nil }
+            let v = VDOTCalculator.vdot(distanceMeters: manualDistance.metres, timeSeconds: totalSeconds)
+            return v >= 30 ? v : nil
         }
 
         var canSave: Bool {
@@ -33,6 +54,7 @@ import VDOTEngine
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
         case detectVDOTTapped
+        case clearDetectedVDOTTapped
         case vdotDetectionResponse(Result<Double, any Error>)
         case saveButtonTapped
         case cancelButtonTapped
@@ -52,9 +74,13 @@ import VDOTEngine
             case .binding:
                 return .none
 
+            case .clearDetectedVDOTTapped:
+                state.detectedVDOT = nil
+                return .none
+
             case .detectVDOTTapped:
                 state.isDetectingVDOT = true
-                return .run { send in
+                return .run { [healthKitClient] send in
                     await send(.vdotDetectionResponse(Result {
                         try await healthKitClient.requestAuthorization()
                         var bestVDOT: Double = 0
@@ -76,7 +102,6 @@ import VDOTEngine
 
             case let .vdotDetectionResponse(.failure(error)):
                 state.isDetectingVDOT = false
-                state.manualVDOTInput = ""
                 _ = error
                 return .none
 
@@ -90,7 +115,7 @@ import VDOTEngine
                     createdAt: now
                 )
                 let (weeks, sessions) = TrainingPlanGenerator.generate(goal: goal, vdot: vdot)
-                return .run { _ in
+                return .run { [database, dismiss] _ in
                     try await database.write { db in
                         try RaceGoal.upsert { goal }.execute(db)
                         for week in weeks {
@@ -104,7 +129,7 @@ import VDOTEngine
                 }
 
             case .cancelButtonTapped:
-                return .run { _ in await dismiss() }
+                return .run { [dismiss] _ in await dismiss() }
             }
         }
     }

@@ -23,7 +23,7 @@ public struct HealthKitClient: Sendable {
     }
 }
 
-public enum RaceDistanceQuery: Sendable {
+public enum RaceDistanceQuery: String, Sendable, CaseIterable, Equatable, Hashable {
     case fiveK
     case tenK
     case halfMarathon
@@ -33,6 +33,23 @@ public enum RaceDistanceQuery: Sendable {
         case .fiveK:        5_000
         case .tenK:         10_000
         case .halfMarathon: 21_097
+        }
+    }
+
+    public var displayName: String {
+        switch self {
+        case .fiveK:        "5K"
+        case .tenK:         "10K"
+        case .halfMarathon: "Half Marathon"
+        }
+    }
+
+    /// Typical finish time range hint shown in UI.
+    public var typicalRange: String {
+        switch self {
+        case .fiveK:        "15–60 min"
+        case .tenK:         "30–90 min"
+        case .halfMarathon: "1h 10m–3h"
         }
     }
 }
