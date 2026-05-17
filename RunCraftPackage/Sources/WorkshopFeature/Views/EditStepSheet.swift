@@ -71,7 +71,9 @@ struct EditStepSheet: View {
                     Button("Cancel") { store.send(.cancelTapped) }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { store.send(.saveTapped) }.bold()
+                    Button("Save") { store.send(.saveTapped) }
+                        .bold()
+                        .disabled(!store.isValid)
                 }
             }
         }

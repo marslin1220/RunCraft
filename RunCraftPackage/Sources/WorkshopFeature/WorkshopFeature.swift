@@ -97,6 +97,8 @@ import SQLiteData
                 let recovery = WorkoutStep(id: uuid(), kind: .recovery, goal: .time(seconds: 90))
                 let group = RepeatGroup(id: uuid(), iterations: 4, steps: [work, recovery])
                 state.blocks.append(.repeatGroup(group))
+                // Open edit sheet immediately so user can configure iterations/steps.
+                state.destination = .editRepeatGroup(EditRepeatGroup.State(group: group))
                 return .none
 
             case let .blockTapped(id):
@@ -276,6 +278,14 @@ import SQLiteData
                 self.distanceMetres = 1_000
                 self.minutes = s / 60
                 self.seconds = s % 60
+            }
+        }
+
+        public var isValid: Bool {
+            switch goalUnit {
+            case .openEnded: true
+            case .distance: distanceMetres > 0
+            case .time:     minutes * 60 + seconds > 0
             }
         }
     }

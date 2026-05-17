@@ -82,6 +82,11 @@ import VDOTEngine
                 state.isLoadingVDOT = false
                 return .none
 
+            case .destination(.dismiss):
+                // Destination closed (e.g. SetupRaceGoal sheet dismissed after Save).
+                // Re-check goal/VDOT state so paceZones refresh immediately.
+                return .send(.onAppear)
+
             case .destination:
                 return .none
             }
