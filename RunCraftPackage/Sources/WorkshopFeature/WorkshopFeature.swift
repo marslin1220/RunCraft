@@ -2,13 +2,25 @@ import ComposableArchitecture
 import Foundation
 import IdentifiedCollections
 import RunCraftModels
+import SQLiteData
 
 @Reducer public struct Workshop {
     @ObservableState public struct State {
+        /// nil = unsaved new template; non-nil = editing existing template from DB.
+        public var editingTemplateId: UUID? = nil
         public var templateName: String = "New Workout"
         public var blocks: IdentifiedArrayOf<WorkoutBlock> = []
         public var isEditing: Bool = false
+        public var isShowingLibrary: Bool = false
+        public var saveStatus: SaveStatus = .idle
         @Presents public var destination: Destination.State?
+
+        public enum SaveStatus: Equatable {
+            case idle
+            case saving
+            case saved
+            case failed(String)
+        }
 
         public init() {}
 
@@ -49,10 +61,21 @@ import RunCraftModels
         case moveBlocks(IndexSet, Int)
         case toggleEditing
         case clearAllTapped
+
+        // Persistence
+        case saveTapped
+        case saveResponse(Result<UUID, any Error>)
+        case newTemplateTapped
+        case libraryButtonTapped
+        case templateSelected(WorkoutTemplate)
+        case deleteTemplate(WorkoutTemplate.ID)
+
         case destination(PresentationAction<Destination.Action>)
     }
 
     @Dependency(\.uuid) var uuid
+    @Dependency(\.date.now) var now
+    @Dependency(\.defaultDatabase) var database
 
     public init() {}
 
@@ -100,6 +123,76 @@ import RunCraftModels
             case .clearAllTapped:
                 state.blocks.removeAll()
                 return .none
+
+            case .saveTapped:
+                guard !state.blocks.isEmpty else { return .none }
+                let id = state.editingTemplateId ?? uuid()
+                let existing = state.editingTemplateId != nil
+                let template = WorkoutTemplate(
+                    id: id,
+                    name: state.templateName.isEmpty ? "Untitled" : state.templateName,
+                    blocks: Array(state.blocks),
+                    createdAt: now,
+                    updatedAt: now
+                )
+                state.saveStatus = .saving
+                return .run { [database, template, existing] send in
+                    await send(.saveResponse(Result {
+                        try await database.write { db in
+                            if existing {
+                                try WorkoutTemplate
+                                    .where { $0.id.eq(template.id) }
+                                    .update {
+                                        $0.name = template.name
+                                        $0.blocksData = template.blocksData
+                                        $0.updatedAt = template.updatedAt
+                                    }
+                                    .execute(db)
+                            } else {
+                                try WorkoutTemplate.insert { template }.execute(db)
+                            }
+                        }
+                        return template.id
+                    }))
+                }
+
+            case let .saveResponse(.success(id)):
+                state.editingTemplateId = id
+                state.saveStatus = .saved
+                return .none
+
+            case let .saveResponse(.failure(error)):
+                state.saveStatus = .failed(error.localizedDescription)
+                return .none
+
+            case .newTemplateTapped:
+                state.editingTemplateId = nil
+                state.templateName = "New Workout"
+                state.blocks.removeAll()
+                state.saveStatus = .idle
+                return .none
+
+            case .libraryButtonTapped:
+                state.isShowingLibrary = true
+                return .none
+
+            case let .templateSelected(template):
+                state.editingTemplateId = template.id
+                state.templateName = template.name
+                state.blocks = IdentifiedArray(uniqueElements: template.blocks)
+                state.isShowingLibrary = false
+                state.saveStatus = .idle
+                return .none
+
+            case let .deleteTemplate(id):
+                return .run { [database] _ in
+                    try await database.write { db in
+                        try WorkoutTemplate
+                            .where { $0.id.eq(id) }
+                            .delete()
+                            .execute(db)
+                    }
+                }
 
             case .destination(.presented(.editStep(.saveTapped))):
                 if case let .editStep(editState) = state.destination {
