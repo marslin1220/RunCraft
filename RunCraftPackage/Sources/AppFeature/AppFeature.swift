@@ -1,10 +1,12 @@
 import ComposableArchitecture
 import TrainingPlanFeature
+import WorkshopFeature
 
 @Reducer public struct AppFeature {
     @ObservableState public struct State {
         public var selectedTab: Tab = .plan
         public var plan: TrainingPlan.State = .init()
+        public var workshop: Workshop.State = .init()
         public var settings: Settings.State = .init()
 
         public init() {}
@@ -20,6 +22,7 @@ import TrainingPlanFeature
     public enum Action {
         case tabSelected(Tab)
         case plan(TrainingPlan.Action)
+        case workshop(Workshop.Action)
         case settings(Settings.Action)
     }
 
@@ -29,6 +32,9 @@ import TrainingPlanFeature
         Scope(state: \.plan, action: \.plan) {
             TrainingPlan()
         }
+        Scope(state: \.workshop, action: \.workshop) {
+            Workshop()
+        }
         Scope(state: \.settings, action: \.settings) {
             Settings()
         }
@@ -37,7 +43,7 @@ import TrainingPlanFeature
             case let .tabSelected(tab):
                 state.selectedTab = tab
                 return .none
-            case .plan, .settings:
+            case .plan, .workshop, .settings:
                 return .none
             }
         }

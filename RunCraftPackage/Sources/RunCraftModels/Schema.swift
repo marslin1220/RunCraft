@@ -72,6 +72,17 @@ extension DependencyValues {
                 ) STRICT
                 """)
                 .execute(db)
+
+            try #sql("""
+                CREATE TABLE "workoutTemplates" (
+                  "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
+                  "name" TEXT NOT NULL DEFAULT '',
+                  "blocksData" TEXT NOT NULL DEFAULT '[]',
+                  "createdAt" TEXT NOT NULL DEFAULT '',
+                  "updatedAt" TEXT NOT NULL DEFAULT ''
+                ) STRICT
+                """)
+                .execute(db)
         }
 
         try migrator.migrate(database)

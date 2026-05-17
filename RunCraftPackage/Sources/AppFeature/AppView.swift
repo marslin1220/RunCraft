@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 import TrainingPlanFeature
+import WorkshopFeature
 
 public struct AppView: View {
     @Bindable public var store: StoreOf<AppFeature>
@@ -17,7 +18,7 @@ public struct AppView: View {
                 }
                 .tag(AppFeature.Tab.plan)
 
-            WorkshopPlaceholderView()
+            WorkshopView(store: store.scope(state: \.workshop, action: \.workshop))
                 .tabItem {
                     Label("Workshop", systemImage: "wrench.and.screwdriver")
                 }
@@ -40,26 +41,7 @@ public struct AppView: View {
     }
 }
 
-// MARK: - Placeholder views for P1 tabs
-
-private struct WorkshopPlaceholderView: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "wrench.and.screwdriver.fill")
-                .font(.system(size: 56))
-                .foregroundStyle(.secondary)
-            Text("Workshop")
-                .font(.title2).bold()
-            Text("Drag-and-drop workout editor — coming in Phase 2")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
-        .preferredColorScheme(.dark)
-    }
-}
+// MARK: - Placeholder for Insights tab (P2)
 
 private struct InsightsPlaceholderView: View {
     var body: some View {
