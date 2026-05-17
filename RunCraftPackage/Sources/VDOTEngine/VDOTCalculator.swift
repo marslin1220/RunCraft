@@ -38,19 +38,24 @@ public struct VDOTCalculator {
     public static func paceZones(vdot: Double) -> PaceZones {
         let vdot = min(max(vdot, 30), 85)
 
-        let easyFast   = pace(forVO2Fraction: 0.63, of: vdot)
-        let easySlow   = pace(forVO2Fraction: 0.54, of: vdot)
-        let marathon   = pace(forVO2Fraction: 0.73, of: vdot)
-        let threshold  = pace(forVO2Fraction: 0.82, of: vdot)
-        let interval   = pace(forVO2Fraction: 0.91, of: vdot)
-        let repetition = pace(forVO2Fraction: 0.97, of: vdot)
+        // Base fractions calibrated at VDOT 40 (matches published Daniels tables).
+        // Below VDOT 40, a linear correction closes the gap toward vdoto2.com values:
+        //   correction = max(0, 40 − VDOT) × factor_per_unit
+        // Derived from two anchor points: VDOT 31 (vdoto2 screenshot) and VDOT 40 (Daniels).
+        let c = max(0, 40 - vdot)
+        let eFast = pace(forVO2Fraction: 0.6250 + c * 0.01500, of: vdot)
+        let eSlow = pace(forVO2Fraction: 0.5388 + c * 0.01501, of: vdot)
+        let mara  = pace(forVO2Fraction: 0.7320 + c * 0.00770, of: vdot)
+        let tempo = pace(forVO2Fraction: 0.8215 + c * 0.01041, of: vdot)
+        let intvl = pace(forVO2Fraction: 0.9075 + c * 0.01641, of: vdot)
+        let rep   = pace(forVO2Fraction: 0.9940 + c * 0.01443, of: vdot)
 
         return PaceZones(
-            easy:       .init(lower: easyFast, upper: easySlow),
-            marathon:   .init(lower: marathon - 5, upper: marathon + 5),
-            threshold:  .init(lower: threshold - 5, upper: threshold + 5),
-            interval:   .init(lower: interval - 3, upper: interval + 3),
-            repetition: .init(lower: repetition - 3, upper: repetition + 3)
+            easy:       .init(lower: eFast, upper: eSlow),
+            marathon:   .init(lower: mara  - 5, upper: mara  + 5),
+            threshold:  .init(lower: tempo - 5, upper: tempo + 5),
+            interval:   .init(lower: intvl - 3, upper: intvl + 3),
+            repetition: .init(lower: rep   - 3, upper: rep   + 3)
         )
     }
 
