@@ -6,17 +6,34 @@ import SwiftUI
 struct TemplateLibrarySheet: View {
     let store: StoreOf<Workshop>
     @Environment(\.dismiss) private var dismiss
-    @FetchAll(WorkoutTemplate.order { $0.updatedAt.desc() }) var templates: [WorkoutTemplate]
+    @FetchAll(WorkoutTemplate.order { $0.updatedAt.desc() }) var userTemplates: [WorkoutTemplate]
 
     var body: some View {
         NavigationStack {
-            Group {
-                if templates.isEmpty {
-                    EmptyLibraryPrompt()
-                } else {
-                    List {
-                        ForEach(templates) { template in
-                            TemplateRow(template: template)
+            List {
+                Section {
+                    ForEach(WorkoutPresets.all) { preset in
+                        TemplateRow(template: preset, isPreset: true)
+                            .listRowBackground(Color(hex: "#1A1B2E"))
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                store.send(.presetSelected(preset))
+                            }
+                    }
+                } header: {
+                    Label("Templates", systemImage: "books.vertical.fill")
+                        .foregroundStyle(Color.electricLime)
+                }
+
+                Section {
+                    if userTemplates.isEmpty {
+                        Text("No saved workouts yet. Build one in the editor or start from a template above.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .listRowBackground(Color.clear)
+                    } else {
+                        ForEach(userTemplates) { template in
+                            TemplateRow(template: template, isPreset: false)
                                 .listRowBackground(Color(hex: "#1A1B2E"))
                                 .contentShape(Rectangle())
                                 .onTapGesture {
@@ -25,14 +42,17 @@ struct TemplateLibrarySheet: View {
                         }
                         .onDelete { indexSet in
                             for i in indexSet {
-                                store.send(.deleteTemplate(templates[i].id))
+                                store.send(.deleteTemplate(userTemplates[i].id))
                             }
                         }
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
+                } header: {
+                    Label("Your Workouts", systemImage: "person.fill")
+                        .foregroundStyle(Color.electricLime)
                 }
             }
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
             .background(Color.black)
             .navigationTitle("Library")
             .navigationBarTitleDisplayMode(.inline)
@@ -47,8 +67,17 @@ struct TemplateLibrarySheet: View {
     }
 }
 
+#Preview {
+    TemplateLibrarySheet(
+        store: .init(initialState: Workshop.State()) {
+            Workshop()
+        }
+    )
+}
+
 private struct TemplateRow: View {
     let template: WorkoutTemplate
+    let isPreset: Bool
 
     private var totalSteps: Int {
         template.blocks.reduce(0) { acc, block in
@@ -62,10 +91,10 @@ private struct TemplateRow: View {
     var body: some View {
         HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 6)
-                .fill(Color.electricLime.opacity(0.15))
+                .fill(isPreset ? Color.electricLime.opacity(0.2) : Color.white.opacity(0.08))
                 .overlay(
-                    Image(systemName: "figure.run")
-                        .foregroundStyle(Color.electricLime)
+                    Image(systemName: isPreset ? "sparkles" : "figure.run")
+                        .foregroundStyle(isPreset ? Color.electricLime : .white)
                 )
                 .frame(width: 36, height: 36)
 
@@ -77,8 +106,10 @@ private struct TemplateRow: View {
                     Text("\(template.blocks.count) block\(template.blocks.count == 1 ? "" : "s")")
                     Text("·")
                     Text("\(totalSteps) step\(totalSteps == 1 ? "" : "s")")
-                    Text("·")
-                    Text(template.updatedAt, format: .relative(presentation: .named))
+                    if !isPreset {
+                        Text("·")
+                        Text(template.updatedAt, format: .relative(presentation: .named))
+                    }
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -90,23 +121,5 @@ private struct TemplateRow: View {
                 .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
-    }
-}
-
-private struct EmptyLibraryPrompt: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "tray")
-                .font(.system(size: 48))
-                .foregroundStyle(.secondary)
-            Text("No saved workouts")
-                .font(.title3.bold())
-                .foregroundStyle(.white)
-            Text("Build a workout in the editor and tap Save to add it here.")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 40)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
