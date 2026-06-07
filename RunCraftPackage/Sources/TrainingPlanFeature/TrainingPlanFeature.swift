@@ -16,7 +16,11 @@ import VDOTEngine
 
     @Reducer public enum Destination {
         case setupRaceGoal(SetupRaceGoal)
-        case alert(AlertState<Never>)
+        case deleteConfirm(AlertState<DeleteAlertAction>)
+    }
+
+    public enum DeleteAlertAction: Equatable {
+        case confirmDelete
     }
 
     public enum Action {
@@ -25,6 +29,9 @@ import VDOTEngine
         case checkRaceGoalResponse(Result<Bool, any Error>)
         case fetchVDOTTapped
         case vdotFetchResponse(Result<Double, any Error>)
+        case deletePlanRequested
+        case recalculateVDOTRequested
+        case planDeleted
         case destination(PresentationAction<Destination.Action>)
     }
 
@@ -80,6 +87,39 @@ import VDOTEngine
 
             case .vdotFetchResponse(.failure):
                 state.isLoadingVDOT = false
+                return .none
+
+            case .deletePlanRequested:
+                state.destination = .deleteConfirm(AlertState {
+                    TextState("Delete plan?")
+                } actions: {
+                    ButtonState(role: .destructive, action: .confirmDelete) {
+                        TextState("Delete")
+                    }
+                    ButtonState(role: .cancel) {
+                        TextState("Cancel")
+                    }
+                } message: {
+                    TextState("This removes your race goal and all generated weekly sessions. Completed workouts are kept.")
+                })
+                return .none
+
+            case .recalculateVDOTRequested:
+                state.destination = .setupRaceGoal(SetupRaceGoal.State())
+                return .none
+
+            case .destination(.presented(.deleteConfirm(.confirmDelete))):
+                return .run { [database] send in
+                    try await database.write { db in
+                        // FK cascades remove trainingWeeks and plannedSessions automatically
+                        try RaceGoal.all.delete().execute(db)
+                    }
+                    await send(.planDeleted)
+                }
+
+            case .planDeleted:
+                state.hasGoal = false
+                state.paceZones = nil
                 return .none
 
             case .destination(.dismiss):

@@ -41,10 +41,32 @@ public struct PlanView: View {
             .navigationTitle("Plan")
             .navigationBarTitleDisplayMode(.large)
             .preferredColorScheme(.dark)
+            .toolbar {
+                if store.hasGoal {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Button {
+                                store.send(.recalculateVDOTRequested)
+                            } label: {
+                                Label("Edit goal / recalculate", systemImage: "pencil")
+                            }
+                            Button(role: .destructive) {
+                                store.send(.deletePlanRequested)
+                            } label: {
+                                Label("Delete plan", systemImage: "trash")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .foregroundStyle(Color(hex: "#CCFF00"))
+                        }
+                    }
+                }
+            }
             .onAppear { store.send(.onAppear) }
             .sheet(item: $store.scope(state: \.destination?.setupRaceGoal, action: \.destination.setupRaceGoal)) { setupStore in
                 SetupRaceGoalView(store: setupStore)
             }
+            .alert($store.scope(state: \.destination?.deleteConfirm, action: \.destination.deleteConfirm))
         }
     }
 
