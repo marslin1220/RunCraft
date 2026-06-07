@@ -97,7 +97,7 @@ let package = Package(
             name: "TrainingPlanFeatureTests",
             dependencies: [
                 "TrainingPlanFeature",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
             ]
         ),
 
@@ -105,7 +105,7 @@ let package = Package(
             name: "WorkshopFeatureTests",
             dependencies: [
                 "WorkshopFeature",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "DependenciesTestSupport", package: "swift-dependencies"),
             ]
         ),
     ]

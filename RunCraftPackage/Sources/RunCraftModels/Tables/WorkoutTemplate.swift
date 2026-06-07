@@ -1,7 +1,7 @@
 import Foundation
 import SQLiteData
 
-@Table public struct WorkoutTemplate: Identifiable, Sendable {
+@Table public struct WorkoutTemplate: Identifiable, Sendable, Equatable {
     public let id: UUID
     public var name: String
     /// JSON-encoded `[WorkoutBlock]`. Decoded on demand via `blocks` accessor.

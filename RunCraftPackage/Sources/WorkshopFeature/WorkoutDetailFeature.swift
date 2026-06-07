@@ -5,7 +5,7 @@ import RunCraftModels
 /// Read-only preview of a workout with a Start button at the bottom.
 /// Source determines whether Duplicate is available and how Edit behaves.
 @Reducer public struct WorkoutDetail {
-    @ObservableState public struct State {
+    @ObservableState public struct State: Equatable {
         public var workout: WorkoutTemplate
         public var source: Source
         @Presents public var alert: AlertState<Action.Alert>?
@@ -29,8 +29,8 @@ import RunCraftModels
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
 
-        public enum Alert {}
-        public enum Delegate {
+        public enum Alert: Equatable {}
+        public enum Delegate: Equatable {
             /// Parent should push the editor with this template.
             case requestEdit(WorkoutTemplate)
             /// Parent should insert this template as a new "Yours" row.
