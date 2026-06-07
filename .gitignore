@@ -1,3 +1,7 @@
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Skill installer artifacts (npx skills add ...)
+.agents/
+skills-lock.json
