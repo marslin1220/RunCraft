@@ -11,7 +11,6 @@ import SQLiteData
         public var templateName: String = "New Workout"
         public var blocks: IdentifiedArrayOf<WorkoutBlock> = []
         public var isEditing: Bool = false
-        public var isShowingLibrary: Bool = false
         public var saveStatus: SaveStatus = .idle
         @Presents public var destination: Destination.State?
 
@@ -74,9 +73,6 @@ import SQLiteData
         case saveTapped
         case saveResponse(Result<UUID, any Error>)
         case newTemplateTapped
-        case libraryButtonTapped
-        case templateSelected(WorkoutTemplate)
-        case presetSelected(WorkoutTemplate)
         case deleteTemplate(WorkoutTemplate.ID)
 
         case destination(PresentationAction<Destination.Action>)
@@ -180,28 +176,6 @@ import SQLiteData
                 state.editingTemplateId = nil
                 state.templateName = "New Workout"
                 state.blocks.removeAll()
-                state.saveStatus = .idle
-                return .none
-
-            case .libraryButtonTapped:
-                state.isShowingLibrary = true
-                return .none
-
-            case let .templateSelected(template):
-                state.editingTemplateId = template.id
-                state.templateName = template.name
-                state.blocks = IdentifiedArray(uniqueElements: template.blocks)
-                state.isShowingLibrary = false
-                state.saveStatus = .idle
-                return .none
-
-            case let .presetSelected(preset):
-                // Load preset blocks but treat as new — editingTemplateId stays nil
-                // so the first Save creates a new user-owned record.
-                state.editingTemplateId = nil
-                state.templateName = preset.name
-                state.blocks = IdentifiedArray(uniqueElements: preset.blocks)
-                state.isShowingLibrary = false
                 state.saveStatus = .idle
                 return .none
 
