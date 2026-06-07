@@ -9,20 +9,50 @@ struct WorkoutDetailTests {
 
     // MARK: - Start
 
-    @Test("Start tap shows 'coming soon' alert")
-    func startTapped_showsAlert() async {
+    @Test("Start tap pushes workout to Watch via WorkoutKit (testValue path)")
+    func startTapped_sendsToWatch() async {
         let store = TestStore(initialState: WorkoutDetail.State(
             workout: .sample,
             source: .yours
         )) {
             WorkoutDetail()
+        } withDependencies: {
+            // testValue is no-op success
+            $0.workoutKitClient = .testValue
         }
 
         await store.send(.startTapped) {
+            $0.syncStatus = .sending
+        }
+        await store.receive(\.syncResponse.success) {
+            $0.syncStatus = .sent
+        }
+    }
+
+    @Test("Start tap with WorkoutKit failure shows alert and records error")
+    func startTapped_failure() async {
+        let store = TestStore(initialState: WorkoutDetail.State(
+            workout: .sample,
+            source: .yours
+        )) {
+            WorkoutDetail()
+        } withDependencies: {
+            $0.workoutKitClient = WorkoutKitClient(
+                isAvailable: { true },
+                requestAuthorization: { .authorized },
+                openInWorkoutApp: { _ in throw WorkoutKitError.watchNotPaired }
+            )
+        }
+
+        await store.send(.startTapped) {
+            $0.syncStatus = .sending
+        }
+        await store.receive(\.syncResponse.failure) {
+            $0.syncStatus = .failed("No paired Apple Watch found. Pair a Watch in the Watch app.")
             $0.alert = AlertState {
-                TextState("Apple Watch sync coming soon")
+                TextState("Couldn't send to Watch")
             } message: {
-                TextState("Pair your Apple Watch to sync this workout. Coming in the next update.")
+                TextState("No paired Apple Watch found. Pair a Watch in the Watch app.")
             }
         }
     }

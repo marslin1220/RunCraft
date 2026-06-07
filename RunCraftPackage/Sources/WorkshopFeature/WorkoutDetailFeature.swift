@@ -8,11 +8,19 @@ import RunCraftModels
     @ObservableState public struct State: Equatable {
         public var workout: WorkoutTemplate
         public var source: Source
+        public var syncStatus: SyncStatus = .idle
         @Presents public var alert: AlertState<Action.Alert>?
 
         public init(workout: WorkoutTemplate, source: Source) {
             self.workout = workout
             self.source = source
+        }
+
+        public enum SyncStatus: Equatable {
+            case idle
+            case sending
+            case sent
+            case failed(String)
         }
     }
 
@@ -24,6 +32,7 @@ import RunCraftModels
 
     public enum Action {
         case startTapped
+        case syncResponse(Result<Void, any Error>)
         case editTapped
         case duplicateTapped
         case alert(PresentationAction<Alert>)
@@ -38,16 +47,35 @@ import RunCraftModels
         }
     }
 
+    @Dependency(\.workoutKitClient) var workoutKitClient
+
     public init() {}
 
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .startTapped:
+                state.syncStatus = .sending
+                let workout = state.workout
+                return .run { [workoutKitClient] send in
+                    await send(.syncResponse(Result {
+                        _ = try await workoutKitClient.requestAuthorization()
+                        try await workoutKitClient.openInWorkoutApp(workout)
+                    }))
+                }
+
+            case .syncResponse(.success):
+                state.syncStatus = .sent
+                return .none
+
+            case let .syncResponse(.failure(error)):
+                let message = (error as? LocalizedError)?.errorDescription
+                    ?? error.localizedDescription
+                state.syncStatus = .failed(message)
                 state.alert = AlertState {
-                    TextState("Apple Watch sync coming soon")
+                    TextState("Couldn't send to Watch")
                 } message: {
-                    TextState("Pair your Apple Watch to sync this workout. Coming in the next update.")
+                    TextState(message)
                 }
                 return .none
 

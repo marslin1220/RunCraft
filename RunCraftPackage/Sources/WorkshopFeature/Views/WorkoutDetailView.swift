@@ -122,8 +122,8 @@ public struct WorkoutDetailView: View {
             store.send(.startTapped)
         } label: {
             HStack(spacing: 8) {
-                Image(systemName: "play.fill")
-                Text("Start Workout")
+                startIcon
+                startLabel
             }
             .font(.headline)
             .foregroundStyle(.black)
@@ -134,6 +134,26 @@ public struct WorkoutDetailView: View {
             .shadow(color: Color.detailLime.opacity(0.4), radius: 12, y: 4)
         }
         .buttonStyle(.plain)
+        .disabled(store.syncStatus == .sending)
+    }
+
+    @ViewBuilder private var startIcon: some View {
+        switch store.syncStatus {
+        case .sending:
+            ProgressView().tint(.black)
+        case .sent:
+            Image(systemName: "checkmark.circle.fill")
+        default:
+            Image(systemName: "applewatch.radiowaves.left.and.right")
+        }
+    }
+
+    private var startLabel: Text {
+        switch store.syncStatus {
+        case .sending: Text("Sending to Apple Watch…")
+        case .sent:    Text("Sent · Open Watch")
+        default:       Text("Send to Apple Watch")
+        }
     }
 }
 
