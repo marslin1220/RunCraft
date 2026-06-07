@@ -5,3 +5,4 @@
 # Skill installer artifacts (npx skills add ...)
 .agents/
 skills-lock.json
+.claude/skills
