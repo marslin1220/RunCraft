@@ -1,5 +1,4 @@
 import Foundation
-import RunCraftModels
 
 /// Converts a daily plan session (sessionType + target distance/time) into a
 /// runnable `WorkoutTemplate` with sensible warm-up/work/cool-down structure.

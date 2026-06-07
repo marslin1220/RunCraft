@@ -30,6 +30,7 @@ public struct WorkoutKitClient: Sendable {
 public enum AuthState: String, Sendable, Equatable {
     case notDetermined
     case denied
+    case restricted
     case authorized
 }
 
@@ -98,6 +99,7 @@ extension WorkoutKitClient: DependencyKey {
         switch state {
         case .notDetermined: .notDetermined
         case .denied:        .denied
+        case .restricted:    .restricted
         case .authorized:    .authorized
         @unknown default:    .notDetermined
         }
