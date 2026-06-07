@@ -28,7 +28,7 @@ public enum WorkoutPresets {
                 id: stepID("YASSO-WU"),
                 kind: .warmup,
                 goal: .time(seconds: 10 * 60),
-                alert: .pace(.easy)
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
             )),
             .repeatGroup(RepeatGroup(
                 id: groupID("YASSO-REP"),
@@ -38,13 +38,13 @@ public enum WorkoutPresets {
                         id: stepID("YASSO-WORK"),
                         kind: .work,
                         goal: .distance(metres: 800),
-                        alert: .pace(.interval)
+                        alert: .paceZone(PaceZoneName.interval, vdot: 40)
                     ),
                     WorkoutStep(
                         id: stepID("YASSO-REC"),
                         kind: .recovery,
                         goal: .distance(metres: 400),
-                        alert: .pace(.easy)
+                        alert: .paceZone(PaceZoneName.easy, vdot: 40)
                     ),
                 ]
             )),
@@ -52,7 +52,7 @@ public enum WorkoutPresets {
                 id: stepID("YASSO-CD"),
                 kind: .cooldown,
                 goal: .time(seconds: 10 * 60),
-                alert: .pace(.easy)
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
             )),
         ]
     )
@@ -68,19 +68,19 @@ public enum WorkoutPresets {
                 id: stepID("TEMPO-WU"),
                 kind: .warmup,
                 goal: .time(seconds: 10 * 60),
-                alert: .pace(.easy)
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
             )),
             .step(WorkoutStep(
                 id: stepID("TEMPO-WORK"),
                 kind: .work,
                 goal: .time(seconds: 20 * 60),
-                alert: .pace(.tempo)
+                alert: .paceZone(PaceZoneName.threshold, vdot: 40)
             )),
             .step(WorkoutStep(
                 id: stepID("TEMPO-CD"),
                 kind: .cooldown,
                 goal: .time(seconds: 10 * 60),
-                alert: .pace(.easy)
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
             )),
         ]
     )
@@ -96,7 +96,7 @@ public enum WorkoutPresets {
                 id: stepID("CRUISE-WU"),
                 kind: .warmup,
                 goal: .time(seconds: 15 * 60),
-                alert: .pace(.easy)
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
             )),
             .repeatGroup(RepeatGroup(
                 id: groupID("CRUISE-REP"),
@@ -106,13 +106,13 @@ public enum WorkoutPresets {
                         id: stepID("CRUISE-WORK"),
                         kind: .work,
                         goal: .distance(metres: 1609),
-                        alert: .pace(.tempo)
+                        alert: .paceZone(PaceZoneName.threshold, vdot: 40)
                     ),
                     WorkoutStep(
                         id: stepID("CRUISE-REC"),
                         kind: .recovery,
                         goal: .time(seconds: 60),
-                        alert: .pace(.easy)
+                        alert: .paceZone(PaceZoneName.easy, vdot: 40)
                     ),
                 ]
             )),
@@ -120,7 +120,7 @@ public enum WorkoutPresets {
                 id: stepID("CRUISE-CD"),
                 kind: .cooldown,
                 goal: .time(seconds: 10 * 60),
-                alert: .pace(.easy)
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
             )),
         ]
     )
@@ -136,24 +136,24 @@ public enum WorkoutPresets {
                 id: stepID("LAD-WU"),
                 kind: .warmup,
                 goal: .time(seconds: 10 * 60),
-                alert: .pace(.easy)
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
             )),
             // Ascending leg
-            .step(WorkoutStep(id: stepID("LAD-W1"), kind: .work, goal: .distance(metres: 400), alert: .pace(.interval))),
-            .step(WorkoutStep(id: stepID("LAD-R1"), kind: .recovery, goal: .time(seconds: 90), alert: .pace(.easy))),
-            .step(WorkoutStep(id: stepID("LAD-W2"), kind: .work, goal: .distance(metres: 800), alert: .pace(.interval))),
-            .step(WorkoutStep(id: stepID("LAD-R2"), kind: .recovery, goal: .time(seconds: 120), alert: .pace(.easy))),
-            .step(WorkoutStep(id: stepID("LAD-W3"), kind: .work, goal: .distance(metres: 1200), alert: .pace(.interval))),
-            .step(WorkoutStep(id: stepID("LAD-R3"), kind: .recovery, goal: .time(seconds: 150), alert: .pace(.easy))),
+            .step(WorkoutStep(id: stepID("LAD-W1"), kind: .work, goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("LAD-R1"), kind: .recovery, goal: .time(seconds: 90), alert: .paceZone(PaceZoneName.easy, vdot: 40))),
+            .step(WorkoutStep(id: stepID("LAD-W2"), kind: .work, goal: .distance(metres: 800), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("LAD-R2"), kind: .recovery, goal: .time(seconds: 120), alert: .paceZone(PaceZoneName.easy, vdot: 40))),
+            .step(WorkoutStep(id: stepID("LAD-W3"), kind: .work, goal: .distance(metres: 1200), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("LAD-R3"), kind: .recovery, goal: .time(seconds: 150), alert: .paceZone(PaceZoneName.easy, vdot: 40))),
             // Descending leg
-            .step(WorkoutStep(id: stepID("LAD-W4"), kind: .work, goal: .distance(metres: 800), alert: .pace(.interval))),
-            .step(WorkoutStep(id: stepID("LAD-R4"), kind: .recovery, goal: .time(seconds: 120), alert: .pace(.easy))),
-            .step(WorkoutStep(id: stepID("LAD-W5"), kind: .work, goal: .distance(metres: 400), alert: .pace(.interval))),
+            .step(WorkoutStep(id: stepID("LAD-W4"), kind: .work, goal: .distance(metres: 800), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("LAD-R4"), kind: .recovery, goal: .time(seconds: 120), alert: .paceZone(PaceZoneName.easy, vdot: 40))),
+            .step(WorkoutStep(id: stepID("LAD-W5"), kind: .work, goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
             .step(WorkoutStep(
                 id: stepID("LAD-CD"),
                 kind: .cooldown,
                 goal: .time(seconds: 10 * 60),
-                alert: .pace(.easy)
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
             )),
         ]
     )
@@ -169,7 +169,7 @@ public enum WorkoutPresets {
                 id: stepID("EASY-RUN"),
                 kind: .work,
                 goal: .time(seconds: 30 * 60),
-                alert: .pace(.easy)
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
             )),
         ]
     )

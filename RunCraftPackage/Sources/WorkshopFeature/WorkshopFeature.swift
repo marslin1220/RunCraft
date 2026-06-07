@@ -246,6 +246,11 @@ import SQLiteData
         public var distanceMetres: Double
         public var minutes: Int
         public var seconds: Int
+        public var alertKind: AlertKind
+        public var paceMinSec: Int   // sec/km (combined min:sec)
+        public var paceMaxSec: Int
+        public var hrMin: Int
+        public var hrMax: Int
 
         public enum GoalUnit: String, CaseIterable, Equatable {
             case distance
@@ -256,6 +261,19 @@ import SQLiteData
                 case .distance:  "Distance"
                 case .time:      "Time"
                 case .openEnded: "Open"
+                }
+            }
+        }
+
+        public enum AlertKind: String, CaseIterable, Equatable {
+            case none
+            case pace
+            case heartRate
+            var label: String {
+                switch self {
+                case .none:       "None"
+                case .pace:       "Pace"
+                case .heartRate:  "Heart rate"
                 }
             }
         }
@@ -279,14 +297,40 @@ import SQLiteData
                 self.minutes = s / 60
                 self.seconds = s % 60
             }
+            switch step.alert {
+            case .none:
+                self.alertKind = .none
+                self.paceMinSec = 360
+                self.paceMaxSec = 420
+                self.hrMin = 130
+                self.hrMax = 160
+            case let .paceRange(lo, hi):
+                self.alertKind = .pace
+                self.paceMinSec = lo
+                self.paceMaxSec = hi
+                self.hrMin = 130
+                self.hrMax = 160
+            case let .heartRate(lo, hi):
+                self.alertKind = .heartRate
+                self.paceMinSec = 360
+                self.paceMaxSec = 420
+                self.hrMin = lo
+                self.hrMax = hi
+            }
         }
 
         public var isValid: Bool {
-            switch goalUnit {
+            let goalOK: Bool = switch goalUnit {
             case .openEnded: true
-            case .distance: distanceMetres > 0
-            case .time:     minutes * 60 + seconds > 0
+            case .distance:  distanceMetres > 0
+            case .time:      minutes * 60 + seconds > 0
             }
+            let alertOK: Bool = switch alertKind {
+            case .none:      true
+            case .pace:      paceMinSec > 0 && paceMaxSec >= paceMinSec
+            case .heartRate: hrMin > 0 && hrMax >= hrMin
+            }
+            return goalOK && alertOK
         }
     }
 
@@ -312,6 +356,17 @@ import SQLiteData
                     state.step.goal = .distance(metres: state.distanceMetres)
                 case .time:
                     state.step.goal = .time(seconds: state.minutes * 60 + state.seconds)
+                }
+                switch state.alertKind {
+                case .none:
+                    state.step.alert = nil
+                case .pace:
+                    state.step.alert = .paceRange(
+                        minSecPerKm: state.paceMinSec,
+                        maxSecPerKm: state.paceMaxSec
+                    )
+                case .heartRate:
+                    state.step.alert = .heartRate(min: state.hrMin, max: state.hrMax)
                 }
                 return .none
 

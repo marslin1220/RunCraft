@@ -337,13 +337,13 @@ extension Color {
 }
 
 #Preview("With blocks") {
-    let warmup = WorkoutStep(kind: .warmup, goal: .time(seconds: 600), alert: .pace(.easy))
-    let work400 = WorkoutStep(kind: .work, goal: .distance(metres: 400), alert: .pace(.interval))
-    let recovery = WorkoutStep(kind: .recovery, goal: .time(seconds: 90), alert: .pace(.easy))
-    let cooldown = WorkoutStep(kind: .cooldown, goal: .time(seconds: 600), alert: .pace(.easy))
+    let warmup = WorkoutStep(kind: .warmup, goal: .time(seconds: 600), alert: .paceZone(.easy, vdot: 40))
+    let work400 = WorkoutStep(kind: .work, goal: .distance(metres: 400), alert: .paceZone(.interval, vdot: 40))
+    let recovery = WorkoutStep(kind: .recovery, goal: .time(seconds: 90), alert: .paceZone(.easy, vdot: 40))
+    let cooldown = WorkoutStep(kind: .cooldown, goal: .time(seconds: 600), alert: .paceZone(.easy, vdot: 40))
     let repeats = RepeatGroup(iterations: 5, steps: [work400, recovery])
 
-    return WorkshopView(
+    WorkshopView(
         store: .init(initialState: Workshop.State(
             blocks: [.step(warmup), .repeatGroup(repeats), .step(cooldown)]
         )) {
