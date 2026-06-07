@@ -1,5 +1,6 @@
 import Foundation
 import RunCraftModels
+import VDOTEngine
 
 /// Built-in workout templates that ship with the app.
 ///

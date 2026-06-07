@@ -2,6 +2,7 @@ import ComposableArchitecture
 import RunCraftModels
 import SQLiteData
 import SwiftUI
+import VDOTEngine
 
 struct EditStepSheet: View {
     @Bindable var store: StoreOf<EditStep>

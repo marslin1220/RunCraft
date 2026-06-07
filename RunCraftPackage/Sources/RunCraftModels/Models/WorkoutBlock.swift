@@ -103,52 +103,13 @@ public enum StepAlert: Equatable, Sendable, Codable {
     }
 
     /// Build a pace range alert from a Jack Daniels zone for a given VDOT.
-    /// Used by presets (with reference VDOT) and Edit Step quick-fill buttons.
+    /// Thin wrapper over `VDOTCalculator.paceRange(for:vdot:)`.
     public static func paceZone(_ zone: PaceZoneName, vdot: Double) -> StepAlert {
-        let zones = VDOTCalculator.paceZones(vdot: vdot)
-        let range: PaceZones.PaceRange = switch zone {
-        case .easy:       zones.easy
-        case .marathon:   zones.marathon
-        case .threshold:  zones.threshold
-        case .interval:   zones.interval
-        case .repetition: zones.repetition
-        }
+        let range = VDOTCalculator.paceRange(for: zone, vdot: vdot)
         return .paceRange(
             minSecPerKm: Int(range.lower.rounded()),
             maxSecPerKm: Int(range.upper.rounded())
         )
-    }
-}
-
-// MARK: - PaceZoneName
-
-/// The five Jack Daniels training pace zones used by Pace Alerts.
-/// Kept separate from `SessionType` (which classifies daily plan sessions).
-public enum PaceZoneName: String, CaseIterable, Equatable, Sendable, Codable {
-    case easy
-    case marathon
-    case threshold
-    case interval
-    case repetition
-
-    public var letter: String {
-        switch self {
-        case .easy:       "E"
-        case .marathon:   "M"
-        case .threshold:  "T"
-        case .interval:   "I"
-        case .repetition: "R"
-        }
-    }
-
-    public var displayName: String {
-        switch self {
-        case .easy:       "Easy"
-        case .marathon:   "Marathon"
-        case .threshold:  "Threshold"
-        case .interval:   "Interval"
-        case .repetition: "Repetition"
-        }
     }
 }
 

@@ -165,11 +165,9 @@ private struct PaceZonesSummaryCard: View {
             }
 
             HStack(spacing: 12) {
-                tappableChip(.easy,       zones.easy,       color: Color(hex: "#4CAF50"))
-                tappableChip(.marathon,   zones.marathon,   color: Color(hex: "#2196F3"))
-                tappableChip(.threshold,  zones.threshold,  color: Color(hex: "#FFC107"))
-                tappableChip(.interval,   zones.interval,   color: Color(hex: "#FF5722"))
-                tappableChip(.repetition, zones.repetition, color: Color(hex: "#F44336"))
+                ForEach(PaceZoneName.allCases, id: \.self) { zone in
+                    tappableChip(zone)
+                }
             }
         }
         .padding()
@@ -177,13 +175,23 @@ private struct PaceZonesSummaryCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    private func tappableChip(_ zone: PaceZoneName, _ range: PaceZones.PaceRange, color: Color) -> some View {
+    private func tappableChip(_ zone: PaceZoneName) -> some View {
         Button {
             onTap(zone)
         } label: {
-            PaceChip(label: zone.letter, pace: range.formatted(), color: color)
+            PaceChip(label: zone.letter, pace: zones[zone].formatted(), color: Self.color(for: zone))
         }
         .buttonStyle(.plain)
+    }
+
+    private static func color(for zone: PaceZoneName) -> Color {
+        switch zone {
+        case .easy:       Color(hex: "#4CAF50")
+        case .marathon:   Color(hex: "#2196F3")
+        case .threshold:  Color(hex: "#FFC107")
+        case .interval:   Color(hex: "#FF5722")
+        case .repetition: Color(hex: "#F44336")
+        }
     }
 }
 

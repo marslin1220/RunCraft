@@ -59,6 +59,13 @@ public struct VDOTCalculator {
         )
     }
 
+    /// One-shot lookup: the pace range for a single zone at a given VDOT.
+    /// Convenience wrapper around `paceZones(vdot:)` for callers that only
+    /// care about a single zone (Edit Step quick-fill, presets, etc.).
+    public static func paceRange(for zone: PaceZoneName, vdot: Double) -> PaceZones.PaceRange {
+        paceZones(vdot: vdot)[zone]
+    }
+
     // MARK: - Internal formula helpers
 
     /// Oxygen cost (VO2, ml/kg/min) at a given running velocity.
