@@ -14,9 +14,22 @@
 		A2C910052FB830CB00D0D23E /* RunCraft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunCraft.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A2213D172FD576B10053570C /* Exceptions for "RunCraft" folder in "RunCraft" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A2C910042FB830CB00D0D23E /* RunCraft */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A2C910072FB830CB00D0D23E /* RunCraft */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A2213D172FD576B10053570C /* Exceptions for "RunCraft" folder in "RunCraft" target */,
+			);
 			path = RunCraft;
 			sourceTree = "<group>";
 		};
@@ -100,15 +113,15 @@
 			);
 			mainGroup = A2C90FFC2FB830CB00D0D23E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A2C910202FB830CB00D0D23E /* XCLocalSwiftPackageReference "../RunCraftPackage" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A2C910062FB830CB00D0D23E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				A2C910042FB830CB00D0D23E /* RunCraft */,
-			);
-			packageReferences = (
-				A2C910202FB830CB00D0D23E /* XCLocalSwiftPackageReference "RunCraftPackage" */,
 			);
 		};
 /* End PBXProject section */
@@ -254,11 +267,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "RunCraft reads your workout history to calculate your VDOT fitness level.";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "-";
-				"CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]" = NO;
 				"CODE_SIGNING_ALLOWED[sdk=iphonesimulator*]" = NO;
+				"CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]" = NO;
+				CODE_SIGN_ENTITLEMENTS = RunCraft/RunCraft.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9PRFX23G7R;
@@ -267,6 +280,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RunCraft/Info.plist;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "RunCraft reads your workout history to calculate your VDOT fitness level.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -302,11 +317,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "RunCraft reads your workout history to calculate your VDOT fitness level.";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "-";
-				"CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]" = NO;
 				"CODE_SIGNING_ALLOWED[sdk=iphonesimulator*]" = NO;
+				"CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]" = NO;
+				CODE_SIGN_ENTITLEMENTS = RunCraft/RunCraft.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9PRFX23G7R;
@@ -315,6 +330,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RunCraft/Info.plist;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "RunCraft reads your workout history to calculate your VDOT fitness level.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -348,21 +365,6 @@
 		};
 /* End XCBuildConfiguration section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		A2C910202FB830CB00D0D23E /* XCLocalSwiftPackageReference "RunCraftPackage" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../RunCraftPackage;
-		};
-/* End XCLocalSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		A2C910212FB830CB00D0D23E /* AppFeature */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A2C910202FB830CB00D0D23E /* XCLocalSwiftPackageReference "RunCraftPackage" */;
-			productName = AppFeature;
-		};
-/* End XCSwiftPackageProductDependency section */
-
 /* Begin XCConfigurationList section */
 		A2C910002FB830CB00D0D23E /* Build configuration list for PBXProject "RunCraft" */ = {
 			isa = XCConfigurationList;
@@ -383,6 +385,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A2C910202FB830CB00D0D23E /* XCLocalSwiftPackageReference "../RunCraftPackage" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../RunCraftPackage;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A2C910212FB830CB00D0D23E /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A2C910202FB830CB00D0D23E /* XCLocalSwiftPackageReference "../RunCraftPackage" */;
+			productName = AppFeature;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A2C90FFD2FB830CB00D0D23E /* Project object */;
 }
