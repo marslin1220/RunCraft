@@ -117,13 +117,18 @@ private struct TemplatesSegment: View {
 private struct PlanSegment: View {
     let store: StoreOf<Workshop>
     @FetchOne(RaceGoal.order { $0.createdAt.desc() }) var goal: RaceGoal?
+    @FetchAll var allWeeks: [TrainingWeek]
     @FetchAll(PlannedSession.none) var thisWeekSessions: [PlannedSession] = []
+
+    private var currentWeek: TrainingWeek? {
+        TrainingWeek.current(in: allWeeks)
+    }
 
     var body: some View {
         Group {
             if goal == nil {
                 EmptyPlanPrompt()
-            } else if thisWeekSessions.isEmpty {
+            } else if currentWeek == nil {
                 ProgressView().tint(Color.workshopLime)
             } else {
                 List {
@@ -147,10 +152,7 @@ private struct PlanSegment: View {
                 .scrollContentBackground(.hidden)
             }
         }
-        .task(id: goal?.id) {
-            guard let goal else { return }
-            await loadThisWeek(raceGoalId: goal.id)
-        }
+        .task(id: currentWeek?.id) { await loadThisWeekSessions() }
     }
 
     private func orderedDays() -> [(dayOfWeek: Int, session: PlannedSession?)] {
@@ -160,9 +162,12 @@ private struct PlanSegment: View {
         }
     }
 
-    private func loadThisWeek(raceGoalId: UUID) async {
+    private func loadThisWeekSessions() async {
+        guard let weekId = currentWeek?.id else { return }
         do {
-            try await $thisWeekSessions.load(PlannedSession.all)
+            try await $thisWeekSessions.load(
+                PlannedSession.where { $0.weekId.eq(weekId) }.order(by: \.dayOfWeek)
+            )
         } catch {
             print("load planned sessions failed: \(error)")
         }

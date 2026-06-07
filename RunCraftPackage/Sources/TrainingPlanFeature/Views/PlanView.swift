@@ -88,13 +88,7 @@ public struct PlanView: View {
     }
 
     private var currentWeek: TrainingWeek? {
-        let today = Date()
-        return allWeeks.first { week in
-            guard let nextMonday = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: week.startDate) else {
-                return false
-            }
-            return week.startDate <= today && today < nextMonday
-        }
+        TrainingWeek.current(in: allWeeks)
     }
 }
 
@@ -410,11 +404,7 @@ struct WeekScheduleView: View {
     }
 
     private func isCurrentWeek(_ week: TrainingWeek) -> Bool {
-        let today = Date()
-        guard let next = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: week.startDate) else {
-            return false
-        }
-        return week.startDate <= today && today < next
+        TrainingWeek.current(in: [week]) != nil
     }
 
     private func loadAllData() async {
