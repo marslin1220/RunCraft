@@ -40,6 +40,7 @@ import SQLiteData
         case newWorkoutTapped
         case workoutTapped(WorkoutTemplate, WorkoutDetail.Source)
         case browseTemplatesTapped
+        case openDetail(WorkoutTemplate, WorkoutDetail.Source)
         case path(StackActionOf<Path>)
     }
 
@@ -66,6 +67,12 @@ import SQLiteData
 
             case .browseTemplatesTapped:
                 state.selectedSegment = .templates
+                return .none
+
+            case let .openDetail(template, source):
+                // Called by AppFeature when Plan tab requests cross-tab navigation.
+                state.path.removeAll()
+                state.path.append(.detail(WorkoutDetail.State(workout: template, source: source)))
                 return .none
 
             // Detail → request Edit: push editor; asCopy=true unless it's "yours"

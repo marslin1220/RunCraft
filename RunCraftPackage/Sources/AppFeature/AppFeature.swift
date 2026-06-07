@@ -43,6 +43,15 @@ import WorkshopFeature
             case let .tabSelected(tab):
                 state.selectedTab = tab
                 return .none
+
+            case let .plan(.delegate(.openWorkoutInWorkshop(template, source))):
+                state.selectedTab = .workshop
+                let workshopSource: WorkoutDetail.Source = switch source {
+                case .planSession: .planSession
+                case .template:    .template
+                }
+                return .send(.workshop(.openDetail(template, workshopSource)))
+
             case .plan, .workshop, .settings:
                 return .none
             }

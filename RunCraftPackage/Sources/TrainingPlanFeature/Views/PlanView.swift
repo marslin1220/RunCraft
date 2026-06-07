@@ -15,19 +15,28 @@ public struct PlanView: View {
     }
 
     public var body: some View {
-        NavigationStack {
+        NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
             ScrollView {
                 VStack(spacing: 24) {
                     if let goal = activeGoal {
-                        RaceCountdownRing(goal: goal)
-                            .padding(.top, 16)
+                        Button {
+                            store.send(.countdownTapped)
+                        } label: {
+                            RaceCountdownRing(goal: goal)
+                                .padding(.top, 16)
+                        }
+                        .buttonStyle(.plain)
 
                         if let zones = store.paceZones {
-                            PaceZonesSummaryCard(zones: zones)
+                            PaceZonesSummaryCard(zones: zones) { zone in
+                                store.send(.paceChipTapped(zone))
+                            }
                         }
 
                         if let currentWeek = currentWeek {
-                            WeekSessionsSection(week: currentWeek)
+                            WeekSessionsSection(week: currentWeek) { session in
+                                store.send(.sessionTapped(session))
+                            }
                         }
                     } else {
                         EmptyPlanPrompt {
@@ -67,6 +76,14 @@ public struct PlanView: View {
                 SetupRaceGoalView(store: setupStore)
             }
             .alert($store.scope(state: \.destination?.deleteConfirm, action: \.destination.deleteConfirm))
+        } destination: { pathStore in
+            switch pathStore.case {
+            case .weekSchedule(let scheduleStore):
+                WeekScheduleView(
+                    store: scheduleStore,
+                    allWeeks: allWeeks
+                )
+            }
         }
     }
 
@@ -132,25 +149,41 @@ private struct RaceCountdownRing: View {
 
 private struct PaceZonesSummaryCard: View {
     let zones: PaceZones
+    let onTap: (PaceZoneName) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Training Paces")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
+            HStack {
+                Text("Training Paces")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+                Spacer()
+                Text("tap to build")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
 
             HStack(spacing: 12) {
-                PaceChip(label: "E", pace: zones.easy.formatted(), color: Color(hex: "#4CAF50"))
-                PaceChip(label: "M", pace: zones.marathon.formatted(), color: Color(hex: "#2196F3"))
-                PaceChip(label: "T", pace: zones.threshold.formatted(), color: Color(hex: "#FFC107"))
-                PaceChip(label: "I", pace: zones.interval.formatted(), color: Color(hex: "#FF5722"))
-                PaceChip(label: "R", pace: zones.repetition.formatted(), color: Color(hex: "#F44336"))
+                tappableChip(.easy,       zones.easy,       color: Color(hex: "#4CAF50"))
+                tappableChip(.marathon,   zones.marathon,   color: Color(hex: "#2196F3"))
+                tappableChip(.threshold,  zones.threshold,  color: Color(hex: "#FFC107"))
+                tappableChip(.interval,   zones.interval,   color: Color(hex: "#FF5722"))
+                tappableChip(.repetition, zones.repetition, color: Color(hex: "#F44336"))
             }
         }
         .padding()
         .background(Color(hex: "#1A1B2E"))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func tappableChip(_ zone: PaceZoneName, _ range: PaceZones.PaceRange, color: Color) -> some View {
+        Button {
+            onTap(zone)
+        } label: {
+            PaceChip(label: zone.letter, pace: range.formatted(), color: color)
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -175,7 +208,13 @@ private struct PaceChip: View {
 
 private struct WeekSessionsSection: View {
     let week: TrainingWeek
+    let onSessionTap: (PlannedSession) -> Void
     @FetchAll(PlannedSession.none) var sessions: [PlannedSession]
+    @FetchAll(CompletedWorkout.none) var completedThisWeek: [CompletedWorkout]
+
+    private var completedSessionIds: Set<UUID> {
+        Set(completedThisWeek.compactMap(\.plannedSessionId))
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -190,7 +229,16 @@ private struct WeekSessionsSection: View {
             }
 
             ForEach(sessions) { session in
-                SessionCard(session: session, weekStart: week.startDate)
+                Button {
+                    onSessionTap(session)
+                } label: {
+                    SessionCard(
+                        session: session,
+                        weekStart: week.startDate,
+                        isCompleted: completedSessionIds.contains(session.id)
+                    )
+                }
+                .buttonStyle(.plain)
             }
         }
         .task(id: week.id) {
@@ -201,6 +249,11 @@ private struct WeekSessionsSection: View {
                         .order(by: \.dayOfWeek)
                 )
             }
+            _ = await withErrorReporting {
+                try await $completedThisWeek.load(
+                    CompletedWorkout.all
+                )
+            }
         }
     }
 }
@@ -208,6 +261,7 @@ private struct WeekSessionsSection: View {
 private struct SessionCard: View {
     let session: PlannedSession
     let weekStart: Date
+    let isCompleted: Bool
 
     var body: some View {
         HStack(spacing: 14) {
@@ -244,10 +298,17 @@ private struct SessionCard: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
+
+            if isCompleted {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(Color(hex: "#4CAF50"))
+            }
         }
         .padding(12)
         .background(Color(hex: "#1A1B2E"))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .opacity(isCompleted ? 0.7 : 1.0)
     }
 
     private var dayLabel: String {
@@ -301,5 +362,129 @@ extension Color {
         let g = Double((int >> 8) & 0xFF) / 255
         let b = Double(int & 0xFF) / 255
         self.init(red: r, green: g, blue: b)
+    }
+}
+
+// MARK: - Week Schedule View (full 16-week timeline)
+
+struct WeekScheduleView: View {
+    let store: StoreOf<WeekSchedule>
+    let allWeeks: [TrainingWeek]
+    @FetchAll(PlannedSession.none) var allSessions: [PlannedSession]
+    @FetchAll(CompletedWorkout.none) var completedAll: [CompletedWorkout]
+
+    private var completedSessionIds: Set<UUID> {
+        Set(completedAll.compactMap(\.plannedSessionId))
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                ForEach(allWeeks) { week in
+                    WeekSection(
+                        week: week,
+                        sessions: allSessions.filter { $0.weekId == week.id }
+                                             .sorted { $0.dayOfWeek < $1.dayOfWeek },
+                        completedIds: completedSessionIds,
+                        isCurrent: isCurrentWeek(week),
+                        onTap: { session in store.send(.sessionTapped(session)) }
+                    )
+                }
+            }
+            .padding(.horizontal)
+            .padding(.top, 12)
+        }
+        .background(Color.black)
+        .navigationTitle("Full Schedule")
+        .navigationBarTitleDisplayMode(.inline)
+        .preferredColorScheme(.dark)
+        .task {
+            _ = await withErrorReporting {
+                try await $allSessions.load(PlannedSession.all)
+            }
+            _ = await withErrorReporting {
+                try await $completedAll.load(CompletedWorkout.all)
+            }
+        }
+    }
+
+    private func isCurrentWeek(_ week: TrainingWeek) -> Bool {
+        let today = Date()
+        guard let next = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: week.startDate) else {
+            return false
+        }
+        return week.startDate <= today && today < next
+    }
+}
+
+private struct WeekSection: View {
+    let week: TrainingWeek
+    let sessions: [PlannedSession]
+    let completedIds: Set<UUID>
+    let isCurrent: Bool
+    let onTap: (PlannedSession) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Week \(week.weekNumber) · \(week.phase.displayName)")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(isCurrent ? Color(hex: "#CCFF00") : .white)
+                if isCurrent {
+                    Text("THIS WEEK")
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color(hex: "#CCFF00").opacity(0.2))
+                        .foregroundStyle(Color(hex: "#CCFF00"))
+                        .clipShape(Capsule())
+                }
+                Spacer()
+                Text("\(week.targetWeeklyKm, format: .number.precision(.fractionLength(0))) km")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            ForEach(sessions) { session in
+                Button {
+                    onTap(session)
+                } label: {
+                    HStack(spacing: 12) {
+                        Text(dayLabel(session.dayOfWeek))
+                            .font(.system(.caption, design: .rounded, weight: .bold))
+                            .foregroundStyle(Color(hex: session.sessionType.colorHex))
+                            .frame(width: 32)
+                        Text(session.sessionType.displayName)
+                            .font(.caption)
+                            .foregroundStyle(.white)
+                        Spacer()
+                        if let km = session.targetDistanceKm {
+                            Text("\(km, format: .number.precision(.fractionLength(0...1))) km")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        if completedIds.contains(session.id) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(Color(hex: "#4CAF50"))
+                        } else {
+                            Image(systemName: "chevron.right")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(10)
+                    .background(Color(hex: "#1A1B2E"))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private func dayLabel(_ day: Int) -> String {
+        let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        let idx = day - 1
+        return (idx >= 0 && idx < days.count) ? days[idx] : "?"
     }
 }

@@ -7,11 +7,17 @@ import VDOTEngine
 @Reducer public struct TrainingPlan {
     @ObservableState public struct State {
         public var hasGoal: Bool = false
+        public var currentVDOT: Double = 0
         public var paceZones: PaceZones? = nil
         public var isLoadingVDOT: Bool = false
+        public var path = StackState<Path.State>()
         @Presents public var destination: Destination.State? = nil
 
         public init() {}
+    }
+
+    @Reducer public enum Path {
+        case weekSchedule(WeekSchedule)
     }
 
     @Reducer public enum Destination {
@@ -32,7 +38,22 @@ import VDOTEngine
         case deletePlanRequested
         case recalculateVDOTRequested
         case planDeleted
+        case countdownTapped
+        case paceChipTapped(PaceZoneName)
+        case sessionTapped(PlannedSession)
+        case path(StackActionOf<Path>)
         case destination(PresentationAction<Destination.Action>)
+        case delegate(Delegate)
+
+        public enum Delegate {
+            /// Parent (AppFeature) should switch to Workshop tab and open this workout.
+            case openWorkoutInWorkshop(WorkoutTemplate, source: TemplateSource)
+        }
+
+        public enum TemplateSource: Equatable {
+            case planSession
+            case template
+        }
     }
 
     @Dependency(\.healthKitClient) var healthKitClient
@@ -82,6 +103,7 @@ import VDOTEngine
 
             case let .vdotFetchResponse(.success(vdot)):
                 state.isLoadingVDOT = false
+                state.currentVDOT = vdot
                 state.paceZones = VDOTCalculator.paceZones(vdot: vdot)
                 return .none
 
@@ -122,6 +144,29 @@ import VDOTEngine
                 state.paceZones = nil
                 return .none
 
+            case .countdownTapped:
+                state.path.append(.weekSchedule(WeekSchedule.State()))
+                return .none
+
+            case let .paceChipTapped(zone):
+                let template = makePaceFocusTemplate(zone: zone, vdot: state.currentVDOT)
+                return .send(.delegate(.openWorkoutInWorkshop(template, source: .template)))
+
+            case let .sessionTapped(session):
+                let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
+                return .send(.delegate(.openWorkoutInWorkshop(template, source: .planSession)))
+
+            case let .path(.element(_, .weekSchedule(.delegate(.openSession(session))))):
+                let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
+                state.path.removeAll()
+                return .send(.delegate(.openWorkoutInWorkshop(template, source: .planSession)))
+
+            case .path:
+                return .none
+
+            case .delegate:
+                return .none
+
             case .destination(.dismiss):
                 // Destination closed (e.g. SetupRaceGoal sheet dismissed after Save).
                 // Re-check goal/VDOT state so paceZones refresh immediately.
@@ -131,7 +176,47 @@ import VDOTEngine
                 return .none
             }
         }
+        .forEach(\.path, action: \.path)
         .ifLet(\.$destination, action: \.destination)
+    }
+
+    /// Quick-action template: 30-minute run at the chosen pace zone.
+    private func makePaceFocusTemplate(zone: PaceZoneName, vdot: Double) -> WorkoutTemplate {
+        let step = WorkoutStep(
+            kind: zone == .easy ? .work : .work,
+            goal: .time(seconds: 30 * 60),
+            alert: .paceZone(zone, vdot: vdot)
+        )
+        return WorkoutTemplate(
+            name: "\(zone.displayName) Run · 30 min",
+            blocks: [.step(step)]
+        )
+    }
+}
+
+// MARK: - Week schedule sub-feature
+
+@Reducer public struct WeekSchedule {
+    @ObservableState public struct State: Equatable {
+        public init() {}
+    }
+    public enum Action {
+        case sessionTapped(PlannedSession)
+        case delegate(Delegate)
+        public enum Delegate {
+            case openSession(PlannedSession)
+        }
+    }
+    public init() {}
+    public var body: some Reducer<State, Action> {
+        Reduce { _, action in
+            switch action {
+            case let .sessionTapped(s):
+                return .send(.delegate(.openSession(s)))
+            case .delegate:
+                return .none
+            }
+        }
     }
 }
 
