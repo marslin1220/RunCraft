@@ -2,7 +2,6 @@ import ComposableArchitecture
 import Foundation
 import IdentifiedCollections
 import RunCraftModels
-import SQLiteData
 
 @Reducer public struct WorkoutEditor {
     @ObservableState public struct State {
@@ -80,7 +79,7 @@ import SQLiteData
 
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
-    @Dependency(\.defaultDatabase) var database
+    @Dependency(\.workoutTemplateRepository) var repository
 
     public init() {}
 
@@ -134,7 +133,6 @@ import SQLiteData
             case .saveTapped:
                 guard !state.blocks.isEmpty else { return .none }
                 let id = state.editingTemplateId ?? uuid()
-                let existing = state.editingTemplateId != nil
                 let template = WorkoutTemplate(
                     id: id,
                     name: state.templateName.isEmpty ? "Untitled" : state.templateName,
@@ -143,23 +141,9 @@ import SQLiteData
                     updatedAt: now
                 )
                 state.saveStatus = .saving
-                return .run { [database, template, existing] send in
+                return .run { [repository, template] send in
                     await send(.saveResponse(Result {
-                        try await database.write { db in
-                            if existing {
-                                try WorkoutTemplate
-                                    .where { $0.id.eq(template.id) }
-                                    .update {
-                                        $0.name = template.name
-                                        $0.blocksData = template.blocksData
-                                        $0.updatedAt = template.updatedAt
-                                    }
-                                    .execute(db)
-                            } else {
-                                try WorkoutTemplate.insert { template }.execute(db)
-                            }
-                        }
-                        return template.id
+                        try await repository.save(template)
                     }))
                 }
 
@@ -180,13 +164,8 @@ import SQLiteData
                 return .none
 
             case let .deleteTemplate(id):
-                return .run { [database] _ in
-                    try await database.write { db in
-                        try WorkoutTemplate
-                            .where { $0.id.eq(id) }
-                            .delete()
-                            .execute(db)
-                    }
+                return .run { [repository] _ in
+                    try await repository.delete(id)
                 }
 
             case .destination(.presented(.editStep(.saveTapped))):

@@ -1,7 +1,6 @@
 import ComposableArchitecture
 import Foundation
 import RunCraftModels
-import SQLiteData
 
 /// Top-level Workshop shell.
 ///
@@ -46,7 +45,7 @@ import SQLiteData
 
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
-    @Dependency(\.defaultDatabase) var database
+    @Dependency(\.workoutTemplateRepository) var repository
 
     public init() {}
 
@@ -100,10 +99,8 @@ import SQLiteData
                 state.selectedSegment = .yours
                 // Pop back to the list so the new copy is visible.
                 state.path.removeAll()
-                return .run { [database, copy] _ in
-                    try await database.write { db in
-                        try WorkoutTemplate.insert { copy }.execute(db)
-                    }
+                return .run { [repository, copy] _ in
+                    _ = try await repository.save(copy)
                 }
 
             case .path:
