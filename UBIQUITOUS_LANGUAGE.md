@@ -16,6 +16,7 @@ picks the canonical name and tells you which aliases to stop using.
 | **I (Interval)**| 91% of VO2max — 3–5 min reps that hit and sustain VO2max                                  | "VO2max pace"                    |
 | **R (Repetition)**| ~mile race pace — short fast reps with long recoveries; targets economy and speed       | "rep pace", "speed work"         |
 | **Pace Range**  | A two-sided pace target (min/max sec per km) attached to a workout step                  | "speed alert" (Apple's name)     |
+| **PaceZoneName**| Enum of the five Daniels zones (E/M/T/I/R). Lives in **VDOTEngine** as of `63839b7`.    | _previously in RunCraftModels_   |
 
 ## Race Plan Lifecycle
 
@@ -57,15 +58,28 @@ picks the canonical name and tells you which aliases to stop using.
 | **Workout Editor**| The drag-and-drop authoring surface (Steps, Repeat Groups, Edit sheets)                                    | "compose view"            |
 | **Start**        | Send the Workout Template to the paired Apple Watch via WorkoutKit                                         | "begin", "run" (not literal — does NOT start a timer in-app) |
 
+## Architectural Seams
+
+These are the deep modules that own a domain responsibility behind a small
+interface. New code should reach for the seam, never around it.
+
+| Seam                          | Module          | Responsibility                                                                  |
+| ----------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| **WorkoutTemplateRepository** | RunCraftModels  | The only path to persist, query, or remove **Workout Templates**. Replaces direct `@Dependency(\.defaultDatabase)` in feature reducers. |
+| **AppleWatchSync**            | AppleWatchSync  | All WorkoutKit interaction lives here — `WorkoutKitClient` (scheduler dependency) and `WorkoutPlanBuilder` (pure model→`WorkoutPlan` conversion). |
+| **TrainingWeek.current**      | RunCraftModels  | Single static function that answers _"which `TrainingWeek` contains this `Date`?"_ Used by both the Plan tab and the Workshop Plan segment. |
+| **VDOTCalculator.paceRange**  | VDOTEngine      | Single-zone lookup: `paceRange(for: PaceZoneName, vdot: Double) → PaceRange`. The deep way to ask "what's T pace for VDOT 40?" |
+
 ## Apple Framework Bridges
 
 When mapping between RunCraft types and Apple framework types, always
 disambiguate by qualifying with the framework name. **Never** drop the qualifier
-in code or docs when both meanings are in scope.
+in code or docs when both meanings are in scope. All Apple-side conversions
+live in the **AppleWatchSync** module.
 
 | RunCraft term     | Apple equivalent              | Notes                                                            |
 | ----------------- | ------------------------------ | ---------------------------------------------------------------- |
-| Workout Template  | `WorkoutKit.WorkoutPlan`       | Built via `WorkoutPlanBuilder.makePlan(from:)`                   |
+| Workout Template  | `WorkoutKit.WorkoutPlan`       | Built via `WorkoutPlanBuilder.makePlan(from:)` in AppleWatchSync |
 | Workout Block (step) | `WorkoutKit.IntervalBlock`  | Single Step becomes a one-iteration IntervalBlock                |
 | Repeat Group      | `WorkoutKit.IntervalBlock`     | N-iteration block with nested IntervalSteps                      |
 | Workout Step      | `WorkoutKit.IntervalStep`      | Apple tags purpose as `.work` or `.recovery`                     |
@@ -127,10 +141,12 @@ the module qualifier when both are in scope.
 
 ### "Pace Zone" vs "Session Type"
 Originally these were tangled — `SessionType.tempo` was used where `PaceZoneName.threshold`
-was meant. The fix (commit `5284cc8`) introduced **PaceZoneName** as a separate
-enum. **Session Type** classifies the *daily session* in a Training Plan
-(Easy / Tempo / Interval / Long / Repetition / Rest); **Pace Zone** is the
-Jack Daniels intensity used as a **Step Alert** (E / M / T / I / R).
+was meant. The first fix (commit `5284cc8`) introduced **PaceZoneName** as a separate
+enum; the second (commit `63839b7`) moved **PaceZoneName** from RunCraftModels into
+**VDOTEngine** where it conceptually belongs. **Session Type** classifies the
+*daily session* in a Training Plan (Easy / Tempo / Interval / Long / Repetition /
+Rest); **Pace Zone** is the Jack Daniels intensity used as a **Step Alert**
+(E / M / T / I / R).
 They overlap conceptually but are not the same enum and **must not be conflated**
 in code. The mapping for adapter conversions is hard-coded in
 `PlanSessionAdapter` (e.g. `SessionType.tempo` → `PaceZoneName.threshold`).
@@ -149,3 +165,26 @@ storage type for any saved or generated workout, presets included).
 **Recommendation:** in code use **WorkoutTemplate**; in UI/PR copy say
 "preset" when you mean the built-in fixtures and "template" only when you
 mean the **Templates** segment specifically.
+
+## Resolved ambiguities (now fixed in code)
+
+- **Library button vs Templates segment.** The legacy `TemplateLibrarySheet`
+  exposed presets and saved templates as a sheet inside the editor;
+  the P3 Workshop restructure made the segmented list the only path.
+  The sheet, its state and three orphan actions were removed in commit
+  `27de8b0` (architecture review candidate #3).
+- **Persistence inside the editor.** WorkoutEditor used to call
+  `@Dependency(\.defaultDatabase)` directly. After commit `f43bbda`
+  (candidate #1) every save/load/all/delete goes through
+  **WorkoutTemplateRepository**.
+- **Bespoke "current week" derivation.** PlanView and the Workshop
+  Plan segment used to compute current week independently; the
+  Workshop segment additionally loaded all 112 sessions and filtered
+  client-side. Both now call `TrainingWeek.current(in:at:)` and the
+  Workshop segment narrows its query to `where(weekId == currentWeekId)`
+  (commit `99de872`, candidate #5).
+- **WorkoutKit inside WorkshopFeature.** WorkoutKitClient and
+  WorkoutPlanBuilder used to ride along with anything linking
+  WorkshopFeature. They now live in the dedicated **AppleWatchSync**
+  module (commit `9c44e05`, candidate #6) so a future `WatchAppFeature`
+  can sync from the wrist without pulling in the editor or the shell.
