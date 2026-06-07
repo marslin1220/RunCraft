@@ -4,7 +4,7 @@ import SQLiteData
 import SwiftUI
 
 struct TemplateLibrarySheet: View {
-    let store: StoreOf<Workshop>
+    let store: StoreOf<WorkoutEditor>
     @Environment(\.dismiss) private var dismiss
     @FetchAll(WorkoutTemplate.order { $0.updatedAt.desc() }) var userTemplates: [WorkoutTemplate]
 
@@ -69,8 +69,8 @@ struct TemplateLibrarySheet: View {
 
 #Preview {
     TemplateLibrarySheet(
-        store: .init(initialState: Workshop.State()) {
-            Workshop()
+        store: .init(initialState: WorkoutEditor.State()) {
+            WorkoutEditor()
         }
     )
 }
