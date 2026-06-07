@@ -94,6 +94,11 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "RunCraftModelsTests",
+            dependencies: ["RunCraftModels"]
+        ),
+
+        .testTarget(
             name: "TrainingPlanFeatureTests",
             dependencies: [
                 "TrainingPlanFeature",
