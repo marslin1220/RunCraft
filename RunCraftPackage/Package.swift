@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "HealthKitClient", targets: ["HealthKitClient"]),
         .library(name: "RunCraftModels", targets: ["RunCraftModels"]),
         .library(name: "TrainingPlanFeature", targets: ["TrainingPlanFeature"]),
+        .library(name: "AppleWatchSync", targets: ["AppleWatchSync"]),
         .library(name: "WorkshopFeature", targets: ["WorkshopFeature"]),
         .library(name: "AppFeature", targets: ["AppFeature"]),
         .library(name: "WatchAppFeature", targets: ["WatchAppFeature"]),
@@ -59,8 +60,17 @@ let package = Package(
         ),
 
         .target(
+            name: "AppleWatchSync",
+            dependencies: [
+                "RunCraftModels",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+            ]
+        ),
+
+        .target(
             name: "WorkshopFeature",
             dependencies: [
+                "AppleWatchSync",
                 "VDOTEngine",
                 "RunCraftModels",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -96,6 +106,11 @@ let package = Package(
         .testTarget(
             name: "RunCraftModelsTests",
             dependencies: ["RunCraftModels"]
+        ),
+
+        .testTarget(
+            name: "AppleWatchSyncTests",
+            dependencies: ["AppleWatchSync"]
         ),
 
         .testTarget(
