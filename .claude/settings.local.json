@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(xcodebuild *)",
+      "Bash(xcrun simctl *)",
+      "Bash(swift build *)",
+      "Bash(echo \"Done: $?\")",
+      "Bash(swift --version)",
+      "mcp__xcode__XcodeListWindows",
+      "mcp__xcode__BuildProject",
+      "mcp__xcode__GetBuildLog",
+      "mcp__xcode__RenderPreview",
+      "mcp__xcode__ExecuteSnippet",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "mcp__xcode__RunSomeTests",
+      "mcp__xcode__GetTestList",
+      "Bash(swift test *)",
+      "Bash(sed -i '' 's/@Reducer public struct Workshop /@Reducer public struct WorkoutEditor /g' WorkoutEditorFeature.swift)",
+      "Bash(sed -i '' 's/StoreOf<Workshop>/StoreOf<WorkoutEditor>/g' Views/*.swift WorkoutEditorFeature.swift)",
+      "Bash(sed -i '' 's/Workshop\\\\.State/WorkoutEditor.State/g' Views/*.swift WorkoutEditorFeature.swift)",
+      "Bash(sed -i '' 's/Workshop\\\\.Action/WorkoutEditor.Action/g' Views/*.swift)",
+      "Bash(sed -i '' 's/initialState: Workshop\\\\.State/initialState: WorkoutEditor.State/g' Views/*.swift WorkoutEditorFeature.swift)",
+      "Bash(sed -i '' 's/public struct WorkshopView/public struct WorkoutEditorView/g' Views/WorkoutEditorView.swift)",
+      "Bash(sed -i '' 's/struct WorkshopView/struct WorkoutEditorView/g' Views/WorkoutEditorView.swift)",
+      "Bash(sed -i '' 's/Workshop\\(\\)$/WorkoutEditor\\(\\)/g' Views/WorkoutEditorView.swift)",
+      "Bash(sed -i '' 's/Workshop\\\\.State\\(/WorkoutEditor.State\\(/g' Views/WorkoutEditorView.swift)",
+      "Bash(git mv *)",
+      "Bash(git reset *)",
+      "Skill(pfw-modern-swiftui)",
+      "Skill(pfw-modern-swiftui:*)"
+    ]
+  }
+}

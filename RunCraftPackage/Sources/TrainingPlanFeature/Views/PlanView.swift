@@ -241,19 +241,19 @@ private struct WeekSessionsSection: View {
                 .buttonStyle(.plain)
             }
         }
-        .task(id: week.id) {
-            _ = await withErrorReporting {
-                try await $sessions.load(
-                    PlannedSession
-                        .where { $0.weekId.eq(week.id) }
-                        .order(by: \.dayOfWeek)
-                )
-            }
-            _ = await withErrorReporting {
-                try await $completedThisWeek.load(
-                    CompletedWorkout.all
-                )
-            }
+        .task(id: week.id) { await loadWeekData() }
+    }
+
+    private func loadWeekData() async {
+        _ = await withErrorReporting {
+            try await $sessions.load(
+                PlannedSession
+                    .where { $0.weekId.eq(week.id) }
+                    .order(by: \.dayOfWeek)
+            )
+        }
+        _ = await withErrorReporting {
+            try await $completedThisWeek.load(CompletedWorkout.all)
         }
     }
 }
@@ -398,14 +398,7 @@ struct WeekScheduleView: View {
         .navigationTitle("Full Schedule")
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
-        .task {
-            _ = await withErrorReporting {
-                try await $allSessions.load(PlannedSession.all)
-            }
-            _ = await withErrorReporting {
-                try await $completedAll.load(CompletedWorkout.all)
-            }
-        }
+        .task { await loadAllData() }
     }
 
     private func isCurrentWeek(_ week: TrainingWeek) -> Bool {
@@ -414,6 +407,15 @@ struct WeekScheduleView: View {
             return false
         }
         return week.startDate <= today && today < next
+    }
+
+    private func loadAllData() async {
+        _ = await withErrorReporting {
+            try await $allSessions.load(PlannedSession.all)
+        }
+        _ = await withErrorReporting {
+            try await $completedAll.load(CompletedWorkout.all)
+        }
     }
 }
 

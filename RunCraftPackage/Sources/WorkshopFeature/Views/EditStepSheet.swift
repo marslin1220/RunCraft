@@ -134,18 +134,12 @@ struct EditStepSheet: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label).font(.caption).foregroundStyle(.secondary)
             HStack(spacing: 4) {
-                TextField("min", value: Binding(
-                    get: { value.wrappedValue / 60 },
-                    set: { value.wrappedValue = $0 * 60 + (value.wrappedValue % 60) }
-                ), format: .number)
+                TextField("min", value: value.minutesPart, format: .number)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.trailing)
                     .frame(width: 36)
                 Text(":").foregroundStyle(.secondary)
-                TextField("sec", value: Binding(
-                    get: { value.wrappedValue % 60 },
-                    set: { value.wrappedValue = (value.wrappedValue / 60) * 60 + $0 }
-                ), format: .number)
+                TextField("sec", value: value.secondsPart, format: .number)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.leading)
                     .frame(width: 36)
@@ -178,6 +172,21 @@ struct EditStepSheet: View {
 }
 
 // MARK: - Time Wheel Picker
+
+// MARK: - Int convenience for MM:SS bindings
+
+extension Int {
+    /// Treat self as total seconds — read/write the minutes component.
+    fileprivate var minutesPart: Int {
+        get { self / 60 }
+        set { self = newValue * 60 + (self % 60) }
+    }
+    /// Treat self as total seconds — read/write the seconds (0–59) component.
+    fileprivate var secondsPart: Int {
+        get { self % 60 }
+        set { self = (self / 60) * 60 + newValue }
+    }
+}
 
 private struct TimeWheelPicker: View {
     @Binding var minutes: Int
