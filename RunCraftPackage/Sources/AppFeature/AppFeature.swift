@@ -52,7 +52,7 @@ import WorkshopFeature
 
             case let .plan(.delegate(.openWorkoutInWorkshop(template, source))):
                 state.selectedTab = .workshop
-                let workshopSource: WorkoutDetail.Source = switch source {
+                let workshopSource: WorkoutEditor.State.Source = switch source {
                 case .planSession: .planSession
                 case .template:    .template
                 }

@@ -1,3 +1,4 @@
+import AppleWatchSync
 import ComposableArchitecture
 import Foundation
 import IdentifiedCollections
@@ -9,14 +10,29 @@ import RunCraftModels
         public var editingTemplateId: UUID? = nil
         public var templateName: String = "New Workout"
         public var blocks: IdentifiedArrayOf<WorkoutBlock> = []
-        public var isEditing: Bool = false
+        public var source: Source = .yours
         public var saveStatus: SaveStatus = .idle
+        public var syncStatus: SyncStatus = .idle
         @Presents public var destination: Destination.State?
+        @Presents public var alert: AlertState<Action.Alert>?
+
+        public enum Source: Equatable {
+            case yours          // existing user-owned template; Save updates in place
+            case template       // built-in preset; Save creates a Yours copy
+            case planSession    // generated session; Save creates a Yours copy
+        }
 
         public enum SaveStatus: Equatable {
             case idle
             case saving
             case saved
+            case failed(String)
+        }
+
+        public enum SyncStatus: Equatable {
+            case idle
+            case sending
+            case sent
             case failed(String)
         }
 
@@ -29,10 +45,24 @@ import RunCraftModels
 
         /// Load an existing template for editing. `asCopy=true` clears
         /// editingTemplateId so the first Save creates a new record.
-        public init(loading template: WorkoutTemplate, asCopy: Bool) {
+        public init(
+            loading template: WorkoutTemplate,
+            asCopy: Bool,
+            source: Source = .yours
+        ) {
             self.editingTemplateId = asCopy ? nil : template.id
             self.templateName = template.name
             self.blocks = IdentifiedArray(uniqueElements: template.blocks)
+            self.source = source
+        }
+
+        /// Top-level steps in the workout (used by EditRepeatGroup to offer
+        /// "include from workout" checkboxes).
+        public var topLevelSteps: [WorkoutStep] {
+            blocks.compactMap { block in
+                if case let .step(s) = block { return s }
+                return nil
+            }
         }
 
         /// Total estimated workout distance in metres (counts repeat group iterations).
@@ -65,8 +95,6 @@ import RunCraftModels
         case blockTapped(id: WorkoutBlock.ID)
         case deleteBlock(id: WorkoutBlock.ID)
         case moveBlocks(IndexSet, Int)
-        case toggleEditing
-        case clearAllTapped
 
         // Persistence
         case saveTapped
@@ -74,12 +102,29 @@ import RunCraftModels
         case newTemplateTapped
         case deleteTemplate(WorkoutTemplate.ID)
 
+        // Apple Watch handoff
+        case startTapped
+        case syncResponse(Result<Void, any Error>)
+
+        // Duplicate — emits delegate; Workshop reducer does the DB insert
+        case duplicateTapped
+
+        case alert(PresentationAction<Alert>)
         case destination(PresentationAction<Destination.Action>)
+        case delegate(Delegate)
+
+        public enum Alert: Equatable {}
+        public enum Delegate: Equatable {
+            /// Carry the editor's current state up so Workshop can write a
+            /// "Yours" copy without re-deriving anything.
+            case requestDuplicate(WorkoutTemplate)
+        }
     }
 
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
     @Dependency(\.workoutTemplateRepository) var repository
+    @Dependency(\.workoutKitClient) var workoutKitClient
 
     public init() {}
 
@@ -93,17 +138,16 @@ import RunCraftModels
             case let .addStepTapped(kind):
                 let step = WorkoutStep(id: uuid(), kind: kind, goal: defaultGoal(for: kind))
                 state.blocks.append(.step(step))
-                // Open edit sheet immediately (mirrors + Repeat behaviour).
                 state.destination = .editStep(EditStep.State(step: step))
                 return .none
 
             case .addRepeatGroupTapped:
-                let work = WorkoutStep(id: uuid(), kind: .work, goal: .distance(metres: 400))
-                let recovery = WorkoutStep(id: uuid(), kind: .recovery, goal: .time(seconds: 90))
-                let group = RepeatGroup(id: uuid(), iterations: 4, steps: [work, recovery])
+                let group = RepeatGroup(id: uuid(), iterations: 4, steps: [])
                 state.blocks.append(.repeatGroup(group))
-                // Open edit sheet immediately so user can configure iterations/steps.
-                state.destination = .editRepeatGroup(EditRepeatGroup.State(group: group))
+                state.destination = .editRepeatGroup(EditRepeatGroup.State(
+                    group: group,
+                    availableSteps: state.topLevelSteps
+                ))
                 return .none
 
             case let .blockTapped(id):
@@ -112,7 +156,10 @@ import RunCraftModels
                 case .step(let step):
                     state.destination = .editStep(EditStep.State(step: step))
                 case .repeatGroup(let group):
-                    state.destination = .editRepeatGroup(EditRepeatGroup.State(group: group))
+                    state.destination = .editRepeatGroup(EditRepeatGroup.State(
+                        group: group,
+                        availableSteps: state.topLevelSteps
+                    ))
                 }
                 return .none
 
@@ -122,14 +169,6 @@ import RunCraftModels
 
             case let .moveBlocks(source, destination):
                 state.blocks.move(fromOffsets: source, toOffset: destination)
-                return .none
-
-            case .toggleEditing:
-                state.isEditing.toggle()
-                return .none
-
-            case .clearAllTapped:
-                state.blocks.removeAll()
                 return .none
 
             case .saveTapped:
@@ -151,6 +190,7 @@ import RunCraftModels
 
             case let .saveResponse(.success(id)):
                 state.editingTemplateId = id
+                state.source = .yours
                 state.saveStatus = .saved
                 return .none
 
@@ -163,12 +203,55 @@ import RunCraftModels
                 state.templateName = "New Workout"
                 state.blocks.removeAll()
                 state.saveStatus = .idle
+                state.source = .yours
                 return .none
 
             case let .deleteTemplate(id):
                 return .run { [repository] _ in
                     try await repository.delete(id)
                 }
+
+            case .startTapped:
+                guard !state.blocks.isEmpty else { return .none }
+                state.syncStatus = .sending
+                let template = WorkoutTemplate(
+                    id: state.editingTemplateId ?? uuid(),
+                    name: state.templateName.isEmpty ? "Untitled" : state.templateName,
+                    blocks: Array(state.blocks),
+                    createdAt: now,
+                    updatedAt: now
+                )
+                return .run { [workoutKitClient] send in
+                    await send(.syncResponse(Result {
+                        _ = try await workoutKitClient.requestAuthorization()
+                        try await workoutKitClient.openInWorkoutApp(template)
+                    }))
+                }
+
+            case .syncResponse(.success):
+                state.syncStatus = .sent
+                return .none
+
+            case let .syncResponse(.failure(error)):
+                let message = (error as? LocalizedError)?.errorDescription
+                    ?? error.localizedDescription
+                state.syncStatus = .failed(message)
+                state.alert = AlertState {
+                    TextState("Couldn't send to Watch")
+                } message: {
+                    TextState(message)
+                }
+                return .none
+
+            case .duplicateTapped:
+                let template = WorkoutTemplate(
+                    id: uuid(),
+                    name: state.templateName + " copy",
+                    blocks: Array(state.blocks),
+                    createdAt: now,
+                    updatedAt: now
+                )
+                return .send(.delegate(.requestDuplicate(template)))
 
             case let .destination(.presented(.editStep(.delegate(.saved(step))))):
                 state.blocks[id: step.id] = .step(step)
@@ -180,11 +263,12 @@ import RunCraftModels
                 state.destination = nil
                 return .none
 
-            case .destination:
+            case .destination, .alert, .delegate:
                 return .none
             }
         }
         .ifLet(\.$destination, action: \.destination)
+        .ifLet(\.$alert, action: \.alert)
     }
 
     private func defaultGoal(for kind: StepKind) -> StepGoal {
@@ -354,9 +438,14 @@ import RunCraftModels
 @Reducer public struct EditRepeatGroup {
     @ObservableState public struct State: Equatable {
         public var group: RepeatGroup
+        /// Top-level steps from the parent workout — offered as checkboxes
+        /// so the user can pull copies into the repeat without retyping.
+        public var availableSteps: [WorkoutStep] = []
+        @Presents public var editingStep: EditStep.State?
 
-        public init(group: RepeatGroup) {
+        public init(group: RepeatGroup, availableSteps: [WorkoutStep] = []) {
             self.group = group
+            self.availableSteps = availableSteps
         }
     }
 
@@ -364,8 +453,11 @@ import RunCraftModels
         case binding(BindingAction<State>)
         case saveTapped
         case cancelTapped
-        case addStepTapped(StepKind)
+        case toggleAvailableStep(WorkoutStep)
+        case addStepTapped
+        case editStepTapped(WorkoutStep.ID)
         case deleteStep(id: WorkoutStep.ID)
+        case editingStep(PresentationAction<EditStep.Action>)
         case delegate(Delegate)
 
         public enum Delegate: Equatable {
@@ -385,17 +477,46 @@ import RunCraftModels
             case .binding:
                 return .none
 
-            case let .addStepTapped(kind):
-                let step = WorkoutStep(
-                    id: uuid(),
-                    kind: kind,
-                    goal: kind == .work ? .distance(metres: 400) : .time(seconds: 90)
-                )
+            case let .toggleAvailableStep(step):
+                // We track inclusion by source step.id stored on a derived
+                // step in the group. Adding makes an independent copy with a
+                // fresh id so future edits stay isolated.
+                if let existing = state.group.steps.first(where: { isCopyOf($0, source: step) }) {
+                    state.group.steps.removeAll { $0.id == existing.id }
+                } else {
+                    let copy = WorkoutStep(
+                        id: uuid(),
+                        kind: step.kind,
+                        goal: step.goal,
+                        alert: step.alert
+                    )
+                    state.group.steps.append(copy)
+                }
+                return .none
+
+            case .addStepTapped:
+                let step = WorkoutStep(id: uuid(), kind: .work, goal: .distance(metres: 400))
                 state.group.steps.append(step)
+                state.editingStep = EditStep.State(step: step)
+                return .none
+
+            case let .editStepTapped(id):
+                guard let step = state.group.steps.first(where: { $0.id == id }) else { return .none }
+                state.editingStep = EditStep.State(step: step)
                 return .none
 
             case let .deleteStep(id):
                 state.group.steps.removeAll { $0.id == id }
+                return .none
+
+            case let .editingStep(.presented(.delegate(.saved(step)))):
+                if let idx = state.group.steps.firstIndex(where: { $0.id == step.id }) {
+                    state.group.steps[idx] = step
+                }
+                state.editingStep = nil
+                return .none
+
+            case .editingStep:
                 return .none
 
             case .saveTapped:
@@ -408,5 +529,16 @@ import RunCraftModels
                 return .run { [dismiss] _ in await dismiss() }
             }
         }
+        .ifLet(\.$editingStep, action: \.editingStep) {
+            EditStep()
+        }
+    }
+
+    /// Two steps are "the same source" if they share kind + goal + alert.
+    /// Identity (UUID) intentionally not checked — the in-repeat copy has
+    /// its own id, but if the user hasn't customised it yet the content
+    /// matches the source.
+    private func isCopyOf(_ a: WorkoutStep, source b: WorkoutStep) -> Bool {
+        a.kind == b.kind && a.goal == b.goal && a.alert == b.alert
     }
 }

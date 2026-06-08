@@ -33,8 +33,6 @@ public struct WorkshopView: View {
             }
         } destination: { pathStore in
             switch pathStore.case {
-            case .detail(let detailStore):
-                WorkoutDetailView(store: detailStore)
             case .editor(let editorStore):
                 WorkoutEditorView(store: editorStore)
             }
@@ -130,7 +128,7 @@ private struct PlanSegment: View {
             if goal == nil {
                 EmptyPlanPrompt()
             } else if currentWeek == nil {
-                ProgressView().tint(Color.workshopLime)
+                OutsidePlanWindowPrompt(goal: goal)
             } else {
                 List {
                     ForEach(orderedDays(), id: \.dayOfWeek) { row in
@@ -327,6 +325,39 @@ private struct EmptyYoursPrompt: View {
         }
         .padding(.top, 40)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+}
+
+private struct OutsidePlanWindowPrompt: View {
+    let goal: RaceGoal?
+
+    var body: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "calendar.badge.clock")
+                .font(.system(size: 44))
+                .foregroundStyle(.secondary)
+            Text(headline)
+                .font(.title3.bold())
+                .foregroundStyle(.white)
+            Text(detail)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 40)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var headline: String {
+        guard let goal else { return "No active plan" }
+        return goal.targetDate < Date() ? "Plan window has ended" : "Plan window hasn't started"
+    }
+
+    private var detail: String {
+        guard let goal else { return "" }
+        if goal.targetDate < Date() {
+            return "\(goal.name) was \(goal.targetDate.formatted(date: .abbreviated, time: .omitted)). Create a new race goal to keep training."
+        }
+        return "\(goal.name) is set for \(goal.targetDate.formatted(date: .abbreviated, time: .omitted)). Training begins 16 weeks out."
     }
 }
 
