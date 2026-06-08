@@ -88,15 +88,15 @@ public struct TrainingPlanGenerator {
         for week: TrainingWeek,
         zones: PaceZones
     ) -> [PlannedSession] {
-        let template = sessionTemplate(for: week.phase, weekNumber: week.weekNumber)
-        return template.enumerated().map { (idx, blueprint) in
+        sessionTemplate(for: week.phase, weekNumber: week.weekNumber).map { blueprint in
             PlannedSession(
                 weekId: week.id,
                 dayOfWeek: blueprint.dayOfWeek,
                 sessionType: blueprint.type,
                 targetDistanceKm: blueprint.distanceKm,
                 targetDurationMin: blueprint.durationMin,
-                notes: blueprint.notes(zones)
+                targetPaceZone: blueprint.paceZone,
+                notes: blueprint.notes
             )
         }
     }
@@ -106,53 +106,74 @@ public struct TrainingPlanGenerator {
         let type: SessionType
         let distanceKm: Double?
         let durationMin: Int?
-        let notes: (PaceZones) -> String
+        let paceZone: PaceZoneName?
+        let notes: String
+
+        init(
+            dayOfWeek: Int,
+            type: SessionType,
+            distanceKm: Double? = nil,
+            durationMin: Int? = nil,
+            paceZone: PaceZoneName? = nil,
+            notes: String = ""
+        ) {
+            self.dayOfWeek = dayOfWeek
+            self.type = type
+            self.distanceKm = distanceKm
+            self.durationMin = durationMin
+            self.paceZone = paceZone
+            self.notes = notes
+        }
     }
 
     private static func sessionTemplate(
         for phase: TrainingPhase,
         weekNumber: Int
     ) -> [SessionBlueprint] {
+        // Per-blueprint: pace text never baked. `paceZone` carries the
+        // intent; the actual sec/km is derived from the current VDOT at
+        // render time so the schedule stays honest as the runner adapts.
+        // `notes` carries structural hints only (e.g. "5×1000m").
         switch phase {
         case .base:
             return [
-                .init(dayOfWeek: 1, type: .easy,  distanceKm: 6,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 2, type: .rest,  distanceKm: nil, durationMin: nil, notes: { _ in "" }),
-                .init(dayOfWeek: 3, type: .easy,  distanceKm: 8,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 4, type: .repetition, distanceKm: 5, durationMin: nil, notes: { z in "R strides \(z.repetition.formatted())" }),
-                .init(dayOfWeek: 5, type: .rest,  distanceKm: nil, durationMin: nil, notes: { _ in "" }),
-                .init(dayOfWeek: 6, type: .easy,  distanceKm: 10, durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 7, type: .long,  distanceKm: 14, durationMin: nil, notes: { z in "Long run E pace \(z.easy.formatted())" }),
+                .init(dayOfWeek: 1, type: .easy,       distanceKm: 6,  paceZone: .easy),
+                .init(dayOfWeek: 2, type: .rest),
+                .init(dayOfWeek: 3, type: .easy,       distanceKm: 8,  paceZone: .easy),
+                .init(dayOfWeek: 4, type: .repetition, distanceKm: 5,  paceZone: .repetition, notes: "R strides"),
+                .init(dayOfWeek: 5, type: .rest),
+                .init(dayOfWeek: 6, type: .easy,       distanceKm: 10, paceZone: .easy),
+                .init(dayOfWeek: 7, type: .long,       distanceKm: 14, paceZone: .easy),
             ]
         case .build:
             return [
-                .init(dayOfWeek: 1, type: .easy,  distanceKm: 8,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 2, type: .tempo, distanceKm: 8,  durationMin: nil, notes: { z in "T pace \(z.threshold.formatted())" }),
-                .init(dayOfWeek: 3, type: .easy,  distanceKm: 6,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 4, type: .rest,  distanceKm: nil, durationMin: nil, notes: { _ in "" }),
-                .init(dayOfWeek: 5, type: .easy,  distanceKm: 8,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 6, type: .tempo, distanceKm: 10, durationMin: nil, notes: { z in "T pace \(z.threshold.formatted())" }),
-                .init(dayOfWeek: 7, type: .long,  distanceKm: 18, durationMin: nil, notes: { z in "Long run E pace \(z.easy.formatted())" }),
+                .init(dayOfWeek: 1, type: .easy,  distanceKm: 8,  paceZone: .easy),
+                .init(dayOfWeek: 2, type: .tempo, distanceKm: 8,  paceZone: .threshold),
+                .init(dayOfWeek: 3, type: .easy,  distanceKm: 6,  paceZone: .easy),
+                .init(dayOfWeek: 4, type: .rest),
+                .init(dayOfWeek: 5, type: .easy,  distanceKm: 8,  paceZone: .easy),
+                .init(dayOfWeek: 6, type: .tempo, distanceKm: 10, paceZone: .threshold),
+                .init(dayOfWeek: 7, type: .long,  distanceKm: 18, paceZone: .easy),
             ]
         case .peak:
             return [
-                .init(dayOfWeek: 1, type: .easy,     distanceKm: 8,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 2, type: .interval, distanceKm: 10, durationMin: nil, notes: { z in "5×1000m I pace \(z.interval.formatted())" }),
-                .init(dayOfWeek: 3, type: .easy,     distanceKm: 6,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 4, type: .tempo,    distanceKm: 10, durationMin: nil, notes: { z in "T pace \(z.threshold.formatted())" }),
-                .init(dayOfWeek: 5, type: .rest,     distanceKm: nil, durationMin: nil, notes: { _ in "" }),
-                .init(dayOfWeek: 6, type: .easy,     distanceKm: 8,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 7, type: .long,     distanceKm: 24, durationMin: nil, notes: { z in "Long run E pace \(z.easy.formatted())" }),
+                .init(dayOfWeek: 1, type: .easy,     distanceKm: 8,  paceZone: .easy),
+                .init(dayOfWeek: 2, type: .interval, distanceKm: 10, paceZone: .interval,  notes: "5×1000m"),
+                .init(dayOfWeek: 3, type: .easy,     distanceKm: 6,  paceZone: .easy),
+                .init(dayOfWeek: 4, type: .tempo,    distanceKm: 10, paceZone: .threshold),
+                .init(dayOfWeek: 5, type: .rest),
+                .init(dayOfWeek: 6, type: .easy,     distanceKm: 8,  paceZone: .easy),
+                .init(dayOfWeek: 7, type: .long,     distanceKm: 24, paceZone: .easy),
             ]
         case .taper:
             return [
-                .init(dayOfWeek: 1, type: .easy,     distanceKm: 6,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 2, type: .tempo,    distanceKm: 8,  durationMin: nil, notes: { z in "T pace \(z.threshold.formatted())" }),
-                .init(dayOfWeek: 3, type: .easy,     distanceKm: 5,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 4, type: .rest,     distanceKm: nil, durationMin: nil, notes: { _ in "" }),
-                .init(dayOfWeek: 5, type: .interval, distanceKm: 6,  durationMin: nil, notes: { z in "3×1000m I pace \(z.interval.formatted())" }),
-                .init(dayOfWeek: 6, type: .easy,     distanceKm: 4,  durationMin: nil, notes: { z in "E pace \(z.easy.formatted())" }),
-                .init(dayOfWeek: 7, type: .rest,     distanceKm: nil, durationMin: nil, notes: { _ in "Rest before race" }),
+                .init(dayOfWeek: 1, type: .easy,     distanceKm: 6, paceZone: .easy),
+                .init(dayOfWeek: 2, type: .tempo,    distanceKm: 8, paceZone: .threshold),
+                .init(dayOfWeek: 3, type: .easy,     distanceKm: 5, paceZone: .easy),
+                .init(dayOfWeek: 4, type: .rest),
+                .init(dayOfWeek: 5, type: .interval, distanceKm: 6, paceZone: .interval, notes: "3×1000m"),
+                .init(dayOfWeek: 6, type: .easy,     distanceKm: 4, paceZone: .easy),
+                .init(dayOfWeek: 7, type: .rest,     notes: "Rest before race"),
             ]
         }
     }

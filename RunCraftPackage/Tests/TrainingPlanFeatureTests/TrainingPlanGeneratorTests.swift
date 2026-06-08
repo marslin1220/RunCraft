@@ -2,6 +2,7 @@ import Foundation
 import RunCraftModels
 import Testing
 import TrainingPlanFeature
+import VDOTEngine
 
 @Suite("TrainingPlanGenerator")
 struct TrainingPlanGeneratorTests {
@@ -73,5 +74,46 @@ struct TrainingPlanGeneratorTests {
         let peakKm  = weeks.filter { $0.phase == .peak  }.map(\.targetWeeklyKm).max() ?? 0
         let taperKm = weeks.filter { $0.phase == .taper }.map(\.targetWeeklyKm).max() ?? 0
         #expect(taperKm < peakKm, "Taper weekly km (\(taperKm)) should be less than peak (\(peakKm))")
+    }
+
+    // MARK: - Schema honesty checks
+
+    @Test("Sessions never bake a sec/km pace into notes — that would lie when VDOT changes")
+    func notes_neverContainPaceText() {
+        let (_, sessions) = TrainingPlanGenerator.generate(goal: sampleGoal, vdot: 40)
+        for session in sessions {
+            // The token "pace" or any "M:SS" pattern would smell of baked text.
+            #expect(!session.notes.lowercased().contains("pace"),
+                    "session.notes still has the word 'pace': \(session.notes)")
+            #expect(!session.notes.contains(":"),
+                    "session.notes has a 'min:sec' looking token: \(session.notes)")
+        }
+    }
+
+    @Test("Tempo / Interval / Repetition sessions carry a target pace zone")
+    func intensitiesHaveZone() {
+        let (_, sessions) = TrainingPlanGenerator.generate(goal: sampleGoal, vdot: 40)
+        let expectations: [(SessionType, PaceZoneName)] = [
+            (.tempo,      .threshold),
+            (.interval,   .interval),
+            (.repetition, .repetition),
+        ]
+        for (sessionType, expectedZone) in expectations {
+            let matches = sessions.filter { $0.sessionType == sessionType }
+            #expect(!matches.isEmpty, "no \(sessionType) sessions generated")
+            for s in matches {
+                #expect(s.targetPaceZone == expectedZone,
+                        "\(sessionType) should target \(expectedZone), got \(String(describing: s.targetPaceZone))")
+            }
+        }
+    }
+
+    @Test("Rest days have neither a target zone nor a distance")
+    func rest_hasNoZoneNorDistance() {
+        let (_, sessions) = TrainingPlanGenerator.generate(goal: sampleGoal, vdot: 40)
+        for s in sessions where s.sessionType == .rest {
+            #expect(s.targetPaceZone == nil)
+            #expect(s.targetDistanceKm == nil)
+        }
     }
 }

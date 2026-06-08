@@ -48,6 +48,7 @@ extension DependencyValues {
                   "sessionType" TEXT NOT NULL DEFAULT 'rest',
                   "targetDistanceKm" REAL,
                   "targetDurationMin" INTEGER,
+                  "targetPaceZone" TEXT,
                   "notes" TEXT NOT NULL DEFAULT ''
                 ) STRICT
                 """)
