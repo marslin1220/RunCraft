@@ -91,8 +91,11 @@ let package = Package(
         .target(
             name: "WatchAppFeature",
             dependencies: [
-                "TrainingPlanFeature",
+                "AppleWatchSync",
+                "RunCraftModels",
+                "VDOTEngine",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SQLiteData", package: "sqlite-data"),
             ]
         ),
 
