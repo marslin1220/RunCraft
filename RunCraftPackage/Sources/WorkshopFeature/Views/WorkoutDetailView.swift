@@ -110,7 +110,12 @@ public struct WorkoutDetailView: View {
     private var blocksSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             ForEach(store.workout.blocks) { block in
-                BlockSummaryCard(block: block)
+                Button {
+                    store.send(.blockTapped(id: block.id))
+                } label: {
+                    BlockSummaryCard(block: block)
+                }
+                .buttonStyle(.plain)
             }
         }
     }

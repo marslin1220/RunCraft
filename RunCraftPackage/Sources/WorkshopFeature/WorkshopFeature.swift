@@ -76,15 +76,30 @@ import RunCraftModels
 
             // Detail → request Edit: push editor; asCopy=true unless it's "yours"
             case let .path(.element(_, .detail(.delegate(.requestEdit(template))))):
-                let isYours: Bool
-                if case .detail(let detailState) = state.path.last {
-                    isYours = detailState.source == .yours
-                } else {
-                    isYours = false
-                }
                 state.path.append(.editor(
-                    WorkoutEditor.State(loading: template, asCopy: !isYours)
+                    WorkoutEditor.State(
+                        loading: template,
+                        asCopy: !isCurrentDetailYours(state: state)
+                    )
                 ))
+                return .none
+
+            // Detail → request edit of a specific block: push editor with that
+            // block's edit sheet preselected.
+            case let .path(.element(_, .detail(.delegate(.requestEditBlock(template, blockId))))):
+                var editorState = WorkoutEditor.State(
+                    loading: template,
+                    asCopy: !isCurrentDetailYours(state: state)
+                )
+                if let block = editorState.blocks[id: blockId] {
+                    switch block {
+                    case let .step(step):
+                        editorState.destination = .editStep(EditStep.State(step: step))
+                    case let .repeatGroup(group):
+                        editorState.destination = .editRepeatGroup(EditRepeatGroup.State(group: group))
+                    }
+                }
+                state.path.append(.editor(editorState))
                 return .none
 
             // Detail → request Duplicate: insert copy into DB and switch to Yours
@@ -108,5 +123,13 @@ import RunCraftModels
             }
         }
         .forEach(\.path, action: \.path)
+    }
+
+    /// True iff the top of the path is a detail page whose source is `.yours`.
+    private func isCurrentDetailYours(state: State) -> Bool {
+        if case let .detail(detailState) = state.path.last {
+            return detailState.source == .yours
+        }
+        return false
     }
 }

@@ -35,6 +35,7 @@ import RunCraftModels
         case startTapped
         case syncResponse(Result<Void, any Error>)
         case editTapped
+        case blockTapped(id: UUID)
         case duplicateTapped
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
@@ -43,6 +44,9 @@ import RunCraftModels
         public enum Delegate: Equatable {
             /// Parent should push the editor with this template.
             case requestEdit(WorkoutTemplate)
+            /// Parent should push the editor with this template and open the
+            /// sheet for the specified block.
+            case requestEditBlock(WorkoutTemplate, blockId: UUID)
             /// Parent should insert this template as a new "Yours" row.
             case requestDuplicate(WorkoutTemplate)
         }
@@ -82,6 +86,9 @@ import RunCraftModels
 
             case .editTapped:
                 return .send(.delegate(.requestEdit(state.workout)))
+
+            case let .blockTapped(id):
+                return .send(.delegate(.requestEditBlock(state.workout, blockId: id)))
 
             case .duplicateTapped:
                 return .send(.delegate(.requestDuplicate(state.workout)))

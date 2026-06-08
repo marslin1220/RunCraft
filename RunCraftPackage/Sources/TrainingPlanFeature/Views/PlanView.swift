@@ -212,7 +212,7 @@ private struct WeekSessionsSection: View {
     let week: TrainingWeek
     let onSessionTap: (PlannedSession) -> Void
     @FetchAll(PlannedSession.none) var sessions: [PlannedSession]
-    @FetchAll(CompletedWorkout.none) var completedThisWeek: [CompletedWorkout]
+    @FetchAll var completedThisWeek: [CompletedWorkout]
 
     private var completedSessionIds: Set<UUID> {
         Set(completedThisWeek.compactMap(\.plannedSessionId))
@@ -253,9 +253,6 @@ private struct WeekSessionsSection: View {
                     .where { $0.weekId.eq(week.id) }
                     .order(by: \.dayOfWeek)
             )
-        }
-        _ = await withErrorReporting {
-            try await $completedThisWeek.load(CompletedWorkout.all)
         }
     }
 }
@@ -372,8 +369,8 @@ extension Color {
 struct WeekScheduleView: View {
     let store: StoreOf<WeekSchedule>
     let allWeeks: [TrainingWeek]
-    @FetchAll(PlannedSession.none) var allSessions: [PlannedSession]
-    @FetchAll(CompletedWorkout.none) var completedAll: [CompletedWorkout]
+    @FetchAll var allSessions: [PlannedSession]
+    @FetchAll var completedAll: [CompletedWorkout]
 
     private var completedSessionIds: Set<UUID> {
         Set(completedAll.compactMap(\.plannedSessionId))
@@ -400,20 +397,10 @@ struct WeekScheduleView: View {
         .navigationTitle("Full Schedule")
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
-        .task { await loadAllData() }
     }
 
     private func isCurrentWeek(_ week: TrainingWeek) -> Bool {
         TrainingWeek.current(in: [week]) != nil
-    }
-
-    private func loadAllData() async {
-        _ = await withErrorReporting {
-            try await $allSessions.load(PlannedSession.all)
-        }
-        _ = await withErrorReporting {
-            try await $completedAll.load(CompletedWorkout.all)
-        }
     }
 }
 

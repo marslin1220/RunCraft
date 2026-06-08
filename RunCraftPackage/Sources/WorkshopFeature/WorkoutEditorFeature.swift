@@ -93,6 +93,8 @@ import RunCraftModels
             case let .addStepTapped(kind):
                 let step = WorkoutStep(id: uuid(), kind: kind, goal: defaultGoal(for: kind))
                 state.blocks.append(.step(step))
+                // Open edit sheet immediately (mirrors + Repeat behaviour).
+                state.destination = .editStep(EditStep.State(step: step))
                 return .none
 
             case .addRepeatGroupTapped:
@@ -168,17 +170,13 @@ import RunCraftModels
                     try await repository.delete(id)
                 }
 
-            case .destination(.presented(.editStep(.saveTapped))):
-                if case let .editStep(editState) = state.destination {
-                    state.blocks[id: editState.step.id] = .step(editState.step)
-                }
+            case let .destination(.presented(.editStep(.delegate(.saved(step))))):
+                state.blocks[id: step.id] = .step(step)
                 state.destination = nil
                 return .none
 
-            case .destination(.presented(.editRepeatGroup(.saveTapped))):
-                if case let .editRepeatGroup(editState) = state.destination {
-                    state.blocks[id: editState.group.id] = .repeatGroup(editState.group)
-                }
+            case let .destination(.presented(.editRepeatGroup(.delegate(.saved(group))))):
+                state.blocks[id: group.id] = .repeatGroup(group)
                 state.destination = nil
                 return .none
 
@@ -299,6 +297,13 @@ import RunCraftModels
         case binding(BindingAction<State>)
         case saveTapped
         case cancelTapped
+        case delegate(Delegate)
+
+        public enum Delegate: Equatable {
+            /// Carries the final step value so the parent doesn't have to
+            /// reach into `state.destination` to read it back.
+            case saved(WorkoutStep)
+        }
     }
 
     @Dependency(\.dismiss) var dismiss
@@ -332,7 +337,10 @@ import RunCraftModels
                 return .none
 
             case .saveTapped:
-                return .none   // parent reducer consumes this and writes back
+                return .send(.delegate(.saved(state.step)))
+
+            case .delegate:
+                return .none
 
             case .cancelTapped:
                 return .run { [dismiss] _ in await dismiss() }
@@ -358,6 +366,11 @@ import RunCraftModels
         case cancelTapped
         case addStepTapped(StepKind)
         case deleteStep(id: WorkoutStep.ID)
+        case delegate(Delegate)
+
+        public enum Delegate: Equatable {
+            case saved(RepeatGroup)
+        }
     }
 
     @Dependency(\.dismiss) var dismiss
@@ -386,6 +399,9 @@ import RunCraftModels
                 return .none
 
             case .saveTapped:
+                return .send(.delegate(.saved(state.group)))
+
+            case .delegate:
                 return .none
 
             case .cancelTapped:
