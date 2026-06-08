@@ -68,6 +68,8 @@ import VDOTEngine
         case vdotUpgradeDetected(VDOTUpgrade?)
         case acceptVDOTUpgradeTapped
         case dismissVDOTUpgrade
+        case syncBackWorkouts
+        case syncBackCompleted
         case path(StackActionOf<Path>)
         case destination(PresentationAction<Destination.Action>)
         case delegate(Delegate)
@@ -133,11 +135,13 @@ import VDOTEngine
                 state.isLoadingVDOT = false
                 state.currentVDOT = vdot
                 state.paceZones = VDOTCalculator.paceZones(vdot: vdot)
-                // VDOT is loaded → kick the readiness and progress checks
-                // now that we know there's an active plan with a today's
-                // session to evaluate and a baseline VDOT to compare against.
+                // VDOT is loaded → kick the readiness, progress and
+                // sync-back checks now that we know there's an active plan
+                // with a today's session to evaluate and a baseline VDOT
+                // to compare against.
                 return .merge(
                     .send(.fetchRecoveryAdvice),
+                    .send(.syncBackWorkouts),
                     .send(.checkVDOTUpgrade)
                 )
 
@@ -255,8 +259,9 @@ import VDOTEngine
             case .checkVDOTUpgrade:
                 let currentVDOT = state.currentVDOT
                 guard currentVDOT > 0 else { return .none }
-                return .run { [healthKitClient] send in
-                    // Re-detect VDOT from latest HealthKit history.
+                return .run { [database, healthKitClient] send in
+                    // Signal A: a fresh race time from HealthKit implies a
+                    // higher VDOT than the plan was generated against.
                     var detectedBest: Double = 0
                     for distance in [RaceDistanceQuery.fiveK, .tenK, .halfMarathon] {
                         if let time = try? await healthKitClient.bestRaceTime(distance) {
@@ -264,14 +269,48 @@ import VDOTEngine
                             detectedBest = max(detectedBest, v)
                         }
                     }
-                    // Only suggest when the gain is meaningful (≥ 1 VDOT point).
-                    guard detectedBest >= currentVDOT + 1 else {
+                    var suggested: Double? = nil
+                    if detectedBest >= currentVDOT + 1 {
+                        suggested = detectedBest
+                    }
+
+                    // Signal B: the runner consistently beat target pace on
+                    // recent hard sessions (interval / tempo / repetition).
+                    let consecutiveOverperformance = try? await database.read { db -> Int in
+                        let hardTypes: [SessionType] = [.interval, .tempo, .repetition]
+                        let sessions = try PlannedSession.all.fetchAll(db)
+                        let hardSessionIds = Set(
+                            sessions.filter { hardTypes.contains($0.sessionType) }.map(\.id)
+                        )
+                        let recent = try CompletedWorkout
+                            .order { $0.completedAt.desc() }
+                            .fetchAll(db)
+                            .prefix(10)
+                        var streak = 0
+                        for row in recent {
+                            guard let planId = row.plannedSessionId,
+                                  hardSessionIds.contains(planId)
+                            else { continue }
+                            if row.paceAchievementRatio < 0.95 {
+                                streak += 1
+                            } else {
+                                break
+                            }
+                        }
+                        return streak
+                    }
+                    if (consecutiveOverperformance ?? 0) >= 2,
+                       (suggested ?? 0) < currentVDOT + 1 {
+                        suggested = currentVDOT + 1
+                    }
+
+                    guard let suggested else {
                         await send(.vdotUpgradeDetected(nil))
                         return
                     }
                     await send(.vdotUpgradeDetected(.init(
                         oldVDOT: currentVDOT,
-                        newVDOT: detectedBest
+                        newVDOT: suggested
                     )))
                 }
 
@@ -296,6 +335,53 @@ import VDOTEngine
             case .dismissVDOTUpgrade:
                 state.vdotUpgrade = nil
                 return .none
+
+            case .syncBackWorkouts:
+                let vdot = state.currentVDOT
+                return .run { [database, healthKitClient] send in
+                    // Look back 90 days. Workouts older than that are unlikely
+                    // to map to a current 16-week plan and aren't worth the
+                    // round-trip.
+                    let lookback = Calendar.current.date(byAdding: .day, value: -90, to: Date())!
+                    let observations = (try? await healthKitClient.recentWorkouts(lookback)) ?? []
+                    guard !observations.isEmpty else {
+                        await send(.syncBackCompleted)
+                        return
+                    }
+                    try await database.write { db in
+                        let weeks = try TrainingWeek.all.fetchAll(db)
+                        let sessions = try PlannedSession.all.fetchAll(db)
+                        let alreadyImported = Set(
+                            try CompletedWorkout.all
+                                .fetchAll(db)
+                                .compactMap(\.hkWorkoutId)
+                        )
+                        for obs in observations where !alreadyImported.contains(obs.id) {
+                            let observation = WorkoutObservation(
+                                id: obs.id,
+                                startDate: obs.startDate,
+                                duration: obs.duration,
+                                distanceMeters: obs.distanceMeters
+                            )
+                            if let row = WorkoutSyncBack.makeCompletedWorkout(
+                                from: observation,
+                                weeks: weeks,
+                                sessions: sessions,
+                                currentVDOT: vdot
+                            ) {
+                                try CompletedWorkout.insert { row }.execute(db)
+                            }
+                        }
+                    }
+                    await send(.syncBackCompleted)
+                }
+
+            case .syncBackCompleted:
+                // After the sync wrote any new rows, re-check whether the
+                // runner has been consistently faster than target on hard
+                // sessions — that's the second VDOT-upgrade signal alongside
+                // the historic best race-time check.
+                return .send(.checkVDOTUpgrade)
 
             case let .paceChipTapped(zone):
                 let template = makePaceFocusTemplate(zone: zone, vdot: state.currentVDOT)

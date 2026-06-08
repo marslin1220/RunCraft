@@ -22,6 +22,9 @@ enum LiveHealthKitClient {
             },
             recentSleepHours: { nights in
                 try await recentSleepHours(nights: nights)
+            },
+            recentWorkouts: { since in
+                try await recentWorkouts(since: since)
             }
         )
     }
@@ -123,6 +126,39 @@ enum LiveHealthKitClient {
 
                 let avgHours = totalSeconds / 3600.0 / Double(max(nights, 1))
                 continuation.resume(returning: avgHours)
+            }
+            store.execute(hkQuery)
+        }
+    }
+
+    // MARK: - Recent workouts
+
+    private static func recentWorkouts(since: Date) async throws -> [HKWorkoutSummary] {
+        guard HKHealthStore.isHealthDataAvailable() else { return [] }
+        let store = HKHealthStore()
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            HKQuery.predicateForWorkouts(with: .running),
+            HKQuery.predicateForSamples(withStart: since, end: Date()),
+        ])
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let hkQuery = HKSampleQuery(
+                sampleType: HKObjectType.workoutType(),
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sort]
+            ) { _, samples, error in
+                if let error { continuation.resume(throwing: error); return }
+                let summaries = (samples as? [HKWorkout])?.map { workout in
+                    HKWorkoutSummary(
+                        id: workout.uuid.uuidString,
+                        startDate: workout.startDate,
+                        duration: workout.duration,
+                        distanceMeters: workout.totalDistance?.doubleValue(for: .meter()) ?? 0
+                    )
+                } ?? []
+                continuation.resume(returning: summaries)
             }
             store.execute(hkQuery)
         }
