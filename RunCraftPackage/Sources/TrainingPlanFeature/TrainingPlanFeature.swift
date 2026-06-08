@@ -12,13 +12,25 @@ import VDOTEngine
         public var paceZones: PaceZones? = nil
         public var isLoadingVDOT: Bool = false
         public var recoveryAdvice: RecoveryAdvice? = nil
-        public var lastRecoveryDismissAt: Date? = nil
         public var vdotUpgrade: VDOTUpgrade? = nil
         public var path = StackState<Path.State>()
         @Presents public var destination: Destination.State? = nil
 
+        /// Time the user last dismissed the recovery banner. Persisted so
+        /// dismissals survive app restarts; `.distantPast` = never dismissed.
+        @Shared(.appStorage("recoveryBanner.lastDismissAt"))
+        public var recoveryBannerLastDismissAt = Date.distantPast
+        /// Same idea for the VDOT-upgrade banner.
+        @Shared(.appStorage("vdotUpgrade.lastDismissAt"))
+        public var vdotUpgradeLastDismissAt = Date.distantPast
+
         public init() {}
     }
+
+    /// How long a dismissal silences either banner before it can re-appear.
+    /// Six hours matches a typical training rhythm: dismissed in the morning,
+    /// the banner can return that evening or next day if signals still apply.
+    private static let bannerDebounce: TimeInterval = 6 * 3600
 
     /// VDOT-improvement signal surfaced from HealthKit when a fresh race
     /// from the runner's history implies a higher VDOT than the plan was
@@ -189,10 +201,9 @@ import VDOTEngine
 
             case .fetchRecoveryAdvice:
                 // Debounce: if the user dismissed within the last 6 h, don't
-                // re-evaluate. They'll see the next banner after that window
-                // or when the app is relaunched (state is in-memory).
-                if let last = state.lastRecoveryDismissAt,
-                   now.timeIntervalSince(last) < 6 * 3600 {
+                // re-evaluate. Timestamp is persisted to AppStorage so
+                // dismissals survive app restarts.
+                if now.timeIntervalSince(state.recoveryBannerLastDismissAt) < Self.bannerDebounce {
                     return .none
                 }
                 return .run { [database, healthKitClient] send in
@@ -254,12 +265,17 @@ import VDOTEngine
 
             case .dismissRecoveryAdvice:
                 state.recoveryAdvice = nil
-                state.lastRecoveryDismissAt = now
+                state.$recoveryBannerLastDismissAt.withLock { $0 = now }
                 return .none
 
             case .checkVDOTUpgrade:
                 let currentVDOT = state.currentVDOT
                 guard currentVDOT > 0 else { return .none }
+                // Debounce: same 6 h window as the recovery banner. Skip the
+                // HealthKit + DB round-trip if the user recently dismissed.
+                if now.timeIntervalSince(state.vdotUpgradeLastDismissAt) < Self.bannerDebounce {
+                    return .none
+                }
                 return .run { [database, healthKitClient] send in
                     // Signal A: a fresh race time from HealthKit implies a
                     // higher VDOT than the plan was generated against.
@@ -342,6 +358,7 @@ import VDOTEngine
 
             case .dismissVDOTUpgrade:
                 state.vdotUpgrade = nil
+                state.$vdotUpgradeLastDismissAt.withLock { $0 = now }
                 return .none
 
             case .syncBackWorkouts:
