@@ -27,6 +27,18 @@ public struct PlanView: View {
                         }
                         .buttonStyle(.plain)
 
+                        if let upgrade = store.vdotUpgrade {
+                            VDOTUpgradeBanner(upgrade: upgrade,
+                                onAccept: { store.send(.acceptVDOTUpgradeTapped) },
+                                onDismiss: { store.send(.dismissVDOTUpgrade) })
+                        }
+
+                        if case let .suggestDowngrade(reason) = store.recoveryAdvice {
+                            RecoveryAdviceBanner(reason: reason) {
+                                store.send(.dismissRecoveryAdvice)
+                            }
+                        }
+
                         if let zones = store.paceZones {
                             PaceZonesSummaryCard(zones: zones) { zone in
                                 store.send(.paceChipTapped(zone))
@@ -334,6 +346,115 @@ private struct SessionCard: View {
         let idx = session.dayOfWeek - 1
         guard idx >= 0, idx < days.count else { return "" }
         return days[idx]
+    }
+}
+
+private struct VDOTUpgradeBanner: View {
+    let upgrade: TrainingPlan.VDOTUpgrade
+    let onAccept: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: "arrow.up.right.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(Color(hex: "#CCFF00"))
+                Text("VDOT improved")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.white)
+                Spacer()
+                Button {
+                    onDismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.caption.bold())
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+
+            HStack(spacing: 6) {
+                Text(upgrade.oldVDOT, format: .number.precision(.fractionLength(1)))
+                    .foregroundStyle(.secondary)
+                Image(systemName: "arrow.right")
+                    .font(.caption.bold())
+                    .foregroundStyle(.secondary)
+                Text(upgrade.newVDOT, format: .number.precision(.fractionLength(1)))
+                    .bold()
+                    .foregroundStyle(Color(hex: "#CCFF00"))
+            }
+            .font(.title3)
+
+            Text("Update your training paces to match?")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Button {
+                onAccept()
+            } label: {
+                Text("Update paces")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(Color(hex: "#CCFF00"))
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(hex: "#1A1B2E"))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color(hex: "#CCFF00").opacity(0.4), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private struct RecoveryAdviceBanner: View {
+    let reason: String
+    let onDismiss: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "moon.zzz.fill")
+                .font(.title2)
+                .foregroundStyle(Color(hex: "#FFC107"))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Recovery looks low today")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.white)
+                Text(reason)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text("Consider swapping today's hard session for an easy run.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 2)
+            }
+
+            Spacer(minLength: 6)
+
+            Button {
+                onDismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.caption.bold())
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .background(Color(hex: "#1A1B2E"))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color(hex: "#FFC107").opacity(0.4), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 

@@ -10,10 +10,27 @@ import VDOTEngine
         public var currentVDOT: Double = 0
         public var paceZones: PaceZones? = nil
         public var isLoadingVDOT: Bool = false
+        public var recoveryAdvice: RecoveryAdvice? = nil
+        public var vdotUpgrade: VDOTUpgrade? = nil
         public var path = StackState<Path.State>()
         @Presents public var destination: Destination.State? = nil
 
         public init() {}
+    }
+
+    /// VDOT-improvement signal surfaced from HealthKit when a fresh race
+    /// from the runner's history implies a higher VDOT than the plan was
+    /// generated against.
+    public struct VDOTUpgrade: Equatable {
+        public let oldVDOT: Double
+        public let newVDOT: Double
+    }
+
+    /// Recovery / readiness signal surfaced from HealthKit when the runner
+    /// has a hard session scheduled today but HRV or sleep say otherwise.
+    public enum RecoveryAdvice: Equatable {
+        /// HRV-driven hint to swap today's high-intensity session for easy.
+        case suggestDowngrade(reason: String)
     }
 
     @Reducer public enum Path {
@@ -41,6 +58,13 @@ import VDOTEngine
         case countdownTapped
         case paceChipTapped(PaceZoneName)
         case sessionTapped(PlannedSession)
+        case fetchRecoveryAdvice
+        case recoveryAdviceLoaded(RecoveryAdvice?)
+        case dismissRecoveryAdvice
+        case checkVDOTUpgrade
+        case vdotUpgradeDetected(VDOTUpgrade?)
+        case acceptVDOTUpgradeTapped
+        case dismissVDOTUpgrade
         case path(StackActionOf<Path>)
         case destination(PresentationAction<Destination.Action>)
         case delegate(Delegate)
@@ -105,7 +129,13 @@ import VDOTEngine
                 state.isLoadingVDOT = false
                 state.currentVDOT = vdot
                 state.paceZones = VDOTCalculator.paceZones(vdot: vdot)
-                return .none
+                // VDOT is loaded → kick the readiness and progress checks
+                // now that we know there's an active plan with a today's
+                // session to evaluate and a baseline VDOT to compare against.
+                return .merge(
+                    .send(.fetchRecoveryAdvice),
+                    .send(.checkVDOTUpgrade)
+                )
 
             case .vdotFetchResponse(.failure):
                 state.isLoadingVDOT = false
@@ -146,6 +176,92 @@ import VDOTEngine
 
             case .countdownTapped:
                 state.path.append(.weekSchedule(WeekSchedule.State()))
+                return .none
+
+            case .fetchRecoveryAdvice:
+                return .run { [database, healthKitClient] send in
+                    // 1. Find today's planned session.
+                    let weekday = Calendar.current.component(.weekday, from: Date())
+                    let dayOfWeek = weekday == 1 ? 7 : weekday - 1  // Sun=1 → 7
+                    let todaysType = try? await database.read { db -> SessionType? in
+                        try PlannedSession
+                            .where { $0.dayOfWeek.eq(dayOfWeek) }
+                            .fetchOne(db)?.sessionType
+                    }
+                    // 2. Only consider downgrading hard sessions.
+                    let hardTypes: Set<SessionType> = [.interval, .tempo, .repetition]
+                    guard let todaysType = todaysType, hardTypes.contains(todaysType) else {
+                        await send(.recoveryAdviceLoaded(nil))
+                        return
+                    }
+                    // 3. Check HRV + sleep.
+                    let hrv = (try? await healthKitClient.latestHRV()) ?? nil
+                    let sleepHours = (try? await healthKitClient.recentSleepHours(1)) ?? 0
+                    var reasons: [String] = []
+                    if let hrv, hrv < 30 {
+                        reasons.append("HRV low (\(Int(hrv.rounded())) ms)")
+                    }
+                    if sleepHours > 0 && sleepHours < 6 {
+                        let sleepStr = sleepHours.formatted(.number.precision(.fractionLength(0...1)))
+                        reasons.append("only \(sleepStr) h sleep")
+                    }
+                    let advice: RecoveryAdvice? = reasons.isEmpty
+                        ? nil
+                        : .suggestDowngrade(reason: reasons.joined(separator: " · "))
+                    await send(.recoveryAdviceLoaded(advice))
+                }
+
+            case let .recoveryAdviceLoaded(advice):
+                state.recoveryAdvice = advice
+                return .none
+
+            case .dismissRecoveryAdvice:
+                state.recoveryAdvice = nil
+                return .none
+
+            case .checkVDOTUpgrade:
+                let currentVDOT = state.currentVDOT
+                guard currentVDOT > 0 else { return .none }
+                return .run { [healthKitClient] send in
+                    // Re-detect VDOT from latest HealthKit history.
+                    var detectedBest: Double = 0
+                    for distance in [RaceDistanceQuery.fiveK, .tenK, .halfMarathon] {
+                        if let time = try? await healthKitClient.bestRaceTime(distance) {
+                            let v = VDOTCalculator.vdot(distanceMeters: distance.metres, timeSeconds: time)
+                            detectedBest = max(detectedBest, v)
+                        }
+                    }
+                    // Only suggest when the gain is meaningful (≥ 1 VDOT point).
+                    guard detectedBest >= currentVDOT + 1 else {
+                        await send(.vdotUpgradeDetected(nil))
+                        return
+                    }
+                    await send(.vdotUpgradeDetected(.init(
+                        oldVDOT: currentVDOT,
+                        newVDOT: detectedBest
+                    )))
+                }
+
+            case let .vdotUpgradeDetected(upgrade):
+                state.vdotUpgrade = upgrade
+                return .none
+
+            case .acceptVDOTUpgradeTapped:
+                guard let upgrade = state.vdotUpgrade else { return .none }
+                let newVDOT = upgrade.newVDOT
+                state.vdotUpgrade = nil
+                state.currentVDOT = newVDOT
+                state.paceZones = VDOTCalculator.paceZones(vdot: newVDOT)
+                return .run { [database] _ in
+                    try await database.write { db in
+                        try RaceGoal.update {
+                            $0.currentVDOT = newVDOT
+                        }.execute(db)
+                    }
+                }
+
+            case .dismissVDOTUpgrade:
+                state.vdotUpgrade = nil
                 return .none
 
             case let .paceChipTapped(zone):
