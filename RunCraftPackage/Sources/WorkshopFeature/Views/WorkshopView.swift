@@ -2,6 +2,7 @@ import ComposableArchitecture
 import RunCraftModels
 import SQLiteData
 import SwiftUI
+import VDOTEngine
 
 public struct WorkshopView: View {
     @Bindable public var store: StoreOf<Workshop>
@@ -180,6 +181,11 @@ private struct PlanSessionRow: View {
     let vdot: Double
     let onTap: (WorkoutTemplate) -> Void
 
+    private var livePace: String? {
+        guard let zone = session.targetPaceZone, vdot > 0 else { return nil }
+        return VDOTCalculator.paceRange(for: zone, vdot: vdot).formatted()
+    }
+
     var body: some View {
         Button {
             let template = PlanSessionAdapter.makeTemplate(from: session, vdot: vdot)
@@ -194,7 +200,9 @@ private struct PlanSessionRow: View {
                     Text(session.sessionType.displayName)
                         .font(.subheadline.bold())
                         .foregroundStyle(.white)
-                    if !session.notes.isEmpty {
+                    if let livePace {
+                        Text(livePace).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    } else if !session.notes.isEmpty {
                         Text(session.notes).font(.caption).foregroundStyle(.secondary).lineLimit(1)
                     }
                 }

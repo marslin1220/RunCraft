@@ -34,7 +34,10 @@ public struct PlanView: View {
                         }
 
                         if let currentWeek = currentWeek {
-                            WeekSessionsSection(week: currentWeek) { session in
+                            WeekSessionsSection(
+                                week: currentWeek,
+                                vdot: store.currentVDOT
+                            ) { session in
                                 store.send(.sessionTapped(session))
                             }
                         }
@@ -210,6 +213,7 @@ private struct PaceChip: View {
 
 private struct WeekSessionsSection: View {
     let week: TrainingWeek
+    let vdot: Double
     let onSessionTap: (PlannedSession) -> Void
     @FetchAll(PlannedSession.none) var sessions: [PlannedSession]
     @FetchAll var completedThisWeek: [CompletedWorkout]
@@ -237,6 +241,7 @@ private struct WeekSessionsSection: View {
                     SessionCard(
                         session: session,
                         weekStart: week.startDate,
+                        vdot: vdot,
                         isCompleted: completedSessionIds.contains(session.id)
                     )
                 }
@@ -260,7 +265,16 @@ private struct WeekSessionsSection: View {
 private struct SessionCard: View {
     let session: PlannedSession
     let weekStart: Date
+    let vdot: Double
     let isCompleted: Bool
+
+    /// Live pace string for the work portion, computed from the session's
+    /// stored zone and the current VDOT. Returns nil for rest days or when
+    /// the VDOT isn't known yet.
+    private var livePaceText: String? {
+        guard let zone = session.targetPaceZone, vdot > 0 else { return nil }
+        return VDOTCalculator.paceRange(for: zone, vdot: vdot).formatted()
+    }
 
     var body: some View {
         HStack(spacing: 14) {
@@ -278,7 +292,12 @@ private struct SessionCard: View {
                     .bold()
                     .foregroundStyle(.white)
 
-                if !session.notes.isEmpty {
+                if let pace = livePaceText {
+                    Text(pace)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                } else if !session.notes.isEmpty {
                     Text(session.notes)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -444,6 +463,20 @@ private struct WeekSection: View {
                         Text(session.sessionType.displayName)
                             .font(.caption)
                             .foregroundStyle(.white)
+                        // Zone letter — the structural intent. Specific
+                        // pace numbers are only honest for the current
+                        // week (and computed at runtime there), so
+                        // future weeks just show the zone badge.
+                        if let zone = session.targetPaceZone {
+                            Text(zone.letter)
+                                .font(.caption2.bold())
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1)
+                                .overlay(
+                                    Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                )
+                        }
                         Spacer()
                         if let km = session.targetDistanceKm {
                             Text("\(km, format: .number.precision(.fractionLength(0...1))) km")
@@ -463,6 +496,7 @@ private struct WeekSection: View {
                     .padding(10)
                     .background(Color(hex: "#1A1B2E"))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .opacity(isCurrent ? 1.0 : 0.85)
                 }
                 .buttonStyle(.plain)
             }
