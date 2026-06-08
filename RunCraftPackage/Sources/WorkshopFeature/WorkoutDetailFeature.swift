@@ -32,6 +32,8 @@ import RunCraftModels
     }
 
     public enum Action {
+        case onAppear
+        case workoutReloaded(WorkoutTemplate?)
         case startTapped
         case syncResponse(Result<Void, any Error>)
         case editTapped
@@ -53,12 +55,27 @@ import RunCraftModels
     }
 
     @Dependency(\.workoutKitClient) var workoutKitClient
+    @Dependency(\.workoutTemplateRepository) var repository
 
     public init() {}
 
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case .onAppear:
+                // Only Yours templates have a DB row to re-fetch. Templates and
+                // plan sessions are computed snapshots.
+                guard state.source == .yours else { return .none }
+                let id = state.workout.id
+                return .run { [repository] send in
+                    let fresh = try? await repository.load(id)
+                    await send(.workoutReloaded(fresh))
+                }
+
+            case let .workoutReloaded(template):
+                if let template { state.workout = template }
+                return .none
+
             case .startTapped:
                 state.syncStatus = .sending
                 let workout = state.workout

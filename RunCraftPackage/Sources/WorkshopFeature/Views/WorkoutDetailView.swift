@@ -29,6 +29,7 @@ public struct WorkoutDetailView: View {
         .navigationTitle(store.workout.name)
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
+        .onAppear { store.send(.onAppear) }
         .toolbar {
             if store.source != .yours {
                 ToolbarItem(placement: .topBarTrailing) {

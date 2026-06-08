@@ -74,6 +74,55 @@ struct WorkoutDetailTests {
         await store.receive(\.delegate.requestEdit)
     }
 
+    // MARK: - onAppear refresh
+
+    @Test("onAppear with source=.yours reloads the workout from the repository")
+    func onAppear_yours_refreshes() async {
+        var stale = WorkoutTemplate.sample
+        stale.name = "Stale name"
+        let fresh = WorkoutTemplate(
+            id: stale.id,
+            name: "Refreshed name",
+            blocks: stale.blocks
+        )
+
+        let store = TestStore(initialState: WorkoutDetail.State(
+            workout: stale,
+            source: .yours
+        )) {
+            WorkoutDetail()
+        } withDependencies: {
+            $0.workoutTemplateRepository = .testValue
+            $0.workoutTemplateRepository.load = { @Sendable id in
+                #expect(id == stale.id)
+                return fresh
+            }
+        }
+
+        await store.send(.onAppear)
+        await store.receive(\.workoutReloaded) {
+            $0.workout = fresh
+        }
+    }
+
+    @Test("onAppear with source=.template is a no-op (no repository call)")
+    func onAppear_template_noOp() async {
+        let store = TestStore(initialState: WorkoutDetail.State(
+            workout: .sample,
+            source: .template
+        )) {
+            WorkoutDetail()
+        } withDependencies: {
+            $0.workoutTemplateRepository = .testValue
+            $0.workoutTemplateRepository.load = { @Sendable _ in
+                Issue.record("repository.load must not be called for non-yours source")
+                return nil
+            }
+        }
+
+        await store.send(.onAppear)   // no .receive expected
+    }
+
     // MARK: - Duplicate delegation
 
     @Test("Duplicate tap emits delegate.requestDuplicate with the current workout")
