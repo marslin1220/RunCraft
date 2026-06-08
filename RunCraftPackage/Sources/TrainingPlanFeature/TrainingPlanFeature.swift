@@ -18,10 +18,11 @@ import VDOTEngine
 
         /// Time the user last dismissed the recovery banner. Persisted so
         /// dismissals survive app restarts; `.distantPast` = never dismissed.
-        @Shared(.appStorage("recoveryBanner.lastDismissAt"))
+        /// Key uses `_` not `.` because UserDefaults KVO can't observe dots.
+        @Shared(.appStorage("recoveryBanner_lastDismissAt"))
         public var recoveryBannerLastDismissAt = Date.distantPast
         /// Same idea for the VDOT-upgrade banner.
-        @Shared(.appStorage("vdotUpgrade.lastDismissAt"))
+        @Shared(.appStorage("vdotUpgrade_lastDismissAt"))
         public var vdotUpgradeLastDismissAt = Date.distantPast
 
         public init() {}
