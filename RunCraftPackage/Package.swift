@@ -17,7 +17,6 @@ let package = Package(
         .library(name: "AppleWatchSync", targets: ["AppleWatchSync"]),
         .library(name: "WorkshopFeature", targets: ["WorkshopFeature"]),
         .library(name: "AppFeature", targets: ["AppFeature"]),
-        .library(name: "WatchAppFeature", targets: ["WatchAppFeature"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.15.0"),
@@ -85,17 +84,6 @@ let package = Package(
                 "TrainingPlanFeature",
                 "WorkshopFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            ]
-        ),
-
-        .target(
-            name: "WatchAppFeature",
-            dependencies: [
-                "AppleWatchSync",
-                "RunCraftModels",
-                "VDOTEngine",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "SQLiteData", package: "sqlite-data"),
             ]
         ),
 
