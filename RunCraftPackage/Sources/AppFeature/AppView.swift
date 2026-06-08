@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import InsightsFeature
 import SwiftUI
 import TrainingPlanFeature
 import WorkshopFeature
@@ -24,7 +25,7 @@ public struct AppView: View {
                 }
                 .tag(AppFeature.Tab.workshop)
 
-            InsightsPlaceholderView()
+            InsightsView(store: store.scope(state: \.insights, action: \.insights))
                 .tabItem {
                     Label("Insights", systemImage: "chart.line.uptrend.xyaxis")
                 }
@@ -41,23 +42,3 @@ public struct AppView: View {
     }
 }
 
-// MARK: - Placeholder for Insights tab (P2)
-
-private struct InsightsPlaceholderView: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "chart.line.uptrend.xyaxis")
-                .font(.system(size: 56))
-                .foregroundStyle(.secondary)
-            Text("Insights")
-                .font(.title2).bold()
-            Text("VDOT trend charts and predicted race times — coming in Phase 2")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
-        .preferredColorScheme(.dark)
-    }
-}

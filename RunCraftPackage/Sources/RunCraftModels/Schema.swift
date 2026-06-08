@@ -86,6 +86,24 @@ extension DependencyValues {
                 .execute(db)
         }
 
+        migrator.registerMigration("v2 – vdot snapshots") { db in
+            try #sql("""
+                CREATE TABLE "vdotSnapshots" (
+                  "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
+                  "vdot" REAL NOT NULL DEFAULT 0,
+                  "recordedAt" TEXT NOT NULL DEFAULT '',
+                  "source" TEXT NOT NULL DEFAULT 'manual'
+                ) STRICT
+                """)
+                .execute(db)
+
+            try #sql("""
+                CREATE INDEX "index_vdotSnapshots_on_recordedAt"
+                ON "vdotSnapshots"("recordedAt")
+                """)
+                .execute(db)
+        }
+
         try migrator.migrate(database)
         defaultDatabase = database
     }

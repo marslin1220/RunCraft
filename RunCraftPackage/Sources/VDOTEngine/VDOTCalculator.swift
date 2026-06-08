@@ -25,6 +25,35 @@ public struct VDOTCalculator {
         return min(max(raw, 30), 85)
     }
 
+    // MARK: - Predicted race time from VDOT
+
+    /// Predicts the finishing time (seconds) for a race of `distanceMeters`
+    /// at the given VDOT. Solves the Daniels formula iteratively because
+    /// the VO2max-fraction depends on duration (non-closed form).
+    public static func predictedTime(distanceMeters: Double, vdot: Double) -> TimeInterval {
+        let vdot = min(max(vdot, 30), 85)
+
+        // Newton-style fixed-point iteration: start from an easy-effort
+        // guess (~70% of VDOT) and converge. Empirically settles in <10 steps.
+        var durationMinutes: Double = max(distanceMeters / 250, 1) // initial guess @ 250 m/min
+        for _ in 0..<30 {
+            let fraction = vo2MaxFraction(at: durationMinutes)
+            let targetVO2 = fraction * vdot
+            // Solve oxygenCost(V) = targetVO2 for V (m/min).
+            let a = 0.000104
+            let b = 0.182258
+            let c = -4.60 - targetVO2
+            let discriminant = b * b - 4 * a * c
+            guard discriminant >= 0 else { break }
+            let velocityMPM = (-b + sqrt(discriminant)) / (2 * a)
+            guard velocityMPM > 0 else { break }
+            let nextDuration = distanceMeters / velocityMPM
+            if abs(nextDuration - durationMinutes) < 0.001 { break }
+            durationMinutes = nextDuration
+        }
+        return durationMinutes * 60
+    }
+
     // MARK: - Pace zones from VDOT
 
     /// Derives the five Jack Daniels training pace zones from a VDOT score.

@@ -115,6 +115,7 @@ import VDOTEngine
                     createdAt: now
                 )
                 let (weeks, sessions) = TrainingPlanGenerator.generate(goal: goal, vdot: vdot)
+                let snapshot = VDOTSnapshot(vdot: vdot, recordedAt: now, source: .initial)
                 return .run { [database, dismiss] _ in
                     try await database.write { db in
                         try RaceGoal.upsert { goal }.execute(db)
@@ -124,6 +125,7 @@ import VDOTEngine
                         for session in sessions {
                             try PlannedSession.upsert { session }.execute(db)
                         }
+                        try VDOTSnapshot.upsert { snapshot }.execute(db)
                     }
                     await dismiss()
                 }

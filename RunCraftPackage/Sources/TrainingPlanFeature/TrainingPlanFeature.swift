@@ -26,6 +26,7 @@ import VDOTEngine
     public struct VDOTUpgrade: Equatable {
         public let oldVDOT: Double
         public let newVDOT: Double
+        public let source: VDOTSnapshot.Source
     }
 
     /// Recovery / readiness signal surfaced from HealthKit when the runner
@@ -270,8 +271,10 @@ import VDOTEngine
                         }
                     }
                     var suggested: Double? = nil
+                    var suggestedSource: VDOTSnapshot.Source = .raceTime
                     if detectedBest >= currentVDOT + 1 {
                         suggested = detectedBest
+                        suggestedSource = .raceTime
                     }
 
                     // Signal B: the runner consistently beat target pace on
@@ -302,6 +305,7 @@ import VDOTEngine
                     if (consecutiveOverperformance ?? 0) >= 2,
                        (suggested ?? 0) < currentVDOT + 1 {
                         suggested = currentVDOT + 1
+                        suggestedSource = .overperformance
                     }
 
                     guard let suggested else {
@@ -310,7 +314,8 @@ import VDOTEngine
                     }
                     await send(.vdotUpgradeDetected(.init(
                         oldVDOT: currentVDOT,
-                        newVDOT: suggested
+                        newVDOT: suggested,
+                        source: suggestedSource
                     )))
                 }
 
@@ -321,6 +326,7 @@ import VDOTEngine
             case .acceptVDOTUpgradeTapped:
                 guard let upgrade = state.vdotUpgrade else { return .none }
                 let newVDOT = upgrade.newVDOT
+                let source = upgrade.source
                 state.vdotUpgrade = nil
                 state.currentVDOT = newVDOT
                 state.paceZones = VDOTCalculator.paceZones(vdot: newVDOT)
@@ -329,6 +335,8 @@ import VDOTEngine
                         try RaceGoal.update {
                             $0.currentVDOT = newVDOT
                         }.execute(db)
+                        let snapshot = VDOTSnapshot(vdot: newVDOT, source: source)
+                        try VDOTSnapshot.upsert { snapshot }.execute(db)
                     }
                 }
 

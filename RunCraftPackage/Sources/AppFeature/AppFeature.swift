@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import InsightsFeature
 import TrainingPlanFeature
 import WorkshopFeature
 
@@ -7,6 +8,7 @@ import WorkshopFeature
         public var selectedTab: Tab = .plan
         public var plan: TrainingPlan.State = .init()
         public var workshop: Workshop.State = .init()
+        public var insights: InsightsFeature.State = .init()
         public var settings: Settings.State = .init()
 
         public init() {}
@@ -23,6 +25,7 @@ import WorkshopFeature
         case tabSelected(Tab)
         case plan(TrainingPlan.Action)
         case workshop(Workshop.Action)
+        case insights(InsightsFeature.Action)
         case settings(Settings.Action)
     }
 
@@ -34,6 +37,9 @@ import WorkshopFeature
         }
         Scope(state: \.workshop, action: \.workshop) {
             Workshop()
+        }
+        Scope(state: \.insights, action: \.insights) {
+            InsightsFeature()
         }
         Scope(state: \.settings, action: \.settings) {
             Settings()
@@ -52,7 +58,7 @@ import WorkshopFeature
                 }
                 return .send(.workshop(.openDetail(template, workshopSource)))
 
-            case .plan, .workshop, .settings:
+            case .plan, .workshop, .insights, .settings:
                 return .none
             }
         }

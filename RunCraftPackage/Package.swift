@@ -16,6 +16,7 @@ let package = Package(
         .library(name: "TrainingPlanFeature", targets: ["TrainingPlanFeature"]),
         .library(name: "AppleWatchSync", targets: ["AppleWatchSync"]),
         .library(name: "WorkshopFeature", targets: ["WorkshopFeature"]),
+        .library(name: "InsightsFeature", targets: ["InsightsFeature"]),
         .library(name: "AppFeature", targets: ["AppFeature"]),
     ],
     dependencies: [
@@ -79,8 +80,19 @@ let package = Package(
         ),
 
         .target(
+            name: "InsightsFeature",
+            dependencies: [
+                "RunCraftModels",
+                "VDOTEngine",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SQLiteData", package: "sqlite-data"),
+            ]
+        ),
+
+        .target(
             name: "AppFeature",
             dependencies: [
+                "InsightsFeature",
                 "TrainingPlanFeature",
                 "WorkshopFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
