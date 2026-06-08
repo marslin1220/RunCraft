@@ -34,9 +34,9 @@ public struct PlanView: View {
                         }
 
                         if case let .suggestDowngrade(reason) = store.recoveryAdvice {
-                            RecoveryAdviceBanner(reason: reason) {
-                                store.send(.dismissRecoveryAdvice)
-                            }
+                            RecoveryAdviceBanner(reason: reason,
+                                onApply: { store.send(.applyDowngradeTapped) },
+                                onDismiss: { store.send(.dismissRecoveryAdvice) })
                         }
 
                         if let zones = store.paceZones {
@@ -416,39 +416,56 @@ private struct VDOTUpgradeBanner: View {
 
 private struct RecoveryAdviceBanner: View {
     let reason: String
+    let onApply: () -> Void
     let onDismiss: () -> Void
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: "moon.zzz.fill")
-                .font(.title2)
-                .foregroundStyle(Color(hex: "#FFC107"))
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "moon.zzz.fill")
+                    .font(.title2)
+                    .foregroundStyle(Color(hex: "#FFC107"))
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Recovery looks low today")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.white)
-                Text(reason)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text("Consider swapping today's hard session for an easy run.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 2)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Recovery looks low today")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.white)
+                    Text(reason)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("We can swap today's hard session for an easy 5 km run.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 2)
+                }
+
+                Spacer(minLength: 6)
+
+                Button {
+                    onDismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.caption.bold())
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
             }
 
-            Spacer(minLength: 6)
-
             Button {
-                onDismiss()
+                onApply()
             } label: {
-                Image(systemName: "xmark")
-                    .font(.caption.bold())
-                    .foregroundStyle(.secondary)
+                Text("Swap to Easy")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(Color(hex: "#FFC107"))
+                    .clipShape(Capsule())
             }
             .buttonStyle(.plain)
         }
         .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(hex: "#1A1B2E"))
         .overlay(
             RoundedRectangle(cornerRadius: 14)

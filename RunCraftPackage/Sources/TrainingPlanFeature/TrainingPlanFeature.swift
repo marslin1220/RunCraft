@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import HealthKitClient
 import RunCraftModels
+import SQLiteData
 import VDOTEngine
 
 @Reducer public struct TrainingPlan {
@@ -11,6 +12,7 @@ import VDOTEngine
         public var paceZones: PaceZones? = nil
         public var isLoadingVDOT: Bool = false
         public var recoveryAdvice: RecoveryAdvice? = nil
+        public var lastRecoveryDismissAt: Date? = nil
         public var vdotUpgrade: VDOTUpgrade? = nil
         public var path = StackState<Path.State>()
         @Presents public var destination: Destination.State? = nil
@@ -60,6 +62,7 @@ import VDOTEngine
         case sessionTapped(PlannedSession)
         case fetchRecoveryAdvice
         case recoveryAdviceLoaded(RecoveryAdvice?)
+        case applyDowngradeTapped
         case dismissRecoveryAdvice
         case checkVDOTUpgrade
         case vdotUpgradeDetected(VDOTUpgrade?)
@@ -82,6 +85,7 @@ import VDOTEngine
 
     @Dependency(\.healthKitClient) var healthKitClient
     @Dependency(\.defaultDatabase) var database
+    @Dependency(\.date.now) var now
 
     public init() {}
 
@@ -179,6 +183,13 @@ import VDOTEngine
                 return .none
 
             case .fetchRecoveryAdvice:
+                // Debounce: if the user dismissed within the last 6 h, don't
+                // re-evaluate. They'll see the next banner after that window
+                // or when the app is relaunched (state is in-memory).
+                if let last = state.lastRecoveryDismissAt,
+                   now.timeIntervalSince(last) < 6 * 3600 {
+                    return .none
+                }
                 return .run { [database, healthKitClient] send in
                     // 1. Find today's planned session.
                     let weekday = Calendar.current.component(.weekday, from: Date())
@@ -215,8 +226,30 @@ import VDOTEngine
                 state.recoveryAdvice = advice
                 return .none
 
+            case .applyDowngradeTapped:
+                state.recoveryAdvice = nil
+                return .run { [database] _ in
+                    try await database.write { db in
+                        let weeks = try TrainingWeek.all.fetchAll(db)
+                        guard let currentWeek = TrainingWeek.current(in: weeks) else { return }
+                        let weekday = Calendar.current.component(.weekday, from: Date())
+                        let dayOfWeek = weekday == 1 ? 7 : weekday - 1
+                        try PlannedSession
+                            .where { $0.weekId.eq(currentWeek.id) }
+                            .where { $0.dayOfWeek.eq(dayOfWeek) }
+                            .update {
+                                $0.sessionType = #bind(.easy)
+                                $0.targetPaceZone = #bind(.easy)
+                                $0.targetDistanceKm = #bind(5)
+                                $0.notes = #bind("Auto-downgraded for recovery")
+                            }
+                            .execute(db)
+                    }
+                }
+
             case .dismissRecoveryAdvice:
                 state.recoveryAdvice = nil
+                state.lastRecoveryDismissAt = now
                 return .none
 
             case .checkVDOTUpgrade:
