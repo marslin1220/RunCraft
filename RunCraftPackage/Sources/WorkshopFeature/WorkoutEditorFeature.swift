@@ -13,6 +13,11 @@ import RunCraftModels
         public var source: Source = .yours
         public var saveStatus: SaveStatus = .idle
         public var syncStatus: SyncStatus = .idle
+        /// Id of a block that was just appended optimistically and is being
+        /// configured in the edit sheet. If the user cancels that sheet, we
+        /// drop the block so they don't get a default-value Step or empty
+        /// Repeat sitting in the workout.
+        public var pendingBlockId: WorkoutBlock.ID? = nil
         @Presents public var destination: Destination.State?
         @Presents public var alert: AlertState<Action.Alert>?
 
@@ -138,12 +143,14 @@ import RunCraftModels
             case let .addStepTapped(kind):
                 let step = WorkoutStep(id: uuid(), kind: kind, goal: defaultGoal(for: kind))
                 state.blocks.append(.step(step))
+                state.pendingBlockId = step.id
                 state.destination = .editStep(EditStep.State(step: step))
                 return .none
 
             case .addRepeatGroupTapped:
                 let group = RepeatGroup(id: uuid(), iterations: 4, steps: [])
                 state.blocks.append(.repeatGroup(group))
+                state.pendingBlockId = group.id
                 state.destination = .editRepeatGroup(EditRepeatGroup.State(
                     group: group,
                     availableSteps: state.topLevelSteps
@@ -152,6 +159,8 @@ import RunCraftModels
 
             case let .blockTapped(id):
                 guard let block = state.blocks[id: id] else { return .none }
+                // Editing an existing block — clear any stale pending flag.
+                state.pendingBlockId = nil
                 switch block {
                 case .step(let step):
                     state.destination = .editStep(EditStep.State(step: step))
@@ -255,12 +264,24 @@ import RunCraftModels
 
             case let .destination(.presented(.editStep(.delegate(.saved(step))))):
                 state.blocks[id: step.id] = .step(step)
+                state.pendingBlockId = nil
                 state.destination = nil
                 return .none
 
             case let .destination(.presented(.editRepeatGroup(.delegate(.saved(group))))):
                 state.blocks[id: group.id] = .repeatGroup(group)
+                state.pendingBlockId = nil
                 state.destination = nil
+                return .none
+
+            case .destination(.dismiss):
+                // Sheet closed (user tapped Cancel or swiped down). If a
+                // newly-appended block hadn't been saved yet, drop it so the
+                // workout doesn't keep a default-value Step or empty Repeat.
+                if let pendingId = state.pendingBlockId {
+                    state.blocks.remove(id: pendingId)
+                    state.pendingBlockId = nil
+                }
                 return .none
 
             case .destination, .alert, .delegate:
@@ -441,6 +462,10 @@ import RunCraftModels
         /// Top-level steps from the parent workout — offered as checkboxes
         /// so the user can pull copies into the repeat without retyping.
         public var availableSteps: [WorkoutStep] = []
+        /// Same idea as WorkoutEditor.pendingBlockId: id of a step we just
+        /// appended optimistically. Dropped on cancel so the user doesn't
+        /// end up with a stray 400 m default if they back out of the sheet.
+        public var pendingStepId: WorkoutStep.ID? = nil
         @Presents public var editingStep: EditStep.State?
 
         public init(group: RepeatGroup, availableSteps: [WorkoutStep] = []) {
@@ -497,11 +522,13 @@ import RunCraftModels
             case .addStepTapped:
                 let step = WorkoutStep(id: uuid(), kind: .work, goal: .distance(metres: 400))
                 state.group.steps.append(step)
+                state.pendingStepId = step.id
                 state.editingStep = EditStep.State(step: step)
                 return .none
 
             case let .editStepTapped(id):
                 guard let step = state.group.steps.first(where: { $0.id == id }) else { return .none }
+                state.pendingStepId = nil
                 state.editingStep = EditStep.State(step: step)
                 return .none
 
@@ -513,7 +540,17 @@ import RunCraftModels
                 if let idx = state.group.steps.firstIndex(where: { $0.id == step.id }) {
                     state.group.steps[idx] = step
                 }
+                state.pendingStepId = nil
                 state.editingStep = nil
+                return .none
+
+            case .editingStep(.dismiss):
+                // Cancelled / swiped down — drop the half-configured step
+                // if one was being added.
+                if let pendingId = state.pendingStepId {
+                    state.group.steps.removeAll { $0.id == pendingId }
+                    state.pendingStepId = nil
+                }
                 return .none
 
             case .editingStep:

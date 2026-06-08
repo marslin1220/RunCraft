@@ -69,6 +69,7 @@ import VDOTEngine
         case vdotFetchResponse(Result<Double, any Error>)
         case deletePlanRequested
         case recalculateVDOTRequested
+        case editGoalLoaded(RaceGoal?)
         case planDeleted
         case countdownTapped
         case paceChipTapped(PaceZoneName)
@@ -178,7 +179,19 @@ import VDOTEngine
                 return .none
 
             case .recalculateVDOTRequested:
-                state.destination = .setupRaceGoal(SetupRaceGoal.State())
+                return .run { [database] send in
+                    let goal = try? await database.read { db in
+                        try RaceGoal.order { $0.createdAt.desc() }.fetchOne(db)
+                    }
+                    await send(.editGoalLoaded(goal))
+                }
+
+            case let .editGoalLoaded(goal):
+                if let goal {
+                    state.destination = .setupRaceGoal(SetupRaceGoal.State(editing: goal))
+                } else {
+                    state.destination = .setupRaceGoal(SetupRaceGoal.State())
+                }
                 return .none
 
             case .destination(.presented(.deleteConfirm(.confirmDelete))):

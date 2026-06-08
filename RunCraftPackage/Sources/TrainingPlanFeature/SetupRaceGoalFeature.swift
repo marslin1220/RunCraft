@@ -10,6 +10,14 @@ import VDOTEngine
         public var targetDate: Date = Calendar.current.date(byAdding: .month, value: 4, to: Date()) ?? Date()
         public var distanceKm: Double = 21.0
 
+        /// nil = creating a new goal; non-nil = editing the existing goal
+        /// in place. When set, Save reuses the same id (so weeks + sessions
+        /// get cleanly regenerated rather than orphaning).
+        public var editingId: UUID? = nil
+        /// VDOT the goal was saved with last time — used to decide whether
+        /// to write a fresh VDOTSnapshot on save.
+        public var originalVDOT: Double? = nil
+
         // HealthKit auto-detection
         public var detectedVDOT: Double? = nil
         public var isDetectingVDOT: Bool = false
@@ -49,6 +57,21 @@ import VDOTEngine
         }
 
         public init() {}
+
+        /// Pre-fill from the runner's current race goal so editing keeps
+        /// every field they've already committed to (name, date, distance)
+        /// and only the race-time row drives a re-calc.
+        public init(editing goal: RaceGoal) {
+            self.goalName = goal.name
+            self.targetDate = goal.targetDate
+            self.distanceKm = goal.distanceKm
+            self.editingId = goal.id
+            self.originalVDOT = goal.currentVDOT
+            // Seed the detected-VDOT pill so the form starts in a valid
+            // (saveable) state — user can clear it if they want to re-enter
+            // a new race time.
+            self.detectedVDOT = goal.currentVDOT
+        }
     }
 
     public enum Action: BindableAction {
@@ -107,7 +130,9 @@ import VDOTEngine
 
             case .saveButtonTapped:
                 guard let vdot = state.effectiveVDOT else { return .none }
+                let goalId = state.editingId ?? UUID()
                 let goal = RaceGoal(
+                    id: goalId,
                     name: state.goalName,
                     targetDate: state.targetDate,
                     distanceKm: state.distanceKm,
@@ -115,9 +140,21 @@ import VDOTEngine
                     createdAt: now
                 )
                 let (weeks, sessions) = TrainingPlanGenerator.generate(goal: goal, vdot: vdot)
-                let snapshot = VDOTSnapshot(vdot: vdot, recordedAt: now, source: .initial)
+                let isEditing = state.editingId != nil
+                // Only snapshot when VDOT changed: avoids piling identical
+                // points on the trend line on every cosmetic edit.
+                let snapshot: VDOTSnapshot? = state.originalVDOT == vdot
+                    ? nil
+                    : VDOTSnapshot(vdot: vdot, recordedAt: now, source: .initial)
                 return .run { [database, dismiss] _ in
                     try await database.write { db in
+                        if isEditing {
+                            // Cascade removes plannedSessions for these weeks.
+                            try TrainingWeek
+                                .where { $0.raceGoalId.eq(goalId) }
+                                .delete()
+                                .execute(db)
+                        }
                         try RaceGoal.upsert { goal }.execute(db)
                         for week in weeks {
                             try TrainingWeek.upsert { week }.execute(db)
@@ -125,7 +162,9 @@ import VDOTEngine
                         for session in sessions {
                             try PlannedSession.upsert { session }.execute(db)
                         }
-                        try VDOTSnapshot.upsert { snapshot }.execute(db)
+                        if let snapshot {
+                            try VDOTSnapshot.upsert { snapshot }.execute(db)
+                        }
                     }
                     await dismiss()
                 }
