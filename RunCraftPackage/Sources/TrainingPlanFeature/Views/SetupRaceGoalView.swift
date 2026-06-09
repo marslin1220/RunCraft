@@ -75,24 +75,19 @@ public struct SetupRaceGoalView: View {
                     .pickerStyle(.segmented)
                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
 
-                    // Finish time input
-                    HStack {
+                    // Finish time input — wheel picker for consistency
+                    // with the Workshop edit-step sheet, avoids the
+                    // tiny number-pad TextFields that were mis-tap-prone.
+                    VStack(alignment: .leading, spacing: 6) {
                         Text("Finish time")
                             .foregroundStyle(.primary)
-                        Spacer()
-                        TextField(store.manualDistance == .halfMarathon ? "75" : "25", text: $store.manualMinutes)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 44)
-                        Text("min")
-                            .foregroundStyle(.secondary)
-                        TextField("00", text: $store.manualSeconds)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 36)
-                        Text("sec")
-                            .foregroundStyle(.secondary)
+                        TimeWheelPicker(
+                            minutes: $store.manualMinutes,
+                            seconds: $store.manualSeconds,
+                            minutesRange: 0...240
+                        )
                     }
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
 
                     // Live VDOT result from manual entry
                     if store.detectedVDOT == nil, let vdot = store.calculatedVDOT {

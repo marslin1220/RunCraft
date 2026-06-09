@@ -24,8 +24,8 @@ import VDOTEngine
 
         // Manual race time input
         public var manualDistance: RaceDistanceQuery = .fiveK
-        public var manualMinutes: String = ""
-        public var manualSeconds: String = ""
+        public var manualMinutes: Int = 0
+        public var manualSeconds: Int = 0
 
         public var paceZones: PaceZones? {
             guard let v = effectiveVDOT else { return nil }
@@ -35,8 +35,8 @@ import VDOTEngine
         /// HealthKit-detected takes priority; falls back to calculated from manual race time.
         public var effectiveVDOT: Double? {
             if let v = detectedVDOT { return v }
-            let mins = Int(manualMinutes) ?? 0
-            let secs = Int(manualSeconds) ?? 0
+            let mins = manualMinutes
+            let secs = manualSeconds
             let totalSeconds = Double(mins * 60 + secs)
             guard totalSeconds > 0 else { return nil }
             let v = VDOTCalculator.vdot(distanceMeters: manualDistance.metres, timeSeconds: totalSeconds)
@@ -44,8 +44,8 @@ import VDOTEngine
         }
 
         public var calculatedVDOT: Double? {
-            let mins = Int(manualMinutes) ?? 0
-            let secs = Int(manualSeconds) ?? 0
+            let mins = manualMinutes
+            let secs = manualSeconds
             let totalSeconds = Double(mins * 60 + secs)
             guard totalSeconds > 0 else { return nil }
             let v = VDOTCalculator.vdot(distanceMeters: manualDistance.metres, timeSeconds: totalSeconds)

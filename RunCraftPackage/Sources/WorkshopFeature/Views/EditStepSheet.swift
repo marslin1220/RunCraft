@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import RunCraftModels
 import SQLiteData
 import SwiftUI
@@ -172,8 +173,6 @@ struct EditStepSheet: View {
     }
 }
 
-// MARK: - Time Wheel Picker
-
 // MARK: - Int convenience for MM:SS bindings
 
 extension Int {
@@ -186,37 +185,5 @@ extension Int {
     fileprivate var secondsPart: Int {
         get { self % 60 }
         set { self = (self / 60) * 60 + newValue }
-    }
-}
-
-private struct TimeWheelPicker: View {
-    @Binding var minutes: Int
-    @Binding var seconds: Int
-
-    var body: some View {
-        HStack(spacing: 0) {
-            Picker("min", selection: $minutes) {
-                ForEach(0...180, id: \.self) { Text("\($0)").tag($0) }
-            }
-            .labelsHidden()
-            .pickerStyle(.wheel)
-            .frame(maxWidth: .infinity)
-
-            Text("min")
-                .foregroundStyle(.secondary)
-                .frame(width: 40)
-
-            Picker("sec", selection: $seconds) {
-                ForEach(0...59, id: \.self) { Text(String(format: "%02d", $0)).tag($0) }
-            }
-            .labelsHidden()
-            .pickerStyle(.wheel)
-            .frame(maxWidth: .infinity)
-
-            Text("sec")
-                .foregroundStyle(.secondary)
-                .frame(width: 40)
-        }
-        .frame(height: 120)
     }
 }

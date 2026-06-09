@@ -117,6 +117,24 @@ private struct RaceCountdownRing: View {
     let goal: RaceGoal
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// Best-effort phase + week-number context based on days until race.
+    /// 16-week plan, ordered: Base (weeks 1–4) → Build (5–8) → Peak (9–12)
+    /// → Taper (13–16). Returns nil once the race window is past.
+    private var phaseContext: (week: Int, phase: TrainingPhase)? {
+        let days = goal.daysUntilRace
+        guard days >= 0 else { return nil }
+        let totalDays = 16 * 7
+        let elapsedDays = max(0, totalDays - days)
+        let weekIndex = min(15, elapsedDays / 7) // 0…15
+        let phase: TrainingPhase = switch weekIndex {
+        case 0..<4:  .base
+        case 4..<8:  .build
+        case 8..<12: .peak
+        default:     .taper
+        }
+        return (week: weekIndex + 1, phase: phase)
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             ZStack {
@@ -144,11 +162,17 @@ private struct RaceCountdownRing: View {
                 }
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(max(goal.daysUntilRace, 0)) days until \(goal.name)")
+            .accessibilityLabel(ringAccessibilityLabel)
 
             Text(goal.name)
                 .font(.headline)
                 .foregroundStyle(.white)
+
+            if let ctx = phaseContext {
+                Text("Week \(ctx.week) of 16 · \(ctx.phase.displayName)")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color.brand.accent)
+            }
 
             Text(goal.targetDate, format: .dateTime.day().month().year())
                 .font(.subheadline)
@@ -160,6 +184,14 @@ private struct RaceCountdownRing: View {
         let total = 16.0 * 7.0
         let remaining = Double(max(goal.daysUntilRace, 0))
         return max(0, min(1, 1 - remaining / total))
+    }
+
+    private var ringAccessibilityLabel: String {
+        var parts: [String] = ["\(max(goal.daysUntilRace, 0)) days until \(goal.name)"]
+        if let ctx = phaseContext {
+            parts.append("Currently week \(ctx.week) of 16, \(ctx.phase.displayName) phase")
+        }
+        return parts.joined(separator: ". ")
     }
 }
 

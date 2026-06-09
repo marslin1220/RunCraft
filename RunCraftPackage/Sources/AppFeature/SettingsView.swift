@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 
 public struct SettingsView: View {
@@ -6,6 +7,14 @@ public struct SettingsView: View {
 
     public init(store: StoreOf<Settings>) {
         self.store = store
+    }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+    }
+
+    private var buildNumber: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
     }
 
     public var body: some View {
@@ -20,30 +29,49 @@ public struct SettingsView: View {
                     .pickerStyle(.segmented)
                 }
 
-                Section("Connections") {
+                Section {
                     HStack {
                         Label("HealthKit", systemImage: "heart.fill")
+                            .foregroundStyle(.primary)
                         Spacer()
                         if store.isHealthKitLinked {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.green)
+                            HStack(spacing: 4) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(Color.brand.success)
+                                Text("Linked")
+                                    .foregroundStyle(.secondary)
+                            }
                         } else {
                             Button("Link") {
                                 store.send(.linkHealthKitTapped)
                             }
                             .buttonStyle(.borderedProminent)
-                            .tint(Color(red: 0.8, green: 1.0, blue: 0.0))
+                            .tint(Color.brand.accent)
                             .foregroundStyle(.black)
                         }
                     }
+                } header: {
+                    Text("Connections")
+                } footer: {
+                    Text("RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days.")
+                        .font(.caption)
                 }
 
-                Section {
+                Section("About") {
                     HStack {
                         Text("Version")
                         Spacer()
-                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
+                        Text("\(appVersion) (\(buildNumber))")
                             .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+
+                    Link(destination: URL(string: "https://github.com/anthropics/claude-code/issues")!) {
+                        Label("Report a bug", systemImage: "ladybug.fill")
+                    }
+
+                    Link(destination: URL(string: "https://www.vo2maxrunning.com/vdot-calculator")!) {
+                        Label("About Jack Daniels VDOT", systemImage: "info.circle.fill")
                     }
                 }
             }

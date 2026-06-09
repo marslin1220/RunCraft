@@ -11,25 +11,38 @@ public struct WorkoutEditorView: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .bottom) {
-            VStack(spacing: 0) {
-                TemplateNameBar(
-                    name: $store.templateName,
-                    status: store.saveStatus,
-                    source: store.source
-                )
-                if store.blocks.isEmpty {
-                    EmptyWorkshopPrompt()
-                } else {
-                    blockList
-                }
+        VStack(spacing: 0) {
+            TemplateNameBar(
+                name: $store.templateName,
+                status: store.saveStatus,
+                source: store.source
+            )
+            if store.blocks.isEmpty {
+                EmptyWorkshopPrompt()
+            } else {
+                blockList
             }
-
-            sendToWatchButton
-                .padding(.horizontal)
-                .padding(.bottom, 24)
         }
         .background(Color.black)
+        // Floating CTA above the home-indicator. safeAreaInset reserves
+        // the right amount of room automatically — no manual spacer rows
+        // in the list, and the system handles inset on the home gesture
+        // bar (HIG `fixed-element-offset`).
+        .safeAreaInset(edge: .bottom) {
+            sendToWatchButton
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+                .background(
+                    LinearGradient(
+                        colors: [Color.black.opacity(0), Color.black],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 60)
+                    .offset(y: 20)
+                    .allowsHitTesting(false)
+                )
+        }
         .navigationTitle(store.templateName.isEmpty ? "Edit Workout" : store.templateName)
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
@@ -108,13 +121,6 @@ public struct WorkoutEditorView: View {
             .onMove { source, destination in
                 store.send(.moveBlocks(source, destination))
             }
-
-            // Bottom spacer so the Send-to-Watch button doesn't cover the
-            // last block when the list grows long.
-            Color.clear
-                .frame(height: 100)
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
@@ -137,7 +143,9 @@ public struct WorkoutEditorView: View {
             .padding(.vertical, 16)
             .background(Color.brand.accent)
             .clipShape(Capsule())
-            .shadow(color: Color.brand.accent.opacity(0.4), radius: 12, y: 4)
+            // Subtle elevation — communicates "floating CTA", not glow
+            // effect. HIG `elevation-consistent`: shadow signals depth.
+            .shadow(color: .black.opacity(0.4), radius: 6, y: 2)
         }
         .buttonStyle(.plain)
         .disabled(store.syncStatus == .sending || store.blocks.isEmpty)
