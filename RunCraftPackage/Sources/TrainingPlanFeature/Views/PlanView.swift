@@ -112,6 +112,7 @@ public struct PlanView: View {
 
 private struct RaceCountdownRing: View {
     let goal: RaceGoal
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 8) {
@@ -128,7 +129,7 @@ private struct RaceCountdownRing: View {
                     )
                     .frame(width: 160, height: 160)
                     .rotationEffect(.degrees(-90))
-                    .animation(.easeInOut(duration: 1), value: ringProgress)
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.3), value: ringProgress)
 
                 VStack(spacing: 2) {
                     Text("\(max(goal.daysUntilRace, 0))")
@@ -136,9 +137,11 @@ private struct RaceCountdownRing: View {
                         .foregroundStyle(.white)
                     Text("days")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.brand.textSecondary)
                 }
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(max(goal.daysUntilRace, 0)) days until \(goal.name)")
 
             Text(goal.name)
                 .font(.headline)
@@ -146,7 +149,7 @@ private struct RaceCountdownRing: View {
 
             Text(goal.targetDate, format: .dateTime.day().month().year())
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
         }
     }
 
@@ -166,15 +169,15 @@ private struct PaceZonesSummaryCard: View {
             HStack {
                 Text("Training Paces")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.brand.textSecondary)
                     .textCase(.uppercase)
                 Spacer()
                 Text("tap to build")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.brand.textSecondary)
             }
 
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 ForEach(PaceZoneName.allCases, id: \.self) { zone in
                     tappableChip(zone)
                 }
@@ -192,15 +195,17 @@ private struct PaceZonesSummaryCard: View {
             PaceChip(label: zone.letter, pace: zones[zone].formatted(), color: Self.color(for: zone))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(zone.fullName) pace, \(zones[zone].formatted())")
+        .accessibilityHint("Builds a workout in the \(zone.fullName) zone")
     }
 
     private static func color(for zone: PaceZoneName) -> Color {
         switch zone {
-        case .easy:       Color(hex: "#4CAF50")
-        case .marathon:   Color(hex: "#2196F3")
-        case .threshold:  Color(hex: "#FFC107")
-        case .interval:   Color(hex: "#FF5722")
-        case .repetition: Color(hex: "#F44336")
+        case .easy:       Color.brand.zone.easy
+        case .marathon:   Color.brand.zone.marathon
+        case .threshold:  Color.brand.zone.threshold
+        case .interval:   Color.brand.zone.interval
+        case .repetition: Color.brand.zone.repetition
         }
     }
 }
@@ -213,14 +218,29 @@ private struct PaceChip: View {
     var body: some View {
         VStack(spacing: 4) {
             Text(label)
-                .font(.system(.caption2, design: .rounded, weight: .bold))
+                .font(.system(.caption, design: .rounded, weight: .bold))
                 .foregroundStyle(color)
             Text(pace.components(separatedBy: " ").first ?? pace)
-                .font(.system(size: 10, design: .monospaced))
+                .font(.caption2.monospacedDigit())
                 .foregroundStyle(.white)
-                .minimumScaleFactor(0.5)
+                .minimumScaleFactor(0.7)
+                .lineLimit(1)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .contentShape(Rectangle())
+    }
+}
+
+private extension PaceZoneName {
+    /// Full word used in VoiceOver labels.
+    var fullName: String {
+        switch self {
+        case .easy:       "Easy"
+        case .marathon:   "Marathon"
+        case .threshold:  "Threshold"
+        case .interval:   "Interval"
+        case .repetition: "Repetition"
+        }
     }
 }
 
@@ -298,7 +318,7 @@ private struct SessionCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(dayLabel)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.brand.textSecondary)
 
                 Text(session.sessionType.displayName)
                     .font(.subheadline)
@@ -307,13 +327,13 @@ private struct SessionCard: View {
 
                 if let pace = livePaceText {
                     Text(pace)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(Color.brand.textSecondary)
                         .lineLimit(1)
                 } else if !session.notes.isEmpty {
                     Text(session.notes)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.brand.textSecondary)
                         .lineLimit(1)
                 }
             }
@@ -322,24 +342,39 @@ private struct SessionCard: View {
 
             if let km = session.targetDistanceKm {
                 Text("\(km, format: .number.precision(.fractionLength(0))) km")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(Color.brand.textSecondary)
             } else if let min = session.targetDurationMin {
                 Text("\(min) min")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(Color.brand.textSecondary)
             }
 
             if isCompleted {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.title3)
-                    .foregroundStyle(Color(hex: "#4CAF50"))
+                    .foregroundStyle(Color.brand.success)
             }
         }
         .padding(12)
         .background(Color.brand.surface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .opacity(isCompleted ? 0.7 : 1.0)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(isCompleted ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private var accessibilityLabel: String {
+        var parts: [String] = [dayLabel, session.sessionType.displayName]
+        if let pace = livePaceText { parts.append("pace \(pace)") }
+        if let km = session.targetDistanceKm {
+            parts.append("\(Int(km)) kilometres")
+        } else if let min = session.targetDurationMin {
+            parts.append("\(min) minutes")
+        }
+        if isCompleted { parts.append("completed") }
+        return parts.joined(separator: ", ")
     }
 
     private var dayLabel: String {
@@ -355,12 +390,16 @@ private struct VDOTUpgradeBanner: View {
     let onAccept: () -> Void
     let onDismiss: () -> Void
 
+    private var oldVDOT: String { upgrade.oldVDOT.formatted(.number.precision(.fractionLength(1))) }
+    private var newVDOT: String { upgrade.newVDOT.formatted(.number.precision(.fractionLength(1))) }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
                 Image(systemName: "arrow.up.right.circle.fill")
                     .font(.title2)
                     .foregroundStyle(Color.brand.accent)
+                    .accessibilityHidden(true)
                 Text("VDOT improved")
                     .font(.subheadline.bold())
                     .foregroundStyle(.white)
@@ -370,26 +409,32 @@ private struct VDOTUpgradeBanner: View {
                 } label: {
                     Image(systemName: "xmark")
                         .font(.caption.bold())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.brand.textSecondary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Dismiss VDOT upgrade")
             }
 
             HStack(spacing: 6) {
-                Text(upgrade.oldVDOT, format: .number.precision(.fractionLength(1)))
-                    .foregroundStyle(.secondary)
+                Text(oldVDOT)
+                    .foregroundStyle(Color.brand.textSecondary)
                 Image(systemName: "arrow.right")
                     .font(.caption.bold())
-                    .foregroundStyle(.secondary)
-                Text(upgrade.newVDOT, format: .number.precision(.fractionLength(1)))
+                    .foregroundStyle(Color.brand.textSecondary)
+                    .accessibilityHidden(true)
+                Text(newVDOT)
                     .bold()
                     .foregroundStyle(Color.brand.accent)
             }
-            .font(.title3)
+            .font(.title3.monospacedDigit())
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("VDOT improved from \(oldVDOT) to \(newVDOT)")
 
             Text("Update your training paces to match?")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
 
             Button {
                 onAccept()
@@ -398,11 +443,13 @@ private struct VDOTUpgradeBanner: View {
                     .font(.subheadline.bold())
                     .foregroundStyle(.black)
                     .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 10)
+                    .frame(minHeight: 44)
                     .background(Color.brand.accent)
                     .clipShape(Capsule())
             }
             .buttonStyle(.plain)
+            .accessibilityHint("Updates your pace zones to use the new VDOT")
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -425,7 +472,8 @@ private struct RecoveryAdviceBanner: View {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "moon.zzz.fill")
                     .font(.title2)
-                    .foregroundStyle(Color(hex: "#FFC107"))
+                    .foregroundStyle(Color.brand.caution)
+                    .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Recovery looks low today")
@@ -433,10 +481,10 @@ private struct RecoveryAdviceBanner: View {
                         .foregroundStyle(.white)
                     Text(reason)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.brand.textSecondary)
                     Text("We can swap today's hard session for an easy 5 km run.")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.brand.textSecondary)
                         .padding(.top, 2)
                 }
 
@@ -447,9 +495,12 @@ private struct RecoveryAdviceBanner: View {
                 } label: {
                     Image(systemName: "xmark")
                         .font(.caption.bold())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.brand.textSecondary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Dismiss recovery advice")
             }
 
             Button {
@@ -459,18 +510,20 @@ private struct RecoveryAdviceBanner: View {
                     .font(.subheadline.bold())
                     .foregroundStyle(.black)
                     .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(Color(hex: "#FFC107"))
+                    .padding(.vertical, 10)
+                    .frame(minHeight: 44)
+                    .background(Color.brand.caution)
                     .clipShape(Capsule())
             }
             .buttonStyle(.plain)
+            .accessibilityHint("Replaces today's hard session with an easy 5 km run")
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.brand.surface)
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .stroke(Color(hex: "#FFC107").opacity(0.4), lineWidth: 1)
+                .stroke(Color.brand.caution.opacity(0.4), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
@@ -484,6 +537,7 @@ private struct EmptyPlanPrompt: View {
             Image(systemName: "figure.run.circle")
                 .font(.system(size: 64))
                 .foregroundStyle(Color.brand.accent)
+                .accessibilityHidden(true)
 
             Text("No race goal yet")
                 .font(.title2)
@@ -492,7 +546,7 @@ private struct EmptyPlanPrompt: View {
 
             Text("Create your first race goal and we'll build a personalised 16-week training plan.")
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
 
             Button(action: onCreateTapped) {
                 Text("Create Race Goal")
@@ -573,7 +627,7 @@ private struct WeekSection: View {
                 Spacer()
                 Text("\(week.targetWeeklyKm, format: .number.precision(.fractionLength(0))) km")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.brand.textSecondary)
             }
 
             ForEach(sessions) { session in
@@ -595,7 +649,7 @@ private struct WeekSection: View {
                         if let zone = session.targetPaceZone {
                             Text(zone.letter)
                                 .font(.caption2.bold())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.brand.textSecondary)
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 1)
                                 .overlay(
@@ -606,16 +660,16 @@ private struct WeekSection: View {
                         if let km = session.targetDistanceKm {
                             Text("\(km, format: .number.precision(.fractionLength(0...1))) km")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.brand.textSecondary)
                         }
                         if completedIds.contains(session.id) {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.caption)
-                                .foregroundStyle(Color(hex: "#4CAF50"))
+                                .foregroundStyle(Color.brand.success)
                         } else {
                             Image(systemName: "chevron.right")
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.brand.textSecondary)
                         }
                     }
                     .padding(10)

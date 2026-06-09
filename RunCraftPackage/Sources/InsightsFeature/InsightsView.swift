@@ -41,7 +41,7 @@ public struct InsightsView: View {
                     .foregroundStyle(Color.brand.accent)
                 Text("VDOT")
                     .font(.headline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.brand.textSecondary)
             }
         }
     }
@@ -60,15 +60,35 @@ public struct InsightsView: View {
                     .interpolationMethod(.monotone)
                     .foregroundStyle(Color.brand.accent)
 
+                    // Encode the snapshot source on TWO channels — colour and
+                    // symbol — so the legend below + the symbol shape work
+                    // for colour-blind users (skill rule `color-not-only`).
                     PointMark(
                         x: .value("Date", snapshot.recordedAt),
                         y: .value("VDOT", snapshot.vdot)
                     )
-                    .foregroundStyle(color(for: snapshot.source))
-                    .symbolSize(60)
+                    .foregroundStyle(by: .value("Source", snapshot.source.legendLabel))
+                    .symbol(by: .value("Source", snapshot.source.legendLabel))
+                    .symbolSize(80)
+                    .accessibilityLabel("\(snapshot.source.legendLabel) update on \(snapshot.recordedAt.formatted(date: .abbreviated, time: .omitted))")
+                    .accessibilityValue("VDOT \(snapshot.vdot.formatted(.number.precision(.fractionLength(1))))")
                 }
-                .frame(height: 180)
+                .chartForegroundStyleScale([
+                    VDOTSnapshot.Source.initial.legendLabel:         .blue,
+                    VDOTSnapshot.Source.raceTime.legendLabel:        Color.brand.accent,
+                    VDOTSnapshot.Source.overperformance.legendLabel: Color.brand.success,
+                    VDOTSnapshot.Source.manual.legendLabel:          Color.brand.caution,
+                ])
+                .chartSymbolScale([
+                    VDOTSnapshot.Source.initial.legendLabel:         .circle,
+                    VDOTSnapshot.Source.raceTime.legendLabel:        .square,
+                    VDOTSnapshot.Source.overperformance.legendLabel: .diamond,
+                    VDOTSnapshot.Source.manual.legendLabel:          .triangle,
+                ])
+                .chartLegend(position: .bottom, alignment: .leading, spacing: 8)
+                .frame(height: 200)
                 .chartYScale(domain: vdotYDomain)
+                .chartYAxisLabel("VDOT")
                 .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
             }
         }
@@ -88,8 +108,11 @@ public struct InsightsView: View {
                     )
                     .foregroundStyle(Color.brand.accent.opacity(0.85))
                     .cornerRadius(4)
+                    .accessibilityLabel("Week of \(week.weekStart.formatted(date: .abbreviated, time: .omitted))")
+                    .accessibilityValue("\(week.totalKm.formatted(.number.precision(.fractionLength(0...1)))) kilometres")
                 }
                 .frame(height: 160)
+                .chartYAxisLabel("km")
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .weekOfYear, count: 2)) { value in
                         AxisValueLabel(format: .dateTime.month(.abbreviated).day())
@@ -115,6 +138,8 @@ public struct InsightsView: View {
                                 .font(.system(.title3, design: .monospaced).weight(.medium))
                                 .foregroundStyle(Color.brand.accent)
                         }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("\(race.distance.displayName) predicted time \(race.formatted)")
                         if race.id != store.state.predictedTimes.last?.id {
                             Divider().opacity(0.3)
                         }
@@ -134,7 +159,7 @@ public struct InsightsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
             content()
         }
         .padding(16)
@@ -149,7 +174,7 @@ public struct InsightsView: View {
     private func emptyState(_ text: String) -> some View {
         Text(text)
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.brand.textSecondary)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, minHeight: 80, alignment: .leading)
     }
@@ -161,13 +186,16 @@ public struct InsightsView: View {
         return (min - 2)...(max + 2)
     }
 
-    private func color(for source: VDOTSnapshot.Source) -> Color {
-        switch source {
-        case .initial:         .blue
-        case .raceTime:        Color.brand.accent
-        case .overperformance: .green
-        case .manual:          .orange
+}
+
+private extension VDOTSnapshot.Source {
+    /// User-facing name for the chart legend + VoiceOver labels.
+    var legendLabel: String {
+        switch self {
+        case .initial:         "Initial"
+        case .raceTime:        "Race time"
+        case .overperformance: "Workout"
+        case .manual:          "Manual"
         }
     }
-
 }

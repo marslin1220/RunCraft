@@ -200,9 +200,9 @@ private struct PlanSessionRow: View {
                         .font(.subheadline.bold())
                         .foregroundStyle(.white)
                     if let livePace {
-                        Text(livePace).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        Text(livePace).font(.caption).foregroundStyle(Color.brand.textSecondary).lineLimit(1)
                     } else if !session.notes.isEmpty {
-                        Text(session.notes).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        Text(session.notes).font(.caption).foregroundStyle(Color.brand.textSecondary).lineLimit(1)
                     }
                 }
                 Spacer()
@@ -211,7 +211,7 @@ private struct PlanSessionRow: View {
                         .font(.subheadline)
                         .foregroundStyle(Color.brand.accent)
                 }
-                Image(systemName: "chevron.right").font(.caption.bold()).foregroundStyle(.secondary)
+                Image(systemName: "chevron.right").font(.caption.bold()).foregroundStyle(Color.brand.textSecondary)
             }
             .padding(.vertical, 4)
         }
@@ -231,11 +231,11 @@ private struct PlanRestRow: View {
         HStack {
             Text(dayLabel)
                 .font(.system(.subheadline, design: .rounded, weight: .bold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
                 .frame(width: 36)
             Text("Rest day")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
             Spacer()
         }
         .padding(.vertical, 6)
@@ -275,10 +275,10 @@ private struct WorkoutListRow: View {
                 Text(template.name).font(.subheadline.bold()).foregroundStyle(.white)
                 Text("\(template.blocks.count) blocks · \(totalSteps) steps")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.brand.textSecondary)
             }
             Spacer()
-            Image(systemName: "chevron.right").font(.caption.bold()).foregroundStyle(.secondary)
+            Image(systemName: "chevron.right").font(.caption.bold()).foregroundStyle(Color.brand.textSecondary)
         }
         .padding(.vertical, 4)
     }
@@ -300,7 +300,7 @@ private struct EmptyYoursPrompt: View {
                 .foregroundStyle(.white)
             Text("Start from a template or build one from scratch.")
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
                 .padding(.horizontal, 40)
 
             VStack(spacing: 10) {
@@ -336,13 +336,13 @@ private struct OutsidePlanWindowPrompt: View {
         VStack(spacing: 14) {
             Image(systemName: "calendar.badge.clock")
                 .font(.system(size: 44))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
             Text(headline)
                 .font(.title3.bold())
                 .foregroundStyle(.white)
             Text(detail)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
                 .padding(.horizontal, 40)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -367,13 +367,13 @@ private struct EmptyPlanPrompt: View {
         VStack(spacing: 16) {
             Image(systemName: "calendar.badge.exclamationmark")
                 .font(.system(size: 48))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
             Text("No active plan")
                 .font(.title3.bold())
                 .foregroundStyle(.white)
             Text("Create a race goal in the Plan tab to see daily training here.")
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
                 .padding(.horizontal, 40)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

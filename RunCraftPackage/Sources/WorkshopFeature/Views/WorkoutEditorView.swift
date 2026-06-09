@@ -195,7 +195,7 @@ private struct TemplateNameBar: View {
             Text(sourceLabel)
         }
         .font(.caption)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(Color.brand.textSecondary)
     }
 
     private var sourceIcon: String {
@@ -222,17 +222,17 @@ private struct TemplateNameBar: View {
         case .saving:
             HStack(spacing: 4) {
                 ProgressView().controlSize(.small)
-                Text("Saving").font(.caption).foregroundStyle(.secondary)
+                Text("Saving").font(.caption).foregroundStyle(Color.brand.textSecondary)
             }
         case .saved:
             HStack(spacing: 4) {
                 Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.brand.accent)
-                Text("Saved").font(.caption).foregroundStyle(.secondary)
+                Text("Saved").font(.caption).foregroundStyle(Color.brand.textSecondary)
             }
         case .failed:
             HStack(spacing: 4) {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                Text("Failed").font(.caption).foregroundStyle(.secondary)
+                Text("Failed").font(.caption).foregroundStyle(Color.brand.textSecondary)
             }
         }
     }
@@ -274,7 +274,7 @@ private struct StepRow: View {
                 if let alert = step.alert {
                     Text(alert.displayText)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.brand.textSecondary)
                 }
             }
 
@@ -311,14 +311,14 @@ private struct RepeatGroupRow: View {
                 Spacer()
                 Text("\(group.steps.count) step\(group.steps.count == 1 ? "" : "s")")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.brand.textSecondary)
             }
 
             ForEach(group.steps) { step in
                 HStack(spacing: 8) {
                     Image(systemName: step.kind.symbolName)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.brand.textSecondary)
                         .frame(width: 16)
                     Text(step.kind.displayName)
                         .font(.caption)
@@ -326,7 +326,7 @@ private struct RepeatGroupRow: View {
                     Spacer()
                     Text(step.goal.displayText)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.brand.textSecondary)
                 }
                 .padding(.leading, 24)
             }
@@ -348,7 +348,7 @@ private struct EmptyWorkshopPrompt: View {
                 .foregroundStyle(.white)
             Text("Tap ⋯ to add a Step or a Repeat group.")
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.brand.textSecondary)
                 .padding(.horizontal, 40)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
