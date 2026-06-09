@@ -5,18 +5,17 @@ import VDOTEngine
 
 @Reducer public struct Settings {
     @ObservableState public struct State: Equatable {
-        /// User-selected pace unit. Persisted to AppStorage via @Shared so
-        /// every view that formats a pace range can pick it up without
-        /// prop-drilling. Default: per-kilometre.
-        @Shared(.appStorage("paceUnit"))
-        public var paceUnit: PaceUnit = .perKilometre
-        public var isHealthKitLinked: Bool = false
+        /// Mirrors UserDefaults so the rest of the app's @Shared
+        /// observers stay in sync. The actual write happens via
+        /// @AppStorage in SettingsView — keeping it out of TCA state
+        /// avoids BindingReducer + @Shared interaction quirks.
+        @Shared(.appStorage("healthKitLinked"))
+        public var hasLinkedHealthKit: Bool = false
 
         public init() {}
     }
 
-    public enum Action: BindableAction {
-        case binding(BindingAction<State>)
+    public enum Action {
         case onAppear
         case linkHealthKitTapped
         case healthKitAuthResponse(Result<Void, any Error>)
@@ -27,12 +26,8 @@ import VDOTEngine
     public init() {}
 
     public var body: some Reducer<State, Action> {
-        BindingReducer()
         Reduce { state, action in
             switch action {
-            case .binding:
-                return .none
-
             case .onAppear:
                 return .none
 
@@ -44,11 +39,10 @@ import VDOTEngine
                 }
 
             case .healthKitAuthResponse(.success):
-                state.isHealthKitLinked = true
+                state.$hasLinkedHealthKit.withLock { $0 = true }
                 return .none
 
             case .healthKitAuthResponse(.failure):
-                state.isHealthKitLinked = false
                 return .none
             }
         }

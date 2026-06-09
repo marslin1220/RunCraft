@@ -5,9 +5,22 @@ import VDOTEngine
 
 public struct SettingsView: View {
     @Bindable public var store: StoreOf<Settings>
+    /// Pace unit lives in UserDefaults; Settings is the writer, every other
+    /// view reads via @Shared(.appStorage("paceUnit")). Using @AppStorage
+    /// here (instead of routing through the Settings state) sidesteps the
+    /// BindingReducer + @Shared edge cases that were causing toggles to
+    /// silently drop.
+    @AppStorage("paceUnit") private var paceUnitRaw: String = PaceUnit.perKilometre.rawValue
 
     public init(store: StoreOf<Settings>) {
         self.store = store
+    }
+
+    private var paceUnit: Binding<PaceUnit> {
+        Binding(
+            get: { PaceUnit(rawValue: paceUnitRaw) ?? .perKilometre },
+            set: { paceUnitRaw = $0.rawValue }
+        )
     }
 
     private var appVersion: String {
@@ -22,7 +35,7 @@ public struct SettingsView: View {
         NavigationStack {
             Form {
                 Section("Units") {
-                    Picker("Pace", selection: $store.paceUnit) {
+                    Picker("Pace", selection: paceUnit) {
                         ForEach(PaceUnit.allCases, id: \.self) { unit in
                             Text(unit.displayName).tag(unit)
                         }
@@ -35,7 +48,7 @@ public struct SettingsView: View {
                         Label("HealthKit", systemImage: "heart.fill")
                             .foregroundStyle(.primary)
                         Spacer()
-                        if store.isHealthKitLinked {
+                        if store.hasLinkedHealthKit {
                             HStack(spacing: 4) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundStyle(Color.brand.success)
@@ -67,11 +80,7 @@ public struct SettingsView: View {
                             .monospacedDigit()
                     }
 
-                    Link(destination: URL(string: "https://github.com/anthropics/claude-code/issues")!) {
-                        Label("Report a bug", systemImage: "ladybug.fill")
-                    }
-
-                    Link(destination: URL(string: "https://www.vo2maxrunning.com/vdot-calculator")!) {
+                    Link(destination: URL(string: "https://vdoto2.com")!) {
                         Label("About Jack Daniels VDOT", systemImage: "info.circle.fill")
                     }
                 }
