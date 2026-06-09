@@ -61,6 +61,7 @@ let package = Package(
                 "VDOTEngine",
                 "HealthKitClient",
                 "RunCraftModels",
+                "WorkshopFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),

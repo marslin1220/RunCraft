@@ -5,6 +5,7 @@ import RunCraftModels
 import SQLiteData
 import SwiftUI
 import VDOTEngine
+import WorkshopFeature
 
 public struct PlanView: View {
     @Bindable public var store: StoreOf<TrainingPlan>
@@ -99,6 +100,8 @@ public struct PlanView: View {
                     store: scheduleStore,
                     allWeeks: allWeeks
                 )
+            case .editor(let editorStore):
+                WorkoutEditorView(store: editorStore)
             }
         }
     }
@@ -570,13 +573,19 @@ struct WeekScheduleView: View {
     @FetchAll var allSessions: [PlannedSession]
     @FetchAll var completedAll: [CompletedWorkout]
 
+    /// Weeks the user has expanded. Seeded with the current week the first
+    /// time the view appears so it's always open by default; user toggles
+    /// take precedence after that.
+    @State private var expandedWeekIds: Set<UUID> = []
+    @State private var hasSeededExpansion = false
+
     private var completedSessionIds: Set<UUID> {
         Set(completedAll.compactMap(\.plannedSessionId))
     }
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 12) {
                 ForEach(allWeeks) { week in
                     WeekSection(
                         week: week,
@@ -584,6 +593,8 @@ struct WeekScheduleView: View {
                                              .sorted { $0.dayOfWeek < $1.dayOfWeek },
                         completedIds: completedSessionIds,
                         isCurrent: isCurrentWeek(week),
+                        isExpanded: expandedWeekIds.contains(week.id),
+                        onToggle: { toggle(week.id) },
                         onTap: { session in store.send(.sessionTapped(session)) }
                     )
                 }
@@ -595,6 +606,23 @@ struct WeekScheduleView: View {
         .navigationTitle("Full Schedule")
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
+        .onAppear(perform: seedExpansionIfNeeded)
+    }
+
+    private func seedExpansionIfNeeded() {
+        guard !hasSeededExpansion else { return }
+        if let current = allWeeks.first(where: isCurrentWeek) {
+            expandedWeekIds.insert(current.id)
+        }
+        hasSeededExpansion = true
+    }
+
+    private func toggle(_ weekId: UUID) {
+        if expandedWeekIds.contains(weekId) {
+            expandedWeekIds.remove(weekId)
+        } else {
+            expandedWeekIds.insert(weekId)
+        }
     }
 
     private func isCurrentWeek(_ week: TrainingWeek) -> Bool {
@@ -607,79 +635,125 @@ private struct WeekSection: View {
     let sessions: [PlannedSession]
     let completedIds: Set<UUID>
     let isCurrent: Bool
+    let isExpanded: Bool
+    let onToggle: () -> Void
     let onTap: (PlannedSession) -> Void
+
+    private var sessionCount: Int { sessions.count }
+    private var completedCount: Int {
+        sessions.filter { completedIds.contains($0.id) }.count
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Week \(week.weekNumber) · \(week.phase.displayName)")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(isCurrent ? Color.brand.accent : .white)
-                if isCurrent {
-                    Text("THIS WEEK")
-                        .font(.caption2.bold())
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.brand.accent.opacity(0.2))
-                        .foregroundStyle(Color.brand.accent)
-                        .clipShape(Capsule())
-                }
-                Spacer()
-                Text("\(week.targetWeeklyKm, format: .number.precision(.fractionLength(0))) km")
-                    .font(.caption)
-                    .foregroundStyle(Color.brand.textSecondary)
-            }
+            // Header is a tap target that toggles expansion. Hit area
+            // covers the whole row for HIG-compliant ergonomics.
+            Button(action: onToggle) {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.bold())
+                        .foregroundStyle(Color.brand.textSecondary)
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                        .animation(.easeInOut(duration: 0.2), value: isExpanded)
+                        .frame(width: 14)
 
-            ForEach(sessions) { session in
-                Button {
-                    onTap(session)
-                } label: {
-                    HStack(spacing: 12) {
-                        Text(dayLabel(session.dayOfWeek))
-                            .font(.system(.caption, design: .rounded, weight: .bold))
-                            .foregroundStyle(Color(hex: session.sessionType.colorHex))
-                            .frame(width: 32)
-                        Text(session.sessionType.displayName)
-                            .font(.caption)
-                            .foregroundStyle(.white)
-                        // Zone letter — the structural intent. Specific
-                        // pace numbers are only honest for the current
-                        // week (and computed at runtime there), so
-                        // future weeks just show the zone badge.
-                        if let zone = session.targetPaceZone {
-                            Text(zone.letter)
-                                .font(.caption2.bold())
-                                .foregroundStyle(Color.brand.textSecondary)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 1)
-                                .overlay(
-                                    Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                )
-                        }
-                        Spacer()
-                        if let km = session.targetDistanceKm {
-                            Text("\(km, format: .number.precision(.fractionLength(0...1))) km")
-                                .font(.caption)
-                                .foregroundStyle(Color.brand.textSecondary)
-                        }
-                        if completedIds.contains(session.id) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.caption)
-                                .foregroundStyle(Color.brand.success)
-                        } else {
-                            Image(systemName: "chevron.right")
-                                .font(.caption2)
-                                .foregroundStyle(Color.brand.textSecondary)
-                        }
+                    Text("Week \(week.weekNumber) · \(week.phase.displayName)")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(isCurrent ? Color.brand.accent : .white)
+
+                    if isCurrent {
+                        Text("THIS WEEK")
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.brand.accent.opacity(0.2))
+                            .foregroundStyle(Color.brand.accent)
+                            .clipShape(Capsule())
                     }
-                    .padding(10)
-                    .background(Color.brand.surface)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .opacity(isCurrent ? 1.0 : 0.85)
+
+                    Spacer()
+
+                    HStack(spacing: 4) {
+                        Text("\(completedCount)/\(sessionCount)")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(Color.brand.textSecondary)
+                        Text("·")
+                            .foregroundStyle(Color.brand.textSecondary)
+                        Text("\(week.targetWeeklyKm, format: .number.precision(.fractionLength(0))) km")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(Color.brand.textSecondary)
+                    }
                 }
-                .buttonStyle(.plain)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 12)
+                .frame(minHeight: 44)
+                .background(Color.brand.surface)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Week \(week.weekNumber), \(week.phase.displayName), \(completedCount) of \(sessionCount) completed")
+            .accessibilityHint(isExpanded ? "Tap to collapse" : "Tap to expand")
+            .accessibilityAddTraits(isExpanded ? [.isHeader, .isSelected] : .isHeader)
+
+            if isExpanded {
+                VStack(spacing: 6) {
+                    ForEach(sessions) { session in
+                        sessionRow(session)
+                    }
+                }
+                .padding(.leading, 22) // align with header text after chevron
             }
         }
+    }
+
+    @ViewBuilder
+    private func sessionRow(_ session: PlannedSession) -> some View {
+        Button {
+            onTap(session)
+        } label: {
+            HStack(spacing: 12) {
+                Text(dayLabel(session.dayOfWeek))
+                    .font(.system(.caption, design: .rounded, weight: .bold))
+                    .foregroundStyle(Color(hex: session.sessionType.colorHex))
+                    .frame(width: 32)
+                Text(session.sessionType.displayName)
+                    .font(.caption)
+                    .foregroundStyle(.white)
+                // Zone letter only — exact paces are honest only for the
+                // current week and computed there.
+                if let zone = session.targetPaceZone {
+                    Text(zone.letter)
+                        .font(.caption2.bold())
+                        .foregroundStyle(Color.brand.textSecondary)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 1)
+                        .overlay(
+                            Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        )
+                }
+                Spacer()
+                if let km = session.targetDistanceKm {
+                    Text("\(km, format: .number.precision(.fractionLength(0...1))) km")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+                if completedIds.contains(session.id) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.success)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+            }
+            .padding(10)
+            .background(Color.brand.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .opacity(isCurrent ? 1.0 : 0.85)
+        }
+        .buttonStyle(.plain)
     }
 
     private func dayLabel(_ day: Int) -> String {

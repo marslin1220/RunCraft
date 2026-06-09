@@ -4,6 +4,7 @@ import HealthKitClient
 import RunCraftModels
 import SQLiteData
 import VDOTEngine
+import WorkshopFeature
 
 @Reducer public struct TrainingPlan {
     @ObservableState public struct State {
@@ -51,6 +52,10 @@ import VDOTEngine
 
     @Reducer public enum Path {
         case weekSchedule(WeekSchedule)
+        /// Pushed onto Plan's own stack when the user opens a workout from
+        /// Full Schedule, so Back lands them back on the schedule rather
+        /// than bouncing to the Workshop tab they didn't visit.
+        case editor(WorkoutEditor)
     }
 
     @Reducer public enum Destination {
@@ -103,6 +108,7 @@ import VDOTEngine
     @Dependency(\.healthKitClient) var healthKitClient
     @Dependency(\.defaultDatabase) var database
     @Dependency(\.date.now) var now
+    @Dependency(\.workoutTemplateRepository) var repository
 
     public init() {}
 
@@ -431,9 +437,22 @@ import VDOTEngine
                 return .send(.delegate(.openWorkoutInWorkshop(template, source: .planSession)))
 
             case let .path(.element(_, .weekSchedule(.delegate(.openSession(session))))):
+                // Push the editor onto Plan's own stack — Back from there
+                // returns to Full Schedule, not the Workshop tab.
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
-                state.path.removeAll()
-                return .send(.delegate(.openWorkoutInWorkshop(template, source: .planSession)))
+                state.path.append(.editor(WorkoutEditor.State(
+                    loading: template,
+                    asCopy: true,
+                    source: .planSession
+                )))
+                return .none
+
+            // Editor opened inside Plan still lets the user save a copy to
+            // Yours — same delegate plumbing as the Workshop-side editor.
+            case let .path(.element(_, .editor(.delegate(.requestDuplicate(template))))):
+                return .run { [repository] _ in
+                    _ = try await repository.save(template)
+                }
 
             case .path:
                 return .none
