@@ -1,3 +1,4 @@
+import AppleWatchSync
 import ComposableArchitecture
 import Foundation
 import HealthKitClient
@@ -491,25 +492,70 @@ import WorkshopFeature
 
 @Reducer public struct WeekSchedule {
     @ObservableState public struct State: Equatable {
+        public var quickStartStatus: QuickStartStatus = .idle
+        @Presents public var alert: AlertState<Action.Alert>?
+
         public init() {}
+
+        public enum QuickStartStatus: Equatable {
+            case idle
+            case sending(sessionId: UUID)
+            case sent
+        }
     }
     public enum Action {
         case sessionTapped(PlannedSession)
+        /// Skips the editor and pushes the workout straight to the Watch.
+        /// Surfaces an alert on failure; otherwise just sets `sent`.
+        case quickStartTapped(PlannedSession, vdot: Double)
+        case quickStartResponse(Result<Void, any Error>)
+        case alert(PresentationAction<Alert>)
         case delegate(Delegate)
+        public enum Alert: Equatable {}
         public enum Delegate {
             case openSession(PlannedSession)
         }
     }
+
+    @Dependency(\.workoutKitClient) var workoutKitClient
+
     public init() {}
     public var body: some Reducer<State, Action> {
-        Reduce { _, action in
+        Reduce { state, action in
             switch action {
             case let .sessionTapped(s):
                 return .send(.delegate(.openSession(s)))
-            case .delegate:
+
+            case let .quickStartTapped(session, vdot):
+                state.quickStartStatus = .sending(sessionId: session.id)
+                let template = PlanSessionAdapter.makeTemplate(from: session, vdot: vdot)
+                return .run { [workoutKitClient] send in
+                    await send(.quickStartResponse(Result {
+                        _ = try await workoutKitClient.requestAuthorization()
+                        try await workoutKitClient.openInWorkoutApp(template)
+                    }))
+                }
+
+            case .quickStartResponse(.success):
+                state.quickStartStatus = .sent
+                return .none
+
+            case let .quickStartResponse(.failure(error)):
+                state.quickStartStatus = .idle
+                let message = (error as? LocalizedError)?.errorDescription
+                    ?? error.localizedDescription
+                state.alert = AlertState {
+                    TextState("Couldn't send to Watch")
+                } message: {
+                    TextState(message)
+                }
+                return .none
+
+            case .alert, .delegate:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
     }
 }
 

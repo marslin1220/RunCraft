@@ -31,4 +31,18 @@ public enum SessionType: String, Sendable, Equatable, CaseIterable, Codable, Que
         case .rest:       "#9E9E9E"  // grey
         }
     }
+
+    /// SF Symbol used as the leading icon on a session row. Outlined /
+    /// stroke style so it reads as "instrument" rather than competing
+    /// with the lime accent.
+    public var symbolName: String {
+        switch self {
+        case .easy:       "figure.run"
+        case .tempo:      "bolt"
+        case .interval:   "flame"
+        case .long:       "figure.run.circle"
+        case .repetition: "arrow.up.right"
+        case .rest:       "moon.zzz"
+        }
+    }
 }

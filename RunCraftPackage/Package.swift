@@ -57,6 +57,7 @@ let package = Package(
         .target(
             name: "TrainingPlanFeature",
             dependencies: [
+                "AppleWatchSync",
                 "DesignSystem",
                 "VDOTEngine",
                 "HealthKitClient",
