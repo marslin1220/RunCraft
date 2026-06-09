@@ -14,9 +14,12 @@ periodised Jack Daniels plan. The visual language should read as
 
 Two opinions drive everything below:
 
-1. **Pure black + a single, loud accent.** Dark mode is the only mode.
-   No light theme. The accent (Electric Lime, `#CCFF00`) carries brand
-   identity *and* signals primary action. Every other colour is muted.
+1. **Pure black + a single, loud accent.** Dark mode is the primary mode
+   (light mode support tracked separately — see "Theme variants"). The
+   accent (Electric Cyan, `#00D4FF`) carries brand identity *and* signals
+   primary action. Every other colour is muted. Cyan was chosen over
+   Apple Workout's signature lime to read as "instrument / precision"
+   rather than "generic fitness app."
 2. **Numbers are the content.** Pace, VDOT, distance, days-to-race —
    the screen exists to surface these. Monospaced digits, generous
    contrast, no decoration that competes with the data.
@@ -59,9 +62,14 @@ file that needs them.
 
 | Token | Hex | Use for |
 |-------|-----|---------|
-| `brand.accent` | `#CCFF00` (Electric Lime) | Primary CTA, focus, "now" markers, VDOT highlights |
+| `brand.accent` | `#00D4FF` (Electric Cyan) | Primary CTA, focus, "now" markers, VDOT highlights |
 | `brand.accentMuted` | `accent` @ 18 % opacity | Chip fills, banner stroke, badge backgrounds |
 
+> **Why cyan, not lime?** Apple's Workout app already owns lime
+> (`#B7FF40`) as a sports-app accent. Cyan keeps the OLED-friendly
+> high saturation while reading as "instrument / data" — closer to a
+> Garmin readout than a fitness tracker.
+>
 > **One accent only.** If you find yourself reaching for a second
 > brand colour, you're either signalling a state (use a semantic
 > token) or a zone (use the zone palette). Two equal-weight accents
@@ -90,14 +98,16 @@ not the only channel.
 | `brand.zone.marathon` | soft slate-blue | M — marathon pace |
 | `brand.zone.threshold` | mustard | T — comfortably hard |
 | `brand.zone.interval` | burnt orange | I — VO₂max efforts |
-| `brand.zone.repetition` | `accent` lime | R — top-end speed |
+| `brand.zone.repetition` | fire red | R — top-end speed |
 
 > **Why this palette over the previous Material Design swatches?**
 > The old `#4CAF50 / #2196F3 / #FFC107 / #FF5722 / #F44336` were five
 > independent traffic-lights — visually loud, no relationship to brand.
 > The new ramp reads as a *progression*: as effort climbs, colour gets
-> warmer and brighter, ending at the brand lime for the hardest zone.
-> Ties pace zones into the brand story.
+> warmer and brighter, ending in fire red for the hardest zone. The
+> heat ramp deliberately *doesn't* end at the cyan brand accent —
+> mixing cool brand into a warm pace progression would break the
+> intensity-as-heat metaphor.
 
 ---
 
@@ -221,7 +231,9 @@ Before shipping a new view, verify:
 
 These come up in code review often enough to call out:
 
-- `Color(hex: "#CCFF00")` — use `Color.brand.accent`
+- `Color(hex: "#00D4FF")` — use `Color.brand.accent`
+- `Color(hex: "#CCFF00")` (the old lime) — use `Color.brand.accent`. The
+  brand switched from lime to cyan; any leftover lime hex is wrong.
 - `Color.electricLime` / `Color.workshopLime` — both removed, use `Color.brand.accent`
 - Multiple `Color(hex:)` initializers — single canonical one lives in `DesignSystem/Theme.swift`
 - `.foregroundStyle(.secondary)` on `Color.black` background — fails WCAG AA, use `Color.brand.textSecondary`

@@ -37,9 +37,10 @@ public extension Color {
 
         // MARK: - Accent
 
-        /// Brand accent (Electric Lime). Primary CTAs, focus, "now" markers,
-        /// VDOT highlights, progress.
-        public static let accent = Color(red: 0.80, green: 1.00, blue: 0.00) // #CCFF00
+        /// Brand accent (Electric Cyan). Primary CTAs, focus, "now" markers,
+        /// VDOT highlights, progress. Distinct from Apple Workout's signature
+        /// lime — reads as "instrument / precision" rather than "fitness app."
+        public static let accent = Color(red: 0.00, green: 0.831, blue: 1.00) // #00D4FF
 
         /// Same hue at low alpha, for tinted backgrounds (chip fills,
         /// banner borders).
@@ -68,7 +69,7 @@ public extension Color {
             public static let marathon   = Color(red: 0.60, green: 0.71, blue: 0.80) // soft slate-blue
             public static let threshold  = Color(red: 0.83, green: 0.77, blue: 0.37) // mustard
             public static let interval   = Color(red: 0.91, green: 0.57, blue: 0.42) // burnt orange
-            public static let repetition = Color(red: 0.80, green: 1.00, blue: 0.00) // accent lime
+            public static let repetition = Color(red: 1.00, green: 0.24, blue: 0.00) // fire red — top of the heat ramp
         }
     }
 }
@@ -112,7 +113,11 @@ public extension WorkoutCardPalette {
     static let repetition = WorkoutCardPalette(tint: Color(red: 1.00, green: 0.34, blue: 0.13))   // orange
     static let long       = WorkoutCardPalette(tint: Color(red: 0.40, green: 0.49, blue: 0.92))   // indigo
     static let rest       = WorkoutCardPalette(tint: Color(white: 0.50), alpha: 0.10)              // grey
-    static let lime       = WorkoutCardPalette(tint: Color(red: 0.80, green: 1.00, blue: 0.00))   // brand
+    /// Brand palette — Electric Cyan. Used for user-created workouts so they
+    /// stand out against the muted preset palette.
+    static let brand      = WorkoutCardPalette(tint: Color(red: 0.00, green: 0.831, blue: 1.00))   // #00D4FF
+    /// Legacy alias for the brand palette — new code should use `.brand`.
+    static let lime       = brand
     static let lilac      = WorkoutCardPalette(tint: Color(red: 0.65, green: 0.51, blue: 0.92))   // for Templates
 }
 
