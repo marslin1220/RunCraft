@@ -15,17 +15,34 @@ public struct SetupRaceGoalView: View {
     public var body: some View {
         NavigationStack {
             Form {
-                Section("Race Goal") {
+                Section {
                     TextField("Goal name (e.g. Sun Moon Lake 29K)", text: $store.goalName)
-                    DatePicker("Race date", selection: $store.targetDate, displayedComponents: .date)
+                        .submitLabel(.next)
+                    DatePicker(
+                        "Race date",
+                        selection: $store.targetDate,
+                        in: Calendar.current.startOfDay(for: Date())...,
+                        displayedComponents: .date
+                    )
                     HStack {
                         Text("Distance")
                         Spacer()
-                        TextField("km", value: $store.distanceKm, format: .number)
+                        TextField("km", value: $store.distanceKm, format: .number.precision(.fractionLength(0...2)))
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                         Text("km")
+                            .foregroundStyle(.secondary)
+                        Stepper("Distance", value: $store.distanceKm, in: 1...100, step: 1)
+                            .labelsHidden()
+                    }
+                } header: {
+                    Text("Race Goal")
+                } footer: {
+                    if !store.canSave {
+                        Text(saveBlockerMessage)
+                            .font(.caption)
+                            .foregroundStyle(Color.brand.caution)
                     }
                 }
 
@@ -141,7 +158,7 @@ public struct SetupRaceGoalView: View {
                     }
                 }
             }
-            .navigationTitle("New Race Goal")
+            .navigationTitle(store.editingId == nil ? "New Race Goal" : "Edit Race Goal")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -154,6 +171,18 @@ public struct SetupRaceGoalView: View {
                 }
             }
         }
+    }
+
+    /// Explains why Save is disabled. Visible as a section footer so the
+    /// user isn't left wondering which field is wrong.
+    private var saveBlockerMessage: String {
+        if store.goalName.isEmpty {
+            return "Enter a goal name to continue."
+        }
+        if store.effectiveVDOT == nil {
+            return "Enter a recent race time, or tap Auto-detect, so we can calculate your VDOT."
+        }
+        return ""
     }
 }
 
