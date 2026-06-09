@@ -3,7 +3,6 @@ import DesignSystem
 import RunCraftModels
 import SQLiteData
 import SwiftUI
-import VDOTEngine
 
 public struct WorkshopView: View {
     @Bindable public var store: StoreOf<Workshop>
@@ -57,7 +56,6 @@ public struct WorkshopView: View {
         switch store.selectedSegment {
         case .yours:     YoursSegment(store: store)
         case .templates: TemplatesSegment(store: store)
-        case .plan:      PlanSegment(store: store)
         }
     }
 }
@@ -109,141 +107,6 @@ private struct TemplatesSegment: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-    }
-}
-
-// MARK: - Plan segment
-
-private struct PlanSegment: View {
-    let store: StoreOf<Workshop>
-    @FetchOne(RaceGoal.order { $0.createdAt.desc() }) var goal: RaceGoal?
-    @FetchAll var allWeeks: [TrainingWeek]
-    @FetchAll(PlannedSession.none) var thisWeekSessions: [PlannedSession] = []
-
-    private var currentWeek: TrainingWeek? {
-        TrainingWeek.current(in: allWeeks)
-    }
-
-    var body: some View {
-        Group {
-            if goal == nil {
-                EmptyPlanPrompt()
-            } else if currentWeek == nil {
-                OutsidePlanWindowPrompt(goal: goal)
-            } else {
-                List {
-                    ForEach(orderedDays(), id: \.dayOfWeek) { row in
-                        if let session = row.session {
-                            PlanSessionRow(
-                                dayOfWeek: row.dayOfWeek,
-                                session: session,
-                                vdot: goal?.currentVDOT ?? 40
-                            ) { template in
-                                store.send(.workoutTapped(template, .planSession))
-                            }
-                            .listRowBackground(Color.brand.surface)
-                        } else {
-                            PlanRestRow(dayOfWeek: row.dayOfWeek)
-                                .listRowBackground(Color.clear)
-                        }
-                    }
-                }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-            }
-        }
-        .task(id: currentWeek?.id) { await loadThisWeekSessions() }
-    }
-
-    private func orderedDays() -> [(dayOfWeek: Int, session: PlannedSession?)] {
-        (1...7).map { day in
-            let s = thisWeekSessions.first { $0.dayOfWeek == day }
-            return (day, s)
-        }
-    }
-
-    private func loadThisWeekSessions() async {
-        guard let weekId = currentWeek?.id else { return }
-        do {
-            try await $thisWeekSessions.load(
-                PlannedSession.where { $0.weekId.eq(weekId) }.order(by: \.dayOfWeek)
-            )
-        } catch {
-            print("load planned sessions failed: \(error)")
-        }
-    }
-}
-
-private struct PlanSessionRow: View {
-    let dayOfWeek: Int
-    let session: PlannedSession
-    let vdot: Double
-    let onTap: (WorkoutTemplate) -> Void
-
-    private var livePace: String? {
-        guard let zone = session.targetPaceZone, vdot > 0 else { return nil }
-        return VDOTCalculator.paceRange(for: zone, vdot: vdot).formatted()
-    }
-
-    var body: some View {
-        Button {
-            let template = PlanSessionAdapter.makeTemplate(from: session, vdot: vdot)
-            onTap(template)
-        } label: {
-            HStack(spacing: 12) {
-                Text(dayLabel)
-                    .font(.system(.subheadline, design: .rounded, weight: .bold))
-                    .foregroundStyle(Color(hex: session.sessionType.colorHex))
-                    .frame(width: 36)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(session.sessionType.displayName)
-                        .font(.subheadline.bold())
-                        .foregroundStyle(.white)
-                    if let livePace {
-                        Text(livePace).font(.caption).foregroundStyle(Color.brand.textSecondary).lineLimit(1)
-                    } else if !session.notes.isEmpty {
-                        Text(session.notes).font(.caption).foregroundStyle(Color.brand.textSecondary).lineLimit(1)
-                    }
-                }
-                Spacer()
-                if let km = session.targetDistanceKm {
-                    Text("\(km, format: .number.precision(.fractionLength(0...1))) km")
-                        .font(.subheadline)
-                        .foregroundStyle(Color.brand.accent)
-                }
-                Image(systemName: "chevron.right").font(.caption.bold()).foregroundStyle(Color.brand.textSecondary)
-            }
-            .padding(.vertical, 4)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var dayLabel: String {
-        let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        let idx = dayOfWeek - 1
-        return (idx >= 0 && idx < days.count) ? days[idx] : "?"
-    }
-}
-
-private struct PlanRestRow: View {
-    let dayOfWeek: Int
-    var body: some View {
-        HStack {
-            Text(dayLabel)
-                .font(.system(.subheadline, design: .rounded, weight: .bold))
-                .foregroundStyle(Color.brand.textSecondary)
-                .frame(width: 36)
-            Text("Rest day")
-                .font(.caption)
-                .foregroundStyle(Color.brand.textSecondary)
-            Spacer()
-        }
-        .padding(.vertical, 6)
-    }
-    private var dayLabel: String {
-        let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        let idx = dayOfWeek - 1
-        return (idx >= 0 && idx < days.count) ? days[idx] : "?"
     }
 }
 
@@ -329,56 +192,6 @@ private struct EmptyYoursPrompt: View {
     }
 }
 
-private struct OutsidePlanWindowPrompt: View {
-    let goal: RaceGoal?
-
-    var body: some View {
-        VStack(spacing: 14) {
-            Image(systemName: "calendar.badge.clock")
-                .font(.system(size: 44))
-                .foregroundStyle(Color.brand.textSecondary)
-            Text(headline)
-                .font(.title3.bold())
-                .foregroundStyle(.white)
-            Text(detail)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color.brand.textSecondary)
-                .padding(.horizontal, 40)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private var headline: String {
-        guard let goal else { return "No active plan" }
-        return goal.targetDate < Date() ? "Plan window has ended" : "Plan window hasn't started"
-    }
-
-    private var detail: String {
-        guard let goal else { return "" }
-        if goal.targetDate < Date() {
-            return "\(goal.name) was \(goal.targetDate.formatted(date: .abbreviated, time: .omitted)). Create a new race goal to keep training."
-        }
-        return "\(goal.name) is set for \(goal.targetDate.formatted(date: .abbreviated, time: .omitted)). Training begins 16 weeks out."
-    }
-}
-
-private struct EmptyPlanPrompt: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "calendar.badge.exclamationmark")
-                .font(.system(size: 48))
-                .foregroundStyle(Color.brand.textSecondary)
-            Text("No active plan")
-                .font(.title3.bold())
-                .foregroundStyle(.white)
-            Text("Create a race goal in the Plan tab to see daily training here.")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color.brand.textSecondary)
-                .padding(.horizontal, 40)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
 
 #Preview {
     WorkshopView(store: .init(initialState: Workshop.State()) { Workshop() })

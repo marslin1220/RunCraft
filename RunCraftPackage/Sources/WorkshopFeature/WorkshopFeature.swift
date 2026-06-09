@@ -2,13 +2,17 @@ import ComposableArchitecture
 import Foundation
 import RunCraftModels
 
-/// Top-level Workshop shell.
+/// Top-level Workouts shell.
 ///
-/// Three-segment list (Yours / Templates / Plan). Tapping any workout pushes
-/// a single `WorkoutEditor` screen — read-only/edit is no longer split: the
+/// Two-segment library (Yours / Templates). Tapping any workout pushes a
+/// single `WorkoutEditor` screen — read-only/edit is no longer split: the
 /// editor is always live, and its `Source` field controls whether Save
-/// updates the existing row (`yours`) or creates a copy (`template` /
-/// `planSession`). `+ New workout` pushes a blank editor.
+/// updates the existing row (`yours`) or creates a copy (`template`).
+/// `+ New workout` pushes a blank editor.
+///
+/// Note: there used to be a third "Plan" segment that surfaced today's
+/// planned session, but it duplicated the Plan tab's session card and
+/// went stale before the 16-week training window opened. Removed.
 @Reducer public struct Workshop {
     @ObservableState public struct State {
         public var selectedSegment: Segment = .yours
@@ -20,13 +24,11 @@ import RunCraftModels
     public enum Segment: String, CaseIterable, Equatable {
         case yours
         case templates
-        case plan
 
         public var label: String {
             switch self {
             case .yours:     "Yours"
             case .templates: "Templates"
-            case .plan:      "Plan"
             }
         }
     }
