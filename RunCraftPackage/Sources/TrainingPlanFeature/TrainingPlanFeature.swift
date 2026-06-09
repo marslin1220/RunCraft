@@ -66,6 +66,7 @@ import WorkshopFeature
 
     @Reducer public enum Destination {
         case setupRaceGoal(SetupRaceGoal)
+        case adjustVDOT(AdjustVDOT)
         case deleteConfirm(AlertState<DeleteAlertAction>)
     }
 
@@ -81,6 +82,7 @@ import WorkshopFeature
         case vdotFetchResponse(Result<Double, any Error>)
         case deletePlanRequested
         case recalculateVDOTRequested
+        case adjustVDOTRequested
         case editGoalLoaded(RaceGoal?)
         case planDeleted
         case countdownTapped
@@ -213,6 +215,10 @@ import WorkshopFeature
                 } else {
                     state.destination = .setupRaceGoal(SetupRaceGoal.State())
                 }
+                return .none
+
+            case .adjustVDOTRequested:
+                state.destination = .adjustVDOT(AdjustVDOT.State(currentVDOT: state.currentVDOT))
                 return .none
 
             case .destination(.presented(.deleteConfirm(.confirmDelete))):

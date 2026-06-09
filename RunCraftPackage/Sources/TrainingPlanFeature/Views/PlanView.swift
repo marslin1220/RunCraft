@@ -77,6 +77,12 @@ public struct PlanView: View {
                             } label: {
                                 Label("Edit goal / recalculate", systemImage: "pencil")
                             }
+                            Button {
+                                store.send(.adjustVDOTRequested)
+                            } label: {
+                                Label("Adjust VDOT manually", systemImage: "slider.horizontal.3")
+                            }
+                            Divider()
                             Button(role: .destructive) {
                                 store.send(.deletePlanRequested)
                             } label: {
@@ -92,6 +98,9 @@ public struct PlanView: View {
             .onAppear { store.send(.onAppear) }
             .sheet(item: $store.scope(state: \.destination?.setupRaceGoal, action: \.destination.setupRaceGoal)) { setupStore in
                 SetupRaceGoalView(store: setupStore)
+            }
+            .sheet(item: $store.scope(state: \.destination?.adjustVDOT, action: \.destination.adjustVDOT)) { adjustStore in
+                AdjustVDOTView(store: adjustStore)
             }
             .alert($store.scope(state: \.destination?.deleteConfirm, action: \.destination.deleteConfirm))
             .alert($store.scope(state: \.quickStartAlert, action: \.quickStartAlert))

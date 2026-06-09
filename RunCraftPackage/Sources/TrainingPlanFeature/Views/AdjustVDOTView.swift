@@ -1,0 +1,93 @@
+import ComposableArchitecture
+import DesignSystem
+import SwiftUI
+import VDOTEngine
+
+public struct AdjustVDOTView: View {
+    @Bindable public var store: StoreOf<AdjustVDOT>
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+
+    public init(store: StoreOf<AdjustVDOT>) {
+        self.store = store
+    }
+
+    public var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    VStack(spacing: 12) {
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text("\(store.vdot, format: .number.precision(.fractionLength(1)))")
+                                .font(.system(size: 56, weight: .bold, design: .rounded))
+                                .foregroundStyle(Color.brand.accent)
+                                .monospacedDigit()
+                            Text("VDOT")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Stepper(
+                            "VDOT",
+                            value: $store.vdot,
+                            in: 30...85,
+                            step: 0.5
+                        )
+                        .labelsHidden()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                } header: {
+                    Text("Adjust VDOT")
+                } footer: {
+                    if store.hasChanged {
+                        let delta = store.vdot - store.originalVDOT
+                        let sign = delta > 0 ? "+" : ""
+                        Text("Changes by \(sign)\(delta.formatted(.number.precision(.fractionLength(1)))) from \(store.originalVDOT.formatted(.number.precision(.fractionLength(1)))).")
+                            .font(.caption)
+                    } else {
+                        Text("Use the stepper to adjust. Changes only commit when you tap Save.")
+                            .font(.caption)
+                    }
+                }
+
+                Section("Resulting Paces") {
+                    PacePreviewRow(label: "E  Easy",       range: store.paceZones.easy,       unit: paceUnit)
+                    PacePreviewRow(label: "M  Marathon",   range: store.paceZones.marathon,   unit: paceUnit)
+                    PacePreviewRow(label: "T  Threshold",  range: store.paceZones.threshold,  unit: paceUnit)
+                    PacePreviewRow(label: "I  Interval",   range: store.paceZones.interval,   unit: paceUnit)
+                    PacePreviewRow(label: "R  Repetition", range: store.paceZones.repetition, unit: paceUnit)
+                }
+            }
+            .navigationTitle("Adjust VDOT")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { store.send(.cancelTapped) }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { store.send(.saveTapped) }
+                        .bold()
+                        .disabled(!store.hasChanged)
+                }
+            }
+        }
+    }
+}
+
+private struct PacePreviewRow: View {
+    let label: String
+    let range: PaceZones.PaceRange
+    let unit: PaceUnit
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.system(.body, design: .monospaced))
+            Spacer()
+            Text(range.formatted(unit: unit))
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+                .contentTransition(.numericText())
+        }
+    }
+}
