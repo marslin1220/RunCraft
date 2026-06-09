@@ -7,7 +7,7 @@ import WorkshopFeature
     @ObservableState public struct State {
         public var selectedTab: Tab = .plan
         public var plan: TrainingPlan.State = .init()
-        public var workshop: Workshop.State = .init()
+        public var workouts: Workshop.State = .init()
         public var insights: InsightsFeature.State = .init()
         public var settings: Settings.State = .init()
 
@@ -16,7 +16,7 @@ import WorkshopFeature
 
     public enum Tab: String, Equatable, CaseIterable {
         case plan
-        case workshop
+        case workouts
         case insights
         case settings
     }
@@ -24,7 +24,7 @@ import WorkshopFeature
     public enum Action {
         case tabSelected(Tab)
         case plan(TrainingPlan.Action)
-        case workshop(Workshop.Action)
+        case workouts(Workshop.Action)
         case insights(InsightsFeature.Action)
         case settings(Settings.Action)
     }
@@ -35,7 +35,7 @@ import WorkshopFeature
         Scope(state: \.plan, action: \.plan) {
             TrainingPlan()
         }
-        Scope(state: \.workshop, action: \.workshop) {
+        Scope(state: \.workouts, action: \.workouts) {
             Workshop()
         }
         Scope(state: \.insights, action: \.insights) {
@@ -51,14 +51,14 @@ import WorkshopFeature
                 return .none
 
             case let .plan(.delegate(.openWorkoutInWorkshop(template, source))):
-                state.selectedTab = .workshop
-                let workshopSource: WorkoutEditor.State.Source = switch source {
+                state.selectedTab = .workouts
+                let workoutsSource: WorkoutEditor.State.Source = switch source {
                 case .planSession: .planSession
                 case .template:    .template
                 }
-                return .send(.workshop(.openDetail(template, workshopSource)))
+                return .send(.workouts(.openDetail(template, workoutsSource)))
 
-            case .plan, .workshop, .insights, .settings:
+            case .plan, .workouts, .insights, .settings:
                 return .none
             }
         }

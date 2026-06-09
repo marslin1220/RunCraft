@@ -19,7 +19,7 @@ public struct WorkshopView: View {
                 content
             }
             .background(Color.black)
-            .navigationTitle("Workshop")
+            .navigationTitle("Workouts")
             .navigationBarTitleDisplayMode(.large)
             .preferredColorScheme(.dark)
             .toolbar {

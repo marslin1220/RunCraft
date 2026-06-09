@@ -19,11 +19,11 @@ public struct AppView: View {
                 }
                 .tag(AppFeature.Tab.plan)
 
-            WorkshopView(store: store.scope(state: \.workshop, action: \.workshop))
+            WorkshopView(store: store.scope(state: \.workouts, action: \.workouts))
                 .tabItem {
-                    Label("Workshop", systemImage: "wrench.and.screwdriver")
+                    Label("Workouts", systemImage: "figure.run")
                 }
-                .tag(AppFeature.Tab.workshop)
+                .tag(AppFeature.Tab.workouts)
 
             InsightsView(store: store.scope(state: \.insights, action: \.insights))
                 .tabItem {
