@@ -1,5 +1,6 @@
 import Charts
 import ComposableArchitecture
+import DesignSystem
 import RunCraftModels
 import SwiftUI
 
@@ -37,7 +38,7 @@ public struct InsightsView: View {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text(store.currentVDOT > 0 ? "\(Int(store.currentVDOT.rounded()))" : "—")
                     .font(.system(size: 48, weight: .bold, design: .rounded))
-                    .foregroundStyle(electricLime)
+                    .foregroundStyle(Color.brand.accent)
                 Text("VDOT")
                     .font(.headline)
                     .foregroundStyle(.secondary)
@@ -57,7 +58,7 @@ public struct InsightsView: View {
                         y: .value("VDOT", snapshot.vdot)
                     )
                     .interpolationMethod(.monotone)
-                    .foregroundStyle(electricLime)
+                    .foregroundStyle(Color.brand.accent)
 
                     PointMark(
                         x: .value("Date", snapshot.recordedAt),
@@ -85,7 +86,7 @@ public struct InsightsView: View {
                         x: .value("Week", week.weekStart, unit: .weekOfYear),
                         y: .value("km", week.totalKm)
                     )
-                    .foregroundStyle(electricLime.opacity(0.85))
+                    .foregroundStyle(Color.brand.accent.opacity(0.85))
                     .cornerRadius(4)
                 }
                 .frame(height: 160)
@@ -112,7 +113,7 @@ public struct InsightsView: View {
                             Spacer()
                             Text(race.formatted)
                                 .font(.system(.title3, design: .monospaced).weight(.medium))
-                                .foregroundStyle(electricLime)
+                                .foregroundStyle(Color.brand.accent)
                         }
                         if race.id != store.state.predictedTimes.last?.id {
                             Divider().opacity(0.3)
@@ -140,7 +141,7 @@ public struct InsightsView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(red: 0.10, green: 0.10, blue: 0.18))
+                .fill(Color.brand.surface)
         )
     }
 
@@ -163,13 +164,10 @@ public struct InsightsView: View {
     private func color(for source: VDOTSnapshot.Source) -> Color {
         switch source {
         case .initial:         .blue
-        case .raceTime:        electricLime
+        case .raceTime:        Color.brand.accent
         case .overperformance: .green
         case .manual:          .orange
         }
     }
 
-    private var electricLime: Color {
-        Color(red: 0.8, green: 1.0, blue: 0.0)
-    }
 }

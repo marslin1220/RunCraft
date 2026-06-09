@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import IssueReporting
 import RunCraftModels
 import SQLiteData
@@ -81,7 +82,7 @@ public struct PlanView: View {
                             }
                         } label: {
                             Image(systemName: "ellipsis.circle")
-                                .foregroundStyle(Color(hex: "#CCFF00"))
+                                .foregroundStyle(Color.brand.accent)
                         }
                     }
                 }
@@ -122,7 +123,7 @@ private struct RaceCountdownRing: View {
                 Circle()
                     .trim(from: 0, to: ringProgress)
                     .stroke(
-                        Color(hex: "#CCFF00"),
+                        Color.brand.accent,
                         style: StrokeStyle(lineWidth: 12, lineCap: .round)
                     )
                     .frame(width: 160, height: 160)
@@ -180,7 +181,7 @@ private struct PaceZonesSummaryCard: View {
             }
         }
         .padding()
-        .background(Color(hex: "#1A1B2E"))
+        .background(Color.brand.surface)
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
@@ -243,7 +244,7 @@ private struct WeekSessionsSection: View {
                 Spacer()
                 Text("\(week.targetWeeklyKm, format: .number.precision(.fractionLength(0))) km")
                     .font(.subheadline)
-                    .foregroundStyle(Color(hex: "#CCFF00"))
+                    .foregroundStyle(Color.brand.accent)
             }
 
             ForEach(sessions) { session in
@@ -336,7 +337,7 @@ private struct SessionCard: View {
             }
         }
         .padding(12)
-        .background(Color(hex: "#1A1B2E"))
+        .background(Color.brand.surface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .opacity(isCompleted ? 0.7 : 1.0)
     }
@@ -359,7 +360,7 @@ private struct VDOTUpgradeBanner: View {
             HStack(spacing: 10) {
                 Image(systemName: "arrow.up.right.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(Color(hex: "#CCFF00"))
+                    .foregroundStyle(Color.brand.accent)
                 Text("VDOT improved")
                     .font(.subheadline.bold())
                     .foregroundStyle(.white)
@@ -382,7 +383,7 @@ private struct VDOTUpgradeBanner: View {
                     .foregroundStyle(.secondary)
                 Text(upgrade.newVDOT, format: .number.precision(.fractionLength(1)))
                     .bold()
-                    .foregroundStyle(Color(hex: "#CCFF00"))
+                    .foregroundStyle(Color.brand.accent)
             }
             .font(.title3)
 
@@ -398,17 +399,17 @@ private struct VDOTUpgradeBanner: View {
                     .foregroundStyle(.black)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
-                    .background(Color(hex: "#CCFF00"))
+                    .background(Color.brand.accent)
                     .clipShape(Capsule())
             }
             .buttonStyle(.plain)
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: "#1A1B2E"))
+        .background(Color.brand.surface)
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .stroke(Color(hex: "#CCFF00").opacity(0.4), lineWidth: 1)
+                .stroke(Color.brand.accent.opacity(0.4), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
@@ -466,7 +467,7 @@ private struct RecoveryAdviceBanner: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: "#1A1B2E"))
+        .background(Color.brand.surface)
         .overlay(
             RoundedRectangle(cornerRadius: 14)
                 .stroke(Color(hex: "#FFC107").opacity(0.4), lineWidth: 1)
@@ -482,7 +483,7 @@ private struct EmptyPlanPrompt: View {
         VStack(spacing: 20) {
             Image(systemName: "figure.run.circle")
                 .font(.system(size: 64))
-                .foregroundStyle(Color(hex: "#CCFF00"))
+                .foregroundStyle(Color.brand.accent)
 
             Text("No race goal yet")
                 .font(.title2)
@@ -499,25 +500,11 @@ private struct EmptyPlanPrompt: View {
                     .foregroundStyle(.black)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
-                    .background(Color(hex: "#CCFF00"))
+                    .background(Color.brand.accent)
                     .clipShape(Capsule())
             }
         }
         .padding(.top, 60)
-    }
-}
-
-// MARK: - Hex Color Helper
-
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let r = Double((int >> 16) & 0xFF) / 255
-        let g = Double((int >> 8) & 0xFF) / 255
-        let b = Double(int & 0xFF) / 255
-        self.init(red: r, green: g, blue: b)
     }
 }
 
@@ -573,14 +560,14 @@ private struct WeekSection: View {
             HStack {
                 Text("Week \(week.weekNumber) · \(week.phase.displayName)")
                     .font(.subheadline.bold())
-                    .foregroundStyle(isCurrent ? Color(hex: "#CCFF00") : .white)
+                    .foregroundStyle(isCurrent ? Color.brand.accent : .white)
                 if isCurrent {
                     Text("THIS WEEK")
                         .font(.caption2.bold())
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color(hex: "#CCFF00").opacity(0.2))
-                        .foregroundStyle(Color(hex: "#CCFF00"))
+                        .background(Color.brand.accent.opacity(0.2))
+                        .foregroundStyle(Color.brand.accent)
                         .clipShape(Capsule())
                 }
                 Spacer()
@@ -632,7 +619,7 @@ private struct WeekSection: View {
                         }
                     }
                     .padding(10)
-                    .background(Color(hex: "#1A1B2E"))
+                    .background(Color.brand.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .opacity(isCurrent ? 1.0 : 0.85)
                 }

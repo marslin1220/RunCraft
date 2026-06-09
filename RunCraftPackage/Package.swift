@@ -13,6 +13,7 @@ let package = Package(
         .library(name: "VDOTEngine", targets: ["VDOTEngine"]),
         .library(name: "HealthKitClient", targets: ["HealthKitClient"]),
         .library(name: "RunCraftModels", targets: ["RunCraftModels"]),
+        .library(name: "DesignSystem", targets: ["DesignSystem"]),
         .library(name: "TrainingPlanFeature", targets: ["TrainingPlanFeature"]),
         .library(name: "AppleWatchSync", targets: ["AppleWatchSync"]),
         .library(name: "WorkshopFeature", targets: ["WorkshopFeature"]),
@@ -47,11 +48,16 @@ let package = Package(
             ]
         ),
 
+        // MARK: - UI
+
+        .target(name: "DesignSystem"),
+
         // MARK: - Features
 
         .target(
             name: "TrainingPlanFeature",
             dependencies: [
+                "DesignSystem",
                 "VDOTEngine",
                 "HealthKitClient",
                 "RunCraftModels",
@@ -71,6 +77,7 @@ let package = Package(
             name: "WorkshopFeature",
             dependencies: [
                 "AppleWatchSync",
+                "DesignSystem",
                 "VDOTEngine",
                 "RunCraftModels",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -82,6 +89,7 @@ let package = Package(
         .target(
             name: "InsightsFeature",
             dependencies: [
+                "DesignSystem",
                 "RunCraftModels",
                 "VDOTEngine",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -92,6 +100,7 @@ let package = Package(
         .target(
             name: "AppFeature",
             dependencies: [
+                "DesignSystem",
                 "InsightsFeature",
                 "TrainingPlanFeature",
                 "WorkshopFeature",

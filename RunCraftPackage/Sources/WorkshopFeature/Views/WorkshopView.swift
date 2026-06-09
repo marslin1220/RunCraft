@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import RunCraftModels
 import SQLiteData
 import SwiftUI
@@ -28,7 +29,7 @@ public struct WorkshopView: View {
                     } label: {
                         Image(systemName: "plus.circle.fill")
                     }
-                    .foregroundStyle(Color.workshopLime)
+                    .foregroundStyle(Color.brand.accent)
                 }
             }
         } destination: { pathStore in
@@ -77,7 +78,7 @@ private struct YoursSegment: View {
             List {
                 ForEach(templates) { t in
                     WorkoutListRow(template: t, sourceIcon: nil)
-                        .listRowBackground(Color(hex: "#1A1B2E"))
+                        .listRowBackground(Color.brand.surface)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             store.send(.workoutTapped(t, .yours))
@@ -99,7 +100,7 @@ private struct TemplatesSegment: View {
         List {
             ForEach(WorkoutPresets.all) { preset in
                 WorkoutListRow(template: preset, sourceIcon: "sparkles")
-                    .listRowBackground(Color(hex: "#1A1B2E"))
+                    .listRowBackground(Color.brand.surface)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         store.send(.workoutTapped(preset, .template))
@@ -140,7 +141,7 @@ private struct PlanSegment: View {
                             ) { template in
                                 store.send(.workoutTapped(template, .planSession))
                             }
-                            .listRowBackground(Color(hex: "#1A1B2E"))
+                            .listRowBackground(Color.brand.surface)
                         } else {
                             PlanRestRow(dayOfWeek: row.dayOfWeek)
                                 .listRowBackground(Color.clear)
@@ -208,7 +209,7 @@ private struct PlanSessionRow: View {
                 if let km = session.targetDistanceKm {
                     Text("\(km, format: .number.precision(.fractionLength(0...1))) km")
                         .font(.subheadline)
-                        .foregroundStyle(Color.workshopLime)
+                        .foregroundStyle(Color.brand.accent)
                 }
                 Image(systemName: "chevron.right").font(.caption.bold()).foregroundStyle(.secondary)
             }
@@ -264,10 +265,10 @@ private struct WorkoutListRow: View {
     var body: some View {
         HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 6)
-                .fill(sourceIcon != nil ? Color.workshopLime.opacity(0.2) : Color.white.opacity(0.08))
+                .fill(sourceIcon != nil ? Color.brand.accent.opacity(0.2) : Color.white.opacity(0.08))
                 .overlay(
                     Image(systemName: sourceIcon ?? "figure.run")
-                        .foregroundStyle(sourceIcon != nil ? Color.workshopLime : .white)
+                        .foregroundStyle(sourceIcon != nil ? Color.brand.accent : .white)
                 )
                 .frame(width: 36, height: 36)
             VStack(alignment: .leading, spacing: 2) {
@@ -293,7 +294,7 @@ private struct EmptyYoursPrompt: View {
         VStack(spacing: 20) {
             Image(systemName: "figure.run.circle")
                 .font(.system(size: 56))
-                .foregroundStyle(Color.workshopLime.opacity(0.6))
+                .foregroundStyle(Color.brand.accent.opacity(0.6))
             Text("No workouts yet")
                 .font(.title3.bold())
                 .foregroundStyle(.white)
@@ -308,7 +309,7 @@ private struct EmptyYoursPrompt: View {
                         .bold()
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(Color.workshopLime)
+                        .background(Color.brand.accent)
                         .foregroundStyle(.black)
                         .clipShape(Capsule())
                 }
@@ -317,8 +318,8 @@ private struct EmptyYoursPrompt: View {
                         .bold()
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .foregroundStyle(Color.workshopLime)
-                        .overlay(Capsule().stroke(Color.workshopLime, lineWidth: 1.5))
+                        .foregroundStyle(Color.brand.accent)
+                        .overlay(Capsule().stroke(Color.brand.accent, lineWidth: 1.5))
                 }
             }
             .padding(.horizontal, 40)
@@ -377,12 +378,6 @@ private struct EmptyPlanPrompt: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-}
-
-// MARK: - Helpers
-
-extension Color {
-    fileprivate static let workshopLime = Color(red: 0.8, green: 1.0, blue: 0.0)
 }
 
 #Preview {

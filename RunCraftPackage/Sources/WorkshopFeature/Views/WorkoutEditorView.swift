@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import RunCraftModels
 import SwiftUI
 
@@ -62,7 +63,7 @@ public struct WorkoutEditorView: View {
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
-                        .foregroundStyle(Color.electricLime)
+                        .foregroundStyle(Color.brand.accent)
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -70,12 +71,12 @@ public struct WorkoutEditorView: View {
                     store.send(.saveTapped)
                 } label: {
                     if store.saveStatus == .saving {
-                        ProgressView().tint(Color.electricLime)
+                        ProgressView().tint(Color.brand.accent)
                     } else {
                         Text("Save").bold()
                     }
                 }
-                .foregroundStyle(Color.electricLime)
+                .foregroundStyle(Color.brand.accent)
                 .disabled(store.blocks.isEmpty || store.saveStatus == .saving)
             }
         }
@@ -92,7 +93,7 @@ public struct WorkoutEditorView: View {
         List {
             ForEach(store.blocks) { block in
                 BlockCardView(block: block)
-                    .listRowBackground(Color(hex: "#1A1B2E"))
+                    .listRowBackground(Color.brand.surface)
                     .listRowSeparator(.hidden)
                     .contentShape(Rectangle())
                     .onTapGesture { store.send(.blockTapped(id: block.id)) }
@@ -134,9 +135,9 @@ public struct WorkoutEditorView: View {
             .foregroundStyle(.black)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(Color.electricLime)
+            .background(Color.brand.accent)
             .clipShape(Capsule())
-            .shadow(color: Color.electricLime.opacity(0.4), radius: 12, y: 4)
+            .shadow(color: Color.brand.accent.opacity(0.4), radius: 12, y: 4)
         }
         .buttonStyle(.plain)
         .disabled(store.syncStatus == .sending || store.blocks.isEmpty)
@@ -184,7 +185,7 @@ private struct TemplateNameBar: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .background(Color(hex: "#1A1B2E"))
+        .background(Color.brand.surface)
     }
 
     @ViewBuilder
@@ -225,7 +226,7 @@ private struct TemplateNameBar: View {
             }
         case .saved:
             HStack(spacing: 4) {
-                Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.electricLime)
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.brand.accent)
                 Text("Saved").font(.caption).foregroundStyle(.secondary)
             }
         case .failed:
@@ -281,7 +282,7 @@ private struct StepRow: View {
 
             Text(step.goal.displayText)
                 .font(.subheadline)
-                .foregroundStyle(Color.electricLime)
+                .foregroundStyle(Color.brand.accent)
         }
         .padding(.vertical, 8)
     }
@@ -303,7 +304,7 @@ private struct RepeatGroupRow: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Image(systemName: "repeat")
-                    .foregroundStyle(Color.electricLime)
+                    .foregroundStyle(Color.brand.accent)
                 Text("Repeat \(group.iterations)×")
                     .font(.subheadline.bold())
                     .foregroundStyle(.white)
@@ -341,7 +342,7 @@ private struct EmptyWorkshopPrompt: View {
         VStack(spacing: 16) {
             Image(systemName: "wrench.and.screwdriver.fill")
                 .font(.system(size: 56))
-                .foregroundStyle(Color.electricLime.opacity(0.6))
+                .foregroundStyle(Color.brand.accent.opacity(0.6))
             Text("Build a workout")
                 .font(.title3.bold())
                 .foregroundStyle(.white)
@@ -357,15 +358,7 @@ private struct EmptyWorkshopPrompt: View {
 // MARK: - Color helpers
 
 extension Color {
-    static let electricLime = Color(hex: "#CCFF00")
-
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let r = Double((int >> 16) & 0xFF) / 255
-        let g = Double((int >> 8) & 0xFF) / 255
-        let b = Double(int & 0xFF) / 255
-        self.init(red: r, green: g, blue: b)
-    }
+    /// Legacy alias for the brand accent. New code should use
+    /// `Color.brand.accent` directly.
+    static let electricLime = Color.brand.accent
 }

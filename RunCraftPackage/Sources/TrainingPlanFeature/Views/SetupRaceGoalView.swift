@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import HealthKitClient
 import RunCraftModels
 import SwiftUI
@@ -84,7 +85,7 @@ public struct SetupRaceGoalView: View {
                             Spacer()
                             Text(vdot, format: .number.precision(.fractionLength(1)))
                                 .bold()
-                                .foregroundStyle(Color(hex: "#CCFF00"))
+                                .foregroundStyle(Color.brand.accent)
                                 .contentTransition(.numericText())
                         }
                     }
@@ -111,7 +112,7 @@ public struct SetupRaceGoalView: View {
                                     .font(.caption)
                                 Text(vdot, format: .number.precision(.fractionLength(1)))
                                     .bold()
-                                    .foregroundStyle(Color(hex: "#CCFF00"))
+                                    .foregroundStyle(Color.brand.accent)
                             }
                             Spacer()
                             Button {
