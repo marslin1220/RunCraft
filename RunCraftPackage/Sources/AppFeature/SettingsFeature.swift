@@ -1,23 +1,16 @@
 import ComposableArchitecture
 import Foundation
 import HealthKitClient
+import VDOTEngine
 
 @Reducer public struct Settings {
     @ObservableState public struct State: Equatable {
+        /// User-selected pace unit. Persisted to AppStorage via @Shared so
+        /// every view that formats a pace range can pick it up without
+        /// prop-drilling. Default: per-kilometre.
+        @Shared(.appStorage("paceUnit"))
         public var paceUnit: PaceUnit = .perKilometre
         public var isHealthKitLinked: Bool = false
-
-        public enum PaceUnit: String, CaseIterable, Equatable {
-            case perKilometre = "km"
-            case perMile = "mi"
-
-            var displayName: String {
-                switch self {
-                case .perKilometre: "/km"
-                case .perMile:      "/mi"
-                }
-            }
-        }
 
         public init() {}
     }

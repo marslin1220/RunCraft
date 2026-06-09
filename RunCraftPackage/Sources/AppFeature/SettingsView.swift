@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import DesignSystem
 import SwiftUI
+import VDOTEngine
 
 public struct SettingsView: View {
     @Bindable public var store: StoreOf<Settings>
@@ -22,7 +23,7 @@ public struct SettingsView: View {
             Form {
                 Section("Units") {
                     Picker("Pace", selection: $store.paceUnit) {
-                        ForEach(Settings.State.PaceUnit.allCases, id: \.self) { unit in
+                        ForEach(PaceUnit.allCases, id: \.self) { unit in
                             Text(unit.displayName).tag(unit)
                         }
                     }

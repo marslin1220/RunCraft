@@ -201,6 +201,7 @@ private struct RaceCountdownRing: View {
 private struct PaceZonesSummaryCard: View {
     let zones: PaceZones
     let onTap: (PaceZoneName) -> Void
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -230,10 +231,10 @@ private struct PaceZonesSummaryCard: View {
         Button {
             onTap(zone)
         } label: {
-            PaceChip(label: zone.letter, pace: zones[zone].formatted(), color: Self.color(for: zone))
+            PaceChip(label: zone.letter, pace: zones[zone].formatted(unit: paceUnit), color: Self.color(for: zone))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(zone.fullName) pace, \(zones[zone].formatted())")
+        .accessibilityLabel("\(zone.fullName) pace, \(zones[zone].formatted(unit: paceUnit))")
         .accessibilityHint("Builds a workout in the \(zone.fullName) zone")
     }
 
@@ -350,6 +351,7 @@ private struct SessionCard: View {
     let isSending: Bool
     let onTap: () -> Void
     let onQuickStart: () -> Void
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
 
     var body: some View {
         WorkoutCard(
@@ -371,8 +373,11 @@ private struct SessionCard: View {
         "\(dayLabel) · \(session.sessionType.displayName)"
     }
 
-    /// Live pace + km/min, e.g. "8 km · 5:30–6:10 /km". Falls back to just
-    /// km or just zone name when one component is missing.
+    /// Live pace + km/min + planner notes, e.g.
+    /// "8 km · 5:30–6:10 /km · 5×1000m". Notes (when present — usually
+    /// for hard sessions like intervals or auto-downgrades) are appended
+    /// last so the runner sees the *structural* context their plan was
+    /// generated with.
     private var cardSubtitle: String? {
         var pieces: [String] = []
         if let km = session.targetDistanceKm {
@@ -382,7 +387,10 @@ private struct SessionCard: View {
         }
         if let zone = session.targetPaceZone, vdot > 0 {
             let range = VDOTCalculator.paceRange(for: zone, vdot: vdot)
-            pieces.append(range.formatted())
+            pieces.append(range.formatted(unit: paceUnit))
+        }
+        if !session.notes.isEmpty {
+            pieces.append(session.notes)
         }
         return pieces.isEmpty ? nil : pieces.joined(separator: " · ")
     }
@@ -800,6 +808,7 @@ private struct WeekSection: View {
     let onToggle: () -> Void
     let onTap: (PlannedSession) -> Void
     let onQuickStart: (PlannedSession) -> Void
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
 
     private var sessionCount: Int { sessions.filter { $0.sessionType != .rest }.count }
     private var completedCount: Int {
@@ -1051,7 +1060,7 @@ private struct WeekSection: View {
         guard let zone = session.targetPaceZone else { return nil }
         if isCurrent, currentVDOT > 0 {
             let range = VDOTCalculator.paceRange(for: zone, vdot: currentVDOT)
-            return "\(zoneName(zone)) · \(range.formatted())"
+            return "\(zoneName(zone)) · \(range.formatted(unit: paceUnit))"
         }
         return zoneName(zone)
     }

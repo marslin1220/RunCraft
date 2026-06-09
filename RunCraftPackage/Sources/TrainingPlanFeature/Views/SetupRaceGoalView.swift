@@ -3,10 +3,12 @@ import DesignSystem
 import HealthKitClient
 import RunCraftModels
 import SwiftUI
+import VDOTEngine
 
 public struct SetupRaceGoalView: View {
     @Bindable public var store: StoreOf<SetupRaceGoal>
     @State private var showVDOTInfo = false
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
 
     public init(store: StoreOf<SetupRaceGoal>) {
         self.store = store
@@ -145,11 +147,11 @@ public struct SetupRaceGoalView: View {
 
                 if let zones = store.paceZones {
                     Section("Your Training Paces") {
-                        PaceZoneRow(label: "E  Easy",       pace: zones.easy.formatted(),       color: Color(hex: "#4CAF50"))
-                        PaceZoneRow(label: "M  Marathon",   pace: zones.marathon.formatted(),   color: Color(hex: "#2196F3"))
-                        PaceZoneRow(label: "T  Threshold",  pace: zones.threshold.formatted(),  color: Color(hex: "#FFC107"))
-                        PaceZoneRow(label: "I  Interval",   pace: zones.interval.formatted(),   color: Color(hex: "#FF5722"))
-                        PaceZoneRow(label: "R  Repetition", pace: zones.repetition.formatted(), color: Color(hex: "#F44336"))
+                        PaceZoneRow(label: "E  Easy",       pace: zones.easy.formatted(unit: paceUnit),       color: Color(hex: "#4CAF50"))
+                        PaceZoneRow(label: "M  Marathon",   pace: zones.marathon.formatted(unit: paceUnit),   color: Color(hex: "#2196F3"))
+                        PaceZoneRow(label: "T  Threshold",  pace: zones.threshold.formatted(unit: paceUnit),  color: Color(hex: "#FFC107"))
+                        PaceZoneRow(label: "I  Interval",   pace: zones.interval.formatted(unit: paceUnit),   color: Color(hex: "#FF5722"))
+                        PaceZoneRow(label: "R  Repetition", pace: zones.repetition.formatted(unit: paceUnit), color: Color(hex: "#F44336"))
                     }
                 }
             }

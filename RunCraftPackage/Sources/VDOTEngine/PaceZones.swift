@@ -48,9 +48,16 @@ public struct PaceZones: Equatable, Sendable {
     }
 }
 
-public enum PaceUnit: Sendable {
-    case perKilometre
-    case perMile
+public enum PaceUnit: String, Sendable, Equatable, CaseIterable, Codable {
+    case perKilometre = "km"
+    case perMile      = "mi"
+
+    public var displayName: String {
+        switch self {
+        case .perKilometre: "/km"
+        case .perMile:      "/mi"
+        }
+    }
 }
 
 private func formatSeconds(_ totalSeconds: Double) -> String {
