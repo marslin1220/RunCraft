@@ -50,10 +50,11 @@ public struct PlanView: View {
                         if let currentWeek = currentWeek {
                             WeekSessionsSection(
                                 week: currentWeek,
-                                vdot: store.currentVDOT
-                            ) { session in
-                                store.send(.sessionTapped(session))
-                            }
+                                vdot: store.currentVDOT,
+                                quickStartSendingSessionId: store.quickStartSendingSessionId,
+                                onSessionTap: { store.send(.sessionTapped($0)) },
+                                onQuickStart: { store.send(.quickStartSession($0)) }
+                            )
                         }
                     } else {
                         EmptyPlanPrompt {
@@ -93,6 +94,7 @@ public struct PlanView: View {
                 SetupRaceGoalView(store: setupStore)
             }
             .alert($store.scope(state: \.destination?.deleteConfirm, action: \.destination.deleteConfirm))
+            .alert($store.scope(state: \.quickStartAlert, action: \.quickStartAlert))
         } destination: { pathStore in
             switch pathStore.case {
             case .weekSchedule(let scheduleStore):
@@ -283,12 +285,19 @@ private extension PaceZoneName {
 private struct WeekSessionsSection: View {
     let week: TrainingWeek
     let vdot: Double
+    let quickStartSendingSessionId: UUID?
     let onSessionTap: (PlannedSession) -> Void
+    let onQuickStart: (PlannedSession) -> Void
     @FetchAll(PlannedSession.none) var sessions: [PlannedSession]
     @FetchAll var completedThisWeek: [CompletedWorkout]
 
     private var completedSessionIds: Set<UUID> {
         Set(completedThisWeek.compactMap(\.plannedSessionId))
+    }
+
+    private var todayDayOfWeek: Int {
+        let weekday = Calendar.current.component(.weekday, from: Date())
+        return weekday == 1 ? 7 : weekday - 1
     }
 
     var body: some View {
@@ -304,17 +313,19 @@ private struct WeekSessionsSection: View {
             }
 
             ForEach(sessions) { session in
-                Button {
-                    onSessionTap(session)
-                } label: {
+                if session.sessionType == .rest {
+                    RestSessionLine(session: session)
+                } else {
                     SessionCard(
                         session: session,
-                        weekStart: week.startDate,
                         vdot: vdot,
-                        isCompleted: completedSessionIds.contains(session.id)
+                        isCompleted: completedSessionIds.contains(session.id),
+                        isToday: session.dayOfWeek == todayDayOfWeek,
+                        isSending: quickStartSendingSessionId == session.id,
+                        onTap: { onSessionTap(session) },
+                        onQuickStart: { onQuickStart(session) }
                     )
                 }
-                .buttonStyle(.plain)
             }
         }
         .task(id: week.id) { await loadWeekData() }
@@ -333,82 +344,59 @@ private struct WeekSessionsSection: View {
 
 private struct SessionCard: View {
     let session: PlannedSession
-    let weekStart: Date
     let vdot: Double
     let isCompleted: Bool
-
-    /// Live pace string for the work portion, computed from the session's
-    /// stored zone and the current VDOT. Returns nil for rest days or when
-    /// the VDOT isn't known yet.
-    private var livePaceText: String? {
-        guard let zone = session.targetPaceZone, vdot > 0 else { return nil }
-        return VDOTCalculator.paceRange(for: zone, vdot: vdot).formatted()
-    }
+    let isToday: Bool
+    let isSending: Bool
+    let onTap: () -> Void
+    let onQuickStart: () -> Void
 
     var body: some View {
-        HStack(spacing: 14) {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Color(hex: session.sessionType.colorHex))
-                .frame(width: 4)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(dayLabel)
-                    .font(.caption)
-                    .foregroundStyle(Color.brand.textSecondary)
-
-                Text(session.sessionType.displayName)
-                    .font(.subheadline)
-                    .bold()
-                    .foregroundStyle(.white)
-
-                if let pace = livePaceText {
-                    Text(pace)
-                        .font(.caption.monospacedDigit())
-                        .foregroundStyle(Color.brand.textSecondary)
-                        .lineLimit(1)
-                } else if !session.notes.isEmpty {
-                    Text(session.notes)
-                        .font(.caption)
-                        .foregroundStyle(Color.brand.textSecondary)
-                        .lineLimit(1)
-                }
-            }
-
-            Spacer()
-
-            if let km = session.targetDistanceKm {
-                Text("\(km, format: .number.precision(.fractionLength(0))) km")
-                    .font(.subheadline.monospacedDigit())
-                    .foregroundStyle(Color.brand.textSecondary)
-            } else if let min = session.targetDurationMin {
-                Text("\(min) min")
-                    .font(.subheadline.monospacedDigit())
-                    .foregroundStyle(Color.brand.textSecondary)
-            }
-
-            if isCompleted {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(Color.brand.success)
-            }
-        }
-        .padding(12)
-        .background(Color.brand.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .opacity(isCompleted ? 0.7 : 1.0)
+        WorkoutCard(
+            palette: SessionPalette.palette(for: session.sessionType),
+            symbolName: session.sessionType.symbolName,
+            title: cardTitle,
+            subtitle: cardSubtitle,
+            trailing: trailingKind,
+            isLoading: isSending,
+            action: onTap,
+            secondary: onQuickStart
+        )
+        .opacity(isCompleted ? 0.65 : 1.0)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
-        .accessibilityAddTraits(isCompleted ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private var cardTitle: String {
+        "\(dayLabel) · \(session.sessionType.displayName)"
+    }
+
+    /// Live pace + km/min, e.g. "8 km · 5:30–6:10 /km". Falls back to just
+    /// km or just zone name when one component is missing.
+    private var cardSubtitle: String? {
+        var pieces: [String] = []
+        if let km = session.targetDistanceKm {
+            pieces.append("\(km.formatted(.number.precision(.fractionLength(0...1)))) km")
+        } else if let min = session.targetDurationMin {
+            pieces.append("\(min) min")
+        }
+        if let zone = session.targetPaceZone, vdot > 0 {
+            let range = VDOTCalculator.paceRange(for: zone, vdot: vdot)
+            pieces.append(range.formatted())
+        }
+        return pieces.isEmpty ? nil : pieces.joined(separator: " · ")
+    }
+
+    private var trailingKind: WorkoutCard<EmptyView>.Trailing {
+        if isCompleted { return .check }
+        if isToday { return .play }
+        return .chevron
     }
 
     private var accessibilityLabel: String {
         var parts: [String] = [dayLabel, session.sessionType.displayName]
-        if let pace = livePaceText { parts.append("pace \(pace)") }
-        if let km = session.targetDistanceKm {
-            parts.append("\(Int(km)) kilometres")
-        } else if let min = session.targetDurationMin {
-            parts.append("\(min) minutes")
-        }
+        if isToday { parts.append("today") }
+        if let sub = cardSubtitle { parts.append(sub) }
         if isCompleted { parts.append("completed") }
         return parts.joined(separator: ", ")
     }
@@ -418,6 +406,53 @@ private struct SessionCard: View {
         let idx = session.dayOfWeek - 1
         guard idx >= 0, idx < days.count else { return "" }
         return days[idx]
+    }
+}
+
+/// Rest days don't get a full card — they're a quiet line so the eye
+/// skips past them to the actual training.
+private struct RestSessionLine: View {
+    let session: PlannedSession
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: session.sessionType.symbolName)
+                .font(.subheadline)
+                .foregroundStyle(Color.brand.textSecondary)
+                .frame(width: 32)
+            Text("\(dayLabel) · Rest")
+                .font(.subheadline)
+                .foregroundStyle(Color.brand.textSecondary)
+            Spacer()
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 16)
+        .opacity(0.7)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(dayLabel), rest day")
+    }
+
+    private var dayLabel: String {
+        let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        let idx = session.dayOfWeek - 1
+        guard idx >= 0, idx < days.count else { return "" }
+        return days[idx]
+    }
+}
+
+/// Maps each SessionType onto a `WorkoutCardPalette` — keeps the palette
+/// lookup centralised so the Plan tab, Full Schedule, and any future
+/// session-row consumer stay visually consistent.
+enum SessionPalette {
+    static func palette(for type: SessionType) -> WorkoutCardPalette {
+        switch type {
+        case .easy:       .easy
+        case .tempo:      .threshold
+        case .interval:   .interval
+        case .long:       .long
+        case .repetition: .repetition
+        case .rest:       .rest
+        }
     }
 }
 

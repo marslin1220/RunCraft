@@ -17,6 +17,11 @@ import WorkshopFeature
         public var vdotUpgrade: VDOTUpgrade? = nil
         public var path = StackState<Path.State>()
         @Presents public var destination: Destination.State? = nil
+        /// Id of the session currently being pushed to the Watch via the
+        /// today-row play button. Drives the ProgressView in the card so
+        /// the runner sees their tap registered.
+        public var quickStartSendingSessionId: UUID? = nil
+        @Presents public var quickStartAlert: AlertState<Action.QuickStartAlert>? = nil
 
         /// Time the user last dismissed the recovery banner. Persisted so
         /// dismissals survive app restarts; `.distantPast` = never dismissed.
@@ -91,9 +96,16 @@ import WorkshopFeature
         case dismissVDOTUpgrade
         case syncBackWorkouts
         case syncBackCompleted
+        /// Sent from the Plan tab's today-card "play" button. Bypasses
+        /// the editor and pushes the workout straight to Apple Watch.
+        case quickStartSession(PlannedSession)
+        case quickStartResponse(sessionId: UUID, Result<Void, any Error>)
+        case quickStartAlert(PresentationAction<QuickStartAlert>)
         case path(StackActionOf<Path>)
         case destination(PresentationAction<Destination.Action>)
         case delegate(Delegate)
+
+        public enum QuickStartAlert: Equatable {}
 
         public enum Delegate {
             /// Parent (AppFeature) should switch to Workshop tab and open this workout.
@@ -110,6 +122,7 @@ import WorkshopFeature
     @Dependency(\.defaultDatabase) var database
     @Dependency(\.date.now) var now
     @Dependency(\.workoutTemplateRepository) var repository
+    @Dependency(\.workoutKitClient) var workoutKitClient
 
     public init() {}
 
@@ -437,6 +450,39 @@ import WorkshopFeature
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
                 return .send(.delegate(.openWorkoutInWorkshop(template, source: .planSession)))
 
+            case let .quickStartSession(session):
+                state.quickStartSendingSessionId = session.id
+                let id = session.id
+                let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
+                return .run { [workoutKitClient] send in
+                    await send(.quickStartResponse(sessionId: id, Result {
+                        _ = try await workoutKitClient.requestAuthorization()
+                        try await workoutKitClient.openInWorkoutApp(template)
+                    }))
+                }
+
+            case let .quickStartResponse(sessionId, .success):
+                if state.quickStartSendingSessionId == sessionId {
+                    state.quickStartSendingSessionId = nil
+                }
+                return .none
+
+            case let .quickStartResponse(sessionId, .failure(error)):
+                if state.quickStartSendingSessionId == sessionId {
+                    state.quickStartSendingSessionId = nil
+                }
+                let message = (error as? LocalizedError)?.errorDescription
+                    ?? error.localizedDescription
+                state.quickStartAlert = AlertState {
+                    TextState("Couldn't send to Watch")
+                } message: {
+                    TextState(message)
+                }
+                return .none
+
+            case .quickStartAlert:
+                return .none
+
             case let .path(.element(_, .weekSchedule(.delegate(.openSession(session))))):
                 // Push the editor onto Plan's own stack — Back from there
                 // returns to Full Schedule, not the Workshop tab.
@@ -472,6 +518,7 @@ import WorkshopFeature
         }
         .forEach(\.path, action: \.path)
         .ifLet(\.$destination, action: \.destination)
+        .ifLet(\.$quickStartAlert, action: \.quickStartAlert)
     }
 
     /// Quick-action template: 30-minute run at the chosen pace zone.

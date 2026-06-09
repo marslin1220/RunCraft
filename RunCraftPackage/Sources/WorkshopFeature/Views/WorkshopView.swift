@@ -73,18 +73,19 @@ private struct YoursSegment: View {
                 onNew: { store.send(.newWorkoutTapped) }
             )
         } else {
-            List {
-                ForEach(templates) { t in
-                    WorkoutListRow(template: t, sourceIcon: nil)
-                        .listRowBackground(Color.brand.surface)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            store.send(.workoutTapped(t, .yours))
-                        }
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(templates) { t in
+                        WorkoutCardRow(
+                            template: t,
+                            isPreset: false,
+                            onTap: { store.send(.workoutTapped(t, .yours)) }
+                        )
+                    }
                 }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
         }
     }
 }
@@ -95,26 +96,30 @@ private struct TemplatesSegment: View {
     let store: StoreOf<Workshop>
 
     var body: some View {
-        List {
-            ForEach(WorkoutPresets.all) { preset in
-                WorkoutListRow(template: preset, sourceIcon: "sparkles")
-                    .listRowBackground(Color.brand.surface)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        store.send(.workoutTapped(preset, .template))
-                    }
+        ScrollView {
+            LazyVStack(spacing: 10) {
+                ForEach(WorkoutPresets.all) { preset in
+                    WorkoutCardRow(
+                        template: preset,
+                        isPreset: true,
+                        onTap: { store.send(.workoutTapped(preset, .template)) }
+                    )
+                }
             }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
     }
 }
 
-// MARK: - List row
+// MARK: - List row (Apple-Workout-style card)
 
-private struct WorkoutListRow: View {
+private struct WorkoutCardRow: View {
     let template: WorkoutTemplate
-    let sourceIcon: String?
+    /// Built-in template uses a different palette + leading icon so the
+    /// runner can spot "sample preset" vs "my workout" at a glance.
+    let isPreset: Bool
+    let onTap: () -> Void
 
     private var totalSteps: Int {
         template.blocks.reduce(0) { acc, block in
@@ -125,25 +130,45 @@ private struct WorkoutListRow: View {
         }
     }
 
-    var body: some View {
-        HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 6)
-                .fill(sourceIcon != nil ? Color.brand.accent.opacity(0.2) : Color.white.opacity(0.08))
-                .overlay(
-                    Image(systemName: sourceIcon ?? "figure.run")
-                        .foregroundStyle(sourceIcon != nil ? Color.brand.accent : .white)
-                )
-                .frame(width: 36, height: 36)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(template.name).font(.subheadline.bold()).foregroundStyle(.white)
-                Text("\(template.blocks.count) blocks · \(totalSteps) steps")
-                    .font(.caption)
-                    .foregroundStyle(Color.brand.textSecondary)
+    /// Total estimated metres in the template; used as a subtitle the
+    /// runner can scan (km > step count for utility).
+    private var totalKm: Double {
+        let metres = template.blocks.reduce(0.0) { acc, block in
+            switch block {
+            case .step(let s):
+                if case .distance(let m) = s.goal { return acc + m }
+                return acc
+            case .repeatGroup(let g):
+                let per = g.steps.reduce(0.0) { sub, s in
+                    if case .distance(let m) = s.goal { return sub + m }
+                    return sub
+                }
+                return acc + per * Double(g.iterations)
             }
-            Spacer()
-            Image(systemName: "chevron.right").font(.caption.bold()).foregroundStyle(Color.brand.textSecondary)
         }
-        .padding(.vertical, 4)
+        return metres / 1_000
+    }
+
+    private var subtitle: String {
+        var parts: [String] = []
+        if totalKm > 0 {
+            parts.append("≈ \(totalKm.formatted(.number.precision(.fractionLength(0...1)))) km")
+        }
+        parts.append("\(totalSteps) step\(totalSteps == 1 ? "" : "s")")
+        return parts.joined(separator: " · ")
+    }
+
+    var body: some View {
+        WorkoutCard(
+            palette: isPreset ? .lilac : .lime,
+            symbolName: isPreset ? "sparkles" : "figure.run",
+            title: template.name,
+            subtitle: subtitle,
+            trailing: .chevron,
+            action: onTap
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(isPreset ? "Template, " : "")\(template.name), \(subtitle)")
     }
 }
 

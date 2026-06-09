@@ -86,3 +86,33 @@ public extension Color {
         self.init(red: r, green: g, blue: b)
     }
 }
+
+// MARK: - Workout-card palette
+//
+// The Apple Workout app gives every card its own *colour identity* —
+// a low-alpha tinted background, a saturated icon, and a play button
+// in the same hue. We model that as a struct so call-sites pick one
+// palette and pass it down instead of plumbing three separate colours.
+
+public struct WorkoutCardPalette: Sendable {
+    public let tint: Color           // saturated — icon + play button
+    public let background: Color     // tint @ low alpha — card fill
+
+    public init(tint: Color, alpha: Double = 0.18) {
+        self.tint = tint
+        self.background = tint.opacity(alpha)
+    }
+}
+
+public extension WorkoutCardPalette {
+    static let easy       = WorkoutCardPalette(tint: Color(red: 0.30, green: 0.69, blue: 0.31))   // green
+    static let marathon   = WorkoutCardPalette(tint: Color(red: 0.13, green: 0.59, blue: 0.95))   // blue
+    static let threshold  = WorkoutCardPalette(tint: Color(red: 1.00, green: 0.76, blue: 0.03))   // amber
+    static let interval   = WorkoutCardPalette(tint: Color(red: 0.96, green: 0.26, blue: 0.21))   // red
+    static let repetition = WorkoutCardPalette(tint: Color(red: 1.00, green: 0.34, blue: 0.13))   // orange
+    static let long       = WorkoutCardPalette(tint: Color(red: 0.40, green: 0.49, blue: 0.92))   // indigo
+    static let rest       = WorkoutCardPalette(tint: Color(white: 0.50), alpha: 0.10)              // grey
+    static let lime       = WorkoutCardPalette(tint: Color(red: 0.80, green: 1.00, blue: 0.00))   // brand
+    static let lilac      = WorkoutCardPalette(tint: Color(red: 0.65, green: 0.51, blue: 0.92))   // for Templates
+}
+
