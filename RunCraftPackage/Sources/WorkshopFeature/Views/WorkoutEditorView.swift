@@ -147,15 +147,15 @@ public struct WorkoutEditorView: View {
         switch store.syncStatus {
         case .sending: ProgressView().tint(.black)
         case .sent:    Image(systemName: "checkmark.circle.fill")
-        default:       Image(systemName: "applewatch.radiowaves.left.and.right")
+        default:       Image(systemName: "play.fill")
         }
     }
 
     private var sendLabel: Text {
         switch store.syncStatus {
-        case .sending: Text("Sending to Apple Watch…")
-        case .sent:    Text("Sent · Open Watch")
-        default:       Text("Send to Apple Watch")
+        case .sending: Text("Starting…")
+        case .sent:    Text("Started · Check Apple Watch")
+        default:       Text("Start Workout")
         }
     }
 }
