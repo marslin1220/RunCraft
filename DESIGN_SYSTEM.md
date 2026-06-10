@@ -148,6 +148,18 @@ We don't ship custom fonts. SF Pro variants only.
 | Caption (helper text, day labels) | `.caption` / `.caption2` | Pair with `Color.brand.textSecondary` |
 | **Numbers** | append `.monospacedDigit()` | Locks digit widths — pace `5:30 → 5:31` doesn't jitter |
 
+### Baseline alignment with display digits
+
+Rounded display digits (`.system(size: 36+, design: .rounded)`) have **tall
+ascenders** that throw off SwiftUI's default `.firstTextBaseline` HStack
+alignment when placed next to caption-sized labels. Mathematically the
+baselines match; visually the big number floats above its captions.
+
+Use `HStack(alignment: .center, …)` whenever a display digit shares a row
+with a smaller caption block. Examples: Insights fitness-trend hero
+(`30  VDOT / Drives your plan`), Plan tab countdown HStack
+(`120pt ring  / Goal name / phase / date`).
+
 ### Dynamic Type
 
 - **Headlines, body, captions:** rely on `.headline` / `.body` /
@@ -267,6 +279,8 @@ These come up in code review often enough to call out:
 - `font(.system(size: 10, ...))` for body text — below HIG floor, use `.caption2` (and `.monospacedDigit()` if numeric)
 - Heavy decorative shadows on primary CTAs (`radius: 12`+) — use shadows for *elevation*, not glow effects
 - A second accent colour — there is only `brand.accent`
+- `HStack(alignment: .firstTextBaseline)` pairing a 36pt+ rounded display digit with caption text — use `.center` (see "Baseline alignment with display digits" above)
+- Swipe-to-page navigation between peer data views (e.g. VDOT / VO₂max / Δ) — use a segmented `Picker` so all options are visible at once. Swipe hides options and suits social/media, not instrument UI.
 
 ---
 

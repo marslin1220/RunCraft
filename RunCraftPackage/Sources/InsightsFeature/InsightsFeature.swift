@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import HealthKitClient
 import RunCraftModels
 import SQLiteData
 import VDOTEngine
@@ -11,10 +12,46 @@ import VDOTEngine
     @ObservableState public struct State {
         public var currentVDOT: Double = 0
         public var snapshots: [VDOTSnapshot] = []
+        public var vo2MaxSamples: [VO2MaxSample] = []
         public var recentWorkouts: [CompletedWorkout] = []
+        public var selectedTrend: TrendKind = .vdot
         public var isLoading: Bool = false
 
         public init() {}
+
+        /// Hero number for the currently selected trend (rendered above the
+        /// chart). Returns nil when there's no data yet so the view can
+        /// substitute a placeholder.
+        public var heroValue: Double? {
+            switch selectedTrend {
+            case .vdot:
+                return currentVDOT > 0 ? currentVDOT : nil
+            case .vo2Max:
+                return vo2MaxSamples.last?.vo2Max
+            case .delta:
+                return deltaSeries.last?.value
+            }
+        }
+
+        /// Time-aligned (VDOT − VO2max) series. For each VDOT snapshot at
+        /// date d, picks the most-recent VO2max sample at or before d and
+        /// emits the difference. Skips snapshots that have no VO2max
+        /// counterpart yet — better than back-filling with zeros which
+        /// would look like real data.
+        public var deltaSeries: [TrendPoint] {
+            guard !vo2MaxSamples.isEmpty else { return [] }
+            let vo2Sorted = vo2MaxSamples.sorted { $0.recordedAt < $1.recordedAt }
+            return snapshots.compactMap { snap -> TrendPoint? in
+                guard let nearest = vo2Sorted.last(where: { $0.recordedAt <= snap.recordedAt }) else {
+                    return nil
+                }
+                return TrendPoint(
+                    id: snap.id.uuidString,
+                    date: snap.recordedAt,
+                    value: snap.vdot - nearest.vo2Max
+                )
+            }
+        }
 
         /// Aggregates the last 8 weeks of completed-workout distance into
         /// week-bucketed totals. Ordered oldest → newest for chart x-axis.
@@ -35,26 +72,57 @@ import VDOTEngine
         }
     }
 
-    public enum Action {
+    /// Which series the fitness-trend card is currently showing. Drives the
+    /// segmented picker, the hero number, and the chart data + colour.
+    public enum TrendKind: String, CaseIterable, Equatable, Sendable {
+        case vdot
+        case vo2Max
+        case delta
+
+        public var label: String {
+            switch self {
+            case .vdot:   "VDOT"
+            case .vo2Max: "VO₂max"
+            case .delta:  "Δ"
+            }
+        }
+
+        public var caption: String {
+            switch self {
+            case .vdot:   "Drives your plan"
+            case .vo2Max: "Apple Watch estimate"
+            case .delta:  "VDOT − VO₂max"
+            }
+        }
+    }
+
+    public enum Action: BindableAction {
+        case binding(BindingAction<State>)
         case onAppear
         case dataLoaded(
             currentVDOT: Double,
             snapshots: [VDOTSnapshot],
-            recentWorkouts: [CompletedWorkout]
+            recentWorkouts: [CompletedWorkout],
+            vo2MaxSamples: [VO2MaxSample]
         )
     }
 
     @Dependency(\.defaultDatabase) var database
+    @Dependency(\.healthKitClient) var healthKitClient
 
     public init() {}
 
     public var body: some Reducer<State, Action> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
+            case .binding:
+                return .none
+
             case .onAppear:
                 state.isLoading = true
-                return .run { [database] send in
-                    let (vdot, snapshots, workouts) = try await database.read {
+                return .run { [database, healthKitClient] send in
+                    async let dbLoad: (Double, [VDOTSnapshot], [CompletedWorkout]) = database.read {
                         db -> (Double, [VDOTSnapshot], [CompletedWorkout]) in
                         let goal = try RaceGoal.order { $0.createdAt.desc() }.fetchOne(db)
                         let snaps = try VDOTSnapshot
@@ -65,21 +133,45 @@ import VDOTEngine
                             .fetchAll(db)
                         return (goal?.currentVDOT ?? 0, snaps, workouts)
                     }
+                    // VO2max is optional — Watch only emits sporadically and
+                    // not every runner has HealthKit access. Failing here
+                    // shouldn't block the rest of the Insights load.
+                    async let vo2Load: [VO2MaxSample] = (try? await healthKitClient.recentVO2MaxSamples(180)) ?? []
+
+                    let (vdot, snapshots, workouts) = try await dbLoad
+                    let vo2 = await vo2Load
+
                     await send(.dataLoaded(
                         currentVDOT: vdot,
                         snapshots: snapshots,
-                        recentWorkouts: workouts
+                        recentWorkouts: workouts,
+                        vo2MaxSamples: vo2
                     ))
                 }
 
-            case let .dataLoaded(vdot, snapshots, workouts):
+            case let .dataLoaded(vdot, snapshots, workouts, vo2):
                 state.isLoading = false
                 state.currentVDOT = vdot
                 state.snapshots = snapshots
                 state.recentWorkouts = workouts
+                state.vo2MaxSamples = vo2
                 return .none
             }
         }
+    }
+}
+
+/// Lightweight point used by the deltaSeries / VO2max chart. Identifiable
+/// + Equatable so Swift Charts can diff frames cheaply.
+public struct TrendPoint: Identifiable, Equatable, Sendable {
+    public let id: String
+    public let date: Date
+    public let value: Double
+
+    public init(id: String, date: Date, value: Double) {
+        self.id = id
+        self.date = date
+        self.value = value
     }
 }
 

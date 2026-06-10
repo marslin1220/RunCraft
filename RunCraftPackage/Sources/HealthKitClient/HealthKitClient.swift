@@ -12,19 +12,41 @@ public struct HealthKitClient: Sendable {
     /// Returns all running HKWorkouts since `date`, projected into a lean
     /// summary the rest of the app can reason about without importing HealthKit.
     public var recentWorkouts: @Sendable (_ since: Date) async throws -> [HKWorkoutSummary]
+    /// VO2max samples Apple Watch has captured in the last `daysBack` days,
+    /// oldest first. Each sample carries the date the Watch decided it had
+    /// enough signal — these are sporadic, not daily.
+    public var recentVO2MaxSamples: @Sendable (_ daysBack: Int) async throws -> [VO2MaxSample]
 
     public init(
         requestAuthorization: @Sendable @escaping () async throws -> Void,
         bestRaceTime: @Sendable @escaping (RaceDistanceQuery) async throws -> TimeInterval?,
         latestHRV: @Sendable @escaping () async throws -> Double?,
         recentSleepHours: @Sendable @escaping (_ nights: Int) async throws -> Double,
-        recentWorkouts: @Sendable @escaping (_ since: Date) async throws -> [HKWorkoutSummary]
+        recentWorkouts: @Sendable @escaping (_ since: Date) async throws -> [HKWorkoutSummary],
+        recentVO2MaxSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [VO2MaxSample]
     ) {
         self.requestAuthorization = requestAuthorization
         self.bestRaceTime = bestRaceTime
         self.latestHRV = latestHRV
         self.recentSleepHours = recentSleepHours
         self.recentWorkouts = recentWorkouts
+        self.recentVO2MaxSamples = recentVO2MaxSamples
+    }
+}
+
+/// Apple-Watch-derived VO2max reading. Same unit (mL/(kg·min)) as Daniels'
+/// VDOT, so the two are directly comparable for the Insights "delta" view.
+/// The Watch produces these sporadically — typically after a run, but only
+/// when GPS + heart-rate signal is strong enough for the estimator.
+public struct VO2MaxSample: Sendable, Equatable, Identifiable {
+    public let id: String
+    public let recordedAt: Date
+    public let vo2Max: Double
+
+    public init(id: String, recordedAt: Date, vo2Max: Double) {
+        self.id = id
+        self.recordedAt = recordedAt
+        self.vo2Max = vo2Max
     }
 }
 
@@ -88,7 +110,8 @@ extension HealthKitClient: DependencyKey {
             bestRaceTime: { _ in 25 * 60 },   // 25-min 5K → VDOT ≈ 40
             latestHRV: { 42.0 },
             recentSleepHours: { _ in 7.5 },
-            recentWorkouts: { _ in [] }
+            recentWorkouts: { _ in [] },
+            recentVO2MaxSamples: { _ in [] }
         )
     }
 

@@ -16,11 +16,17 @@ RunCraft turns Jack Daniels' VDOT methodology into a phone-and-watch experience:
 
 The iPhone app is built around four tabs — **Plan** (the dashboard),
 **Workouts** (the workout library, internally still called `WorkshopFeature`
-in code for historical reasons), **Insights** (VDOT trend, weekly mileage,
-predicted race times), and **Settings**. Plan and Workouts are connected by
-a one-way navigation delegate. All Apple-framework I/O (HealthKit, WorkoutKit)
-sits behind TCA dependencies; all persistence sits behind SQLiteData; all
-visual tokens (colours, dynamic light/dark variants) live in `DesignSystem`.
+in code for historical reasons), **Insights** (VDOT and VO₂max trend,
+weekly mileage, predicted race times), and **Settings**. Plan and Workouts
+are connected by a one-way navigation delegate. All Apple-framework I/O
+(HealthKit, WorkoutKit) sits behind TCA dependencies; all persistence sits
+behind SQLiteData; all visual tokens (colours, dynamic light/dark variants)
+live in `DesignSystem`.
+
+Beyond the GUI, **RunCraftIntents** exposes four App Intents
+(`WhatIsTodaysTrainingIntent`, `StartWorkoutIntent`, `AdjustVDOTIntent`,
+`LogCompletedRunIntent`) so Siri, Spotlight, the Action button, and Apple
+Intelligence can read and mutate plan state without launching the UI.
 
 ---
 
@@ -42,8 +48,8 @@ visual tokens (colours, dynamic light/dark variants) live in `DesignSystem`.
 
 ```
                           ┌───────────────────────────────┐
-                          │            RunCraft.app       │
-                          │       (Xcode app target)      │
+                          │            RunCraft.app       │  RunCraftAppShortcuts
+                          │       (Xcode app target)      │  registers Siri phrases
                           └──────────────┬────────────────┘
                                          │  imports
                                          ▼
@@ -56,21 +62,35 @@ visual tokens (colours, dynamic light/dark variants) live in `DesignSystem`.
         ▼                                ▼                            ▼
  ┌────────────────────┐    ┌─────────────────────────┐    ┌───────────────────┐
  │ TrainingPlanFeature│    │     WorkshopFeature     │    │  InsightsFeature  │
- │ Plan tab, ring,    │    │   "Workouts" tab,       │    │  VDOT trend,      │
- │ adaptive banners,  │    │   editor, preset lib,   │    │  weekly mileage,  │
- │ Full Schedule,     │    │   shared WorkoutEditor  │    │  race predictions │
- │ AdjustVDOT         │    │   (also pushed from     │    └─────────┬─────────┘
- └────┬─────────┬─────┘    │    Plan's stack)        │              │
+ │ Plan tab, ring,    │    │   "Workouts" tab,       │    │  Fitness trend    │
+ │ adaptive banners,  │    │   editor, preset lib,   │    │  (VDOT/VO₂max/Δ), │
+ │ This Week strip,   │    │   shared WorkoutEditor  │    │  weekly mileage,  │
+ │ AdjustVDOT         │    │   (also pushed from     │    │  race predictions │
+ └────┬─────────┬─────┘    │    Plan's stack)        │    └─────────┬─────────┘
       │         │          └──────┬──────────────────┘              │
       │         │                 │                                 │
       │         │ ┌───────────────┴─────────────────┐               │
       │         ▼ ▼                                 ▼               │
       │     ┌──────────────────┐         ┌────────────────────┐     │
       ├────►│  HealthKitClient │         │   AppleWatchSync   │     │
-      │     │  (workouts, HRV) │         │   WorkoutKit +     │     │
-      │     └──────────────────┘         │   WorkoutPlanBuilder│    │
-      │                                  └────────┬───────────┘     │
-      ▼                                           ▼                 ▼
+      │     │  workouts, HRV,  │◄────────┤   WorkoutKit +     │     │
+      │     │  sleep, VO₂max   │         │   WorkoutPlanBuilder│    │
+      │     └────────▲─────────┘         └────────┬───────────┘     │
+      │              │                            │                 │
+      │              │  also read by InsightsFeature                │
+      │              └──────────────────────────────────────────────┘
+      │
+      │              ┌──────────────────────────────────────────────┐
+      └─────────────►│              RunCraftIntents                  │◄──── AppFeature
+                     │  AppEntities + AppIntents:                    │      re-exports
+                     │  • WhatIsTodaysTrainingIntent                 │      via @_exported
+                     │  • StartWorkoutIntent (param: template)       │
+                     │  • AdjustVDOTIntent                           │
+                     │  • LogCompletedRunIntent                      │
+                     │  Each returns a SwiftUI snippet view.         │
+                     └────────────────────────┬──────────────────────┘
+                                              │
+      ▼                                       ▼                     ▼
       ┌───────────────────────────────────────────────────────────────┐
       │                          RunCraftModels                       │
       │  @Table types · Schema migration · WorkoutTemplateRepository  │
@@ -131,8 +151,10 @@ VDOT 31, and continuous interpolation in between (see commit `aab5f16`).
 ### 4.2 HealthKitClient (2 files · `Dependencies` only)
 
 A TCA Dependency that wraps `HKHealthStore`. Live implementation queries
-running workouts, HRV (`heartRateVariabilitySDNN`), and sleep windows.
-Test/preview values return canned data (a 25-minute 5K → VDOT ≈ 40).
+running workouts, HRV (`heartRateVariabilitySDNN`), sleep windows, and
+VO₂max samples (`vo2Max`, unit `mL/(kg·min)` — directly comparable to
+Daniels' VDOT). Test/preview values return canned data
+(a 25-minute 5K → VDOT ≈ 40, empty VO₂max sample list).
 
 The repository pattern is intentionally not used here: there is no
 "local fake" use case — either HealthKit is present or it isn't.
@@ -203,8 +225,16 @@ The Plan tab.
 | `TrainingPlanFeature.swift`     | Root reducer for the Plan tab; emits delegate actions to AppFeature. |
 | `SetupRaceGoalFeature.swift`    | Onboarding sheet — VDOT detection (HealthKit) or race-time entry. |
 | `TrainingPlanGenerator.swift`   | Pure function: race goal + VDOT → 16 weeks × 7 sessions.      |
-| `Views/PlanView.swift`          | Dashboard: countdown ring, pace chips, current week list, full-schedule destination. |
+| `Views/PlanView.swift`          | Dashboard: countdown ring, This Week strip, pace chips, full-schedule destination. |
 | `Views/SetupRaceGoalView.swift` | The onboarding form.                                          |
+
+**Dashboard hierarchy.** Top-down: compact HStack countdown (120pt ring
++ goal name / phase / date), banners (VDOT upgrade, recovery advice),
+**This Week** session strip (today's card carries a play-button
+quick-start), then pace-zone chips at the bottom. The week strip sits
+**above** the pace chips because the runner's daily question is "what
+do I run today?" — paces are reference data, the schedule is the
+action. Apple Workout follows the same hierarchy.
 
 **Cross-tab delegate.** `TrainingPlanFeature.Action` includes a
 `delegate(.openWorkoutInWorkshop(WorkoutTemplate, source))` case. The
@@ -254,16 +284,31 @@ The root.
 | `SettingsView.swift`        | Settings form. Pace unit Picker writes directly to `@AppStorage("paceUnit")` so the bind sidesteps a BindingReducer + `@Shared` quirk; every other view reads via `@Shared(.appStorage("paceUnit"))`. |
 | `Bootstrap.swift`           | `makeAppStore()` (`@MainActor`) + `bootstrapApp()` (calls `prepareDependencies { try! $0.bootstrapDatabase() }`). |
 
-### 4.8 InsightsFeature (2 files · RunCraftModels + VDOTEngine + ComposableArchitecture + SQLiteData)
+### 4.8 InsightsFeature (2 files · HealthKitClient + RunCraftModels + VDOTEngine + ComposableArchitecture + SQLiteData)
 
-The Insights tab. Reducer loads `VDOTSnapshot` history (one row per
-VDOT change, sourced as `initial` / `raceTime` / `overperformance` /
-`manual`) and recent `CompletedWorkout` rows. The view renders three
-cards: a VDOT trend line chart with marks shape-coded by source, a
-weekly mileage bar chart aggregated from completed workouts, and a
-predicted-race-times table (5K / 10K / HM / Marathon) computed via
-`VDOTCalculator.predictedTime(distanceMeters:vdot:)` — an iterative
-inversion of the Daniels formula.
+The Insights tab. Reducer loads three series in parallel via
+`async let`: `VDOTSnapshot` history from SQLiteData (one row per VDOT
+change, sourced as `initial` / `raceTime` / `overperformance` / `manual`),
+recent `CompletedWorkout` rows, and the last 180 days of HealthKit
+VO₂max samples. VO₂max fetch failures are swallowed so the rest of
+the tab still loads.
+
+The view renders three cards:
+
+1. **Fitness trend** — segmented `Picker` (VDOT / VO₂max / Δ) drives a
+   shared hero number + chart pane. The three series are peers, not
+   stacked: putting them in one card prevents users from treating VDOT
+   and VO₂max as separate goals. The Δ series is computed lazily on
+   `State.deltaSeries` — for each VDOT snapshot, picks the nearest
+   VO₂max sample at or before that date and emits the difference.
+   Snapshots without a VO₂max counterpart are skipped (don't fabricate
+   zeros). Picker selection lives on `State.selectedTrend: TrendKind`
+   via `BindingReducer`.
+2. **Weekly mileage** — last 8 weeks of completed-workout distance
+   as a bar chart.
+3. **Predicted race times** — 5K / 10K / HM / Marathon, computed via
+   `VDOTCalculator.predictedTime(distanceMeters:vdot:)` (iterative
+   inversion of the Daniels formula).
 
 ### 4.9 DesignSystem (3 files · 0 deps)
 
@@ -274,6 +319,44 @@ UI tokens only. No logic, no state.
 | `Theme.swift`         | `Color.brand.*` tokens (background, surface, textPrimary, textSecondary, accent, success, caution, danger, zone.*) — each resolves dynamically via `UIColor(dynamicProvider:)`. Plus `WorkoutCardPalette` and the canonical `Color(hex:)` initialiser. |
 | `WorkoutCard.swift`   | The Apple-Workout-style card component used by Plan tab and Workouts list. Tinted background + leading SF Symbol + trailing Play / Chevron / Check. |
 | `TimeWheelPicker.swift` | Two-wheel minute/second picker shared between `EditStepSheet` and `SetupRaceGoalView`. |
+
+### 4.10 RunCraftIntents (7 files · DesignSystem + AppleWatchSync + RunCraftModels + VDOTEngine + WorkshopFeature + SQLiteData + Dependencies)
+
+The voice / Spotlight / Apple-Intelligence surface. Four intents + two
+queries + four SwiftUI snippet views.
+
+| File                              | Role                                                          |
+| --------------------------------- | ------------------------------------------------------------- |
+| `TodaySessionEntity.swift`        | `AppEntity` for "today's planned session" — singleton id `"today"`. |
+| `TodaySessionQuery.swift`         | Reads current `TrainingWeek` + day-of-week from SQLiteData and joins the latest VDOT for live paces. |
+| `WhatIsTodaysTrainingIntent.swift`| Voice phrase: "What's today's training in RunCraft". Returns dialog + snippet. |
+| `WorkoutTemplateEntity.swift`     | `AppEntity` covering both built-in presets and user-saved templates. |
+| `WorkoutTemplateQuery.swift`      | `EntityStringQuery` — name-fuzzy lookup so "Yasso" / "Mona" / "Recovery" resolves. |
+| `StartWorkoutIntent.swift`        | `@Parameter var workout` → `workoutKitClient.openInWorkoutApp`. |
+| `AdjustVDOTIntent.swift`          | `@Parameter var vdot: Double` (30–85). Writes `RaceGoal.currentVDOT` + a `VDOTSnapshot(source: .manual)`. |
+| `LogCompletedRunIntent.swift`     | Conversational refinement — Siri asks for distance + duration; writes a `CompletedWorkout`. |
+| `*SnippetView.swift`              | Static SwiftUI snippets rendered inline in Siri / Spotlight responses. |
+
+**Module placement.** `AppShortcutsProvider` *must* live in the app
+target (iOS scans the main bundle at install time), but the intents
+themselves live in this SPM target. `AppFeature/Bootstrap.swift` does
+`@_exported import RunCraftIntents`, so the app target's
+`RunCraftAppShortcuts.swift` sees the intent types through `AppFeature`
+without an explicit `import RunCraftIntents`. This avoids touching
+`.pbxproj` to add a second framework dependency.
+
+**Sendable workaround.** `EntityQuery` requires `Self: Sendable`, but
+applying the `@Dependency` macro inside a `Sendable` struct triggers a
+Swift compiler internal panic (`failed to produce diagnostic for
+expression`). Workaround: instantiate the wrapper directly with
+`Dependency(key: \DependencyValues.X).wrappedValue` — same runtime,
+no macro expansion. See `TodaySessionQuery.currentDatabase()` and
+`StartWorkoutIntent.perform()` for the pattern.
+
+**iOS 26 `view:` overload.** The `result(dialog:view:)` /
+`result(dialog:) { content }` overloads that combine a dialog with a
+SwiftUI snippet live in the `_AppIntents_SwiftUI` cross-import overlay.
+Files using snippets must `import AppIntents` **and** `import SwiftUI`.
 
 ---
 
@@ -508,6 +591,7 @@ products: [
     .library(name: "InsightsFeature",     targets: ["InsightsFeature"]),
     .library(name: "DesignSystem",        targets: ["DesignSystem"]),
     .library(name: "AppFeature",          targets: ["AppFeature"]),
+    .library(name: "RunCraftIntents",     targets: ["RunCraftIntents"]),
 ],
 ```
 
@@ -554,6 +638,7 @@ macOS host.
 | **iCloud sync via `SyncEngine`**      | SQLiteData supports CloudKit sync; we haven't enabled it. Single device only today. |
 | **App-level theme override**          | The user's system Appearance setting wins. A future Settings toggle (Auto / Light / Dark) could let runners pin a mode regardless of system. |
 | **HealthKit revocation handling**     | iOS doesn't expose read-authorisation status. If the runner revokes Health permission in iOS Settings, our HealthKit-backed features (HRV banner, race-time detection, completed-workout sync-back) silently return empty data instead of failing loudly. A "Health permission lost — re-grant in Settings" banner would be the right escalation. |
+| **Pre-plan period UX**                | `TrainingPlanGenerator` rolls 16 weeks backward from the race date: a race more than 16 weeks out leaves a gap where the plan exists in the DB but `TrainingWeek.current(in:)` returns `nil`, so the Plan tab renders countdown + paces only — no schedule strip. A "Plan starts in N days" badge plus a greyed-out preview of week 1 would close this loop. |
 
 ---
 

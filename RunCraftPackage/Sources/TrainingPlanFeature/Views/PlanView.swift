@@ -19,13 +19,13 @@ public struct PlanView: View {
     public var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 20) {
                     if let goal = activeGoal {
                         Button {
                             store.send(.countdownTapped)
                         } label: {
                             RaceCountdownRing(goal: goal)
-                                .padding(.top, 16)
+                                .padding(.top, 8)
                         }
                         .buttonStyle(.plain)
 
@@ -41,12 +41,11 @@ public struct PlanView: View {
                                 onDismiss: { store.send(.dismissRecoveryAdvice) })
                         }
 
-                        if let zones = store.paceZones {
-                            PaceZonesSummaryCard(zones: zones) { zone in
-                                store.send(.paceChipTapped(zone))
-                            }
-                        }
-
+                        // This Week comes BEFORE the pace zones — the runner's
+                        // daily question is "what do I run today?" not "what
+                        // are my paces?". Paces are reference; the schedule
+                        // is the action. Apple Workout follows the same
+                        // hierarchy.
                         if let currentWeek = currentWeek {
                             WeekSessionsSection(
                                 week: currentWeek,
@@ -55,6 +54,12 @@ public struct PlanView: View {
                                 onSessionTap: { store.send(.sessionTapped($0)) },
                                 onQuickStart: { store.send(.quickStartSession($0)) }
                             )
+                        }
+
+                        if let zones = store.paceZones {
+                            PaceZonesSummaryCard(zones: zones) { zone in
+                                store.send(.paceChipTapped(zone))
+                            }
                         }
                     } else {
                         EmptyPlanPrompt {
@@ -147,47 +152,56 @@ private struct RaceCountdownRing: View {
     }
 
     var body: some View {
-        VStack(spacing: 8) {
+        // Slimmer hero so This Week clears the fold — 120pt ring (down from
+        // 160) and the goal name / phase / date collapsed into a single
+        // metadata line. The countdown is still the focal point but no
+        // longer eats the whole first screen.
+        HStack(spacing: 16) {
             ZStack {
                 Circle()
-                    .stroke(Color.primary.opacity(0.12), lineWidth: 12)
-                    .frame(width: 160, height: 160)
+                    .stroke(Color.primary.opacity(0.12), lineWidth: 10)
+                    .frame(width: 120, height: 120)
 
                 Circle()
                     .trim(from: 0, to: ringProgress)
                     .stroke(
                         Color.brand.accent,
-                        style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                        style: StrokeStyle(lineWidth: 10, lineCap: .round)
                     )
-                    .frame(width: 160, height: 160)
+                    .frame(width: 120, height: 120)
                     .rotationEffect(.degrees(-90))
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.3), value: ringProgress)
 
-                VStack(spacing: 2) {
+                VStack(spacing: 0) {
                     Text("\(max(goal.daysUntilRace, 0))")
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .font(.system(size: 36, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(Color.brand.textPrimary)
                     Text("days")
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel(ringAccessibilityLabel)
 
-            Text(goal.name)
-                .font(.headline)
-                .foregroundStyle(Color.brand.textPrimary)
+            VStack(alignment: .leading, spacing: 6) {
+                Text(goal.name)
+                    .font(.headline)
+                    .foregroundStyle(Color.brand.textPrimary)
+                    .lineLimit(2)
 
-            if let ctx = phaseContext {
-                Text("Week \(ctx.week) of 16 · \(ctx.phase.displayName)")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(Color.brand.accent)
+                if let ctx = phaseContext {
+                    Text("Week \(ctx.week) of 16 · \(ctx.phase.displayName)")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Color.brand.accent)
+                }
+
+                Text(goal.targetDate, format: .dateTime.day().month().year())
+                    .font(.caption)
+                    .foregroundStyle(Color.brand.textSecondary)
             }
 
-            Text(goal.targetDate, format: .dateTime.day().month().year())
-                .font(.subheadline)
-                .foregroundStyle(Color.brand.textSecondary)
+            Spacer(minLength: 0)
         }
     }
 

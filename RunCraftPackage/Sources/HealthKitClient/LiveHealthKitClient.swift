@@ -10,6 +10,7 @@ enum LiveHealthKitClient {
                 let types: Set<HKObjectType> = [
                     HKObjectType.workoutType(),
                     HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!,
+                    HKObjectType.quantityType(forIdentifier: .vo2Max)!,
                     HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
                 ]
                 try await store.requestAuthorization(toShare: [], read: types)
@@ -25,8 +26,49 @@ enum LiveHealthKitClient {
             },
             recentWorkouts: { since in
                 try await recentWorkouts(since: since)
+            },
+            recentVO2MaxSamples: { daysBack in
+                try await recentVO2MaxSamples(daysBack: daysBack)
             }
         )
+    }
+
+    // MARK: - VO2max
+
+    /// HealthKit unit is mL/(kg·min) — same as Daniels' VDOT — so values
+    /// can be charted side-by-side without conversion.
+    private static func recentVO2MaxSamples(daysBack: Int) async throws -> [VO2MaxSample] {
+        guard HKHealthStore.isHealthDataAvailable() else { return [] }
+        let store = HKHealthStore()
+
+        guard let vo2Type = HKObjectType.quantityType(forIdentifier: .vo2Max) else {
+            return []
+        }
+        let startDate = Calendar.current.date(byAdding: .day, value: -daysBack, to: Date())!
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        // Oldest first so the chart's x-axis lines up naturally.
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+        let unit = HKUnit(from: "mL/kg*min")
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let hkQuery = HKSampleQuery(
+                sampleType: vo2Type,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sort]
+            ) { _, samples, error in
+                if let error { continuation.resume(throwing: error); return }
+                let mapped = (samples as? [HKQuantitySample])?.map { sample in
+                    VO2MaxSample(
+                        id: sample.uuid.uuidString,
+                        recordedAt: sample.startDate,
+                        vo2Max: sample.quantity.doubleValue(for: unit)
+                    )
+                } ?? []
+                continuation.resume(returning: mapped)
+            }
+            store.execute(hkQuery)
+        }
     }
 
     // MARK: - Best race time

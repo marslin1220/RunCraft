@@ -93,6 +93,7 @@ let package = Package(
             name: "InsightsFeature",
             dependencies: [
                 "DesignSystem",
+                "HealthKitClient",
                 "RunCraftModels",
                 "VDOTEngine",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
