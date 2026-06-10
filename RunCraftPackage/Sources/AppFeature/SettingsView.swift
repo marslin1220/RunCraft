@@ -86,7 +86,6 @@ public struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            .preferredColorScheme(.dark)
             .onAppear { store.send(.onAppear) }
         }
     }

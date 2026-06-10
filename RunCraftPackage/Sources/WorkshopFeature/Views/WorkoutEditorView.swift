@@ -23,7 +23,7 @@ public struct WorkoutEditorView: View {
                 blockList
             }
         }
-        .background(Color.black)
+        .background(Color.brand.background)
         // Floating CTA above the home-indicator. safeAreaInset reserves
         // the right amount of room automatically — no manual spacer rows
         // in the list, and the system handles inset on the home gesture
@@ -34,7 +34,7 @@ public struct WorkoutEditorView: View {
                 .padding(.bottom, 8)
                 .background(
                     LinearGradient(
-                        colors: [Color.black.opacity(0), Color.black],
+                        colors: [Color.brand.background.opacity(0), Color.brand.background],
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -45,7 +45,6 @@ public struct WorkoutEditorView: View {
         }
         .navigationTitle(store.templateName.isEmpty ? "Edit Workout" : store.templateName)
         .navigationBarTitleDisplayMode(.inline)
-        .preferredColorScheme(.dark)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
@@ -182,7 +181,7 @@ private struct TemplateNameBar: View {
                 TextField("Workout name", text: $name)
                     .textFieldStyle(.plain)
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.brand.textPrimary)
                     .submitLabel(.done)
 
                 Spacer()
@@ -278,7 +277,7 @@ private struct StepRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(step.kind.displayName)
                     .font(.subheadline.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.brand.textPrimary)
                 if let alert = step.alert {
                     Text(alert.displayText)
                         .font(.caption)
@@ -315,7 +314,7 @@ private struct RepeatGroupRow: View {
                     .foregroundStyle(Color.brand.accent)
                 Text("Repeat \(group.iterations)×")
                     .font(.subheadline.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.brand.textPrimary)
                 Spacer()
                 Text("\(group.steps.count) step\(group.steps.count == 1 ? "" : "s")")
                     .font(.caption)
@@ -353,7 +352,7 @@ private struct EmptyWorkshopPrompt: View {
                 .foregroundStyle(Color.brand.accent.opacity(0.6))
             Text("Build a workout")
                 .font(.title3.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.brand.textPrimary)
             Text("Tap ⋯ to add a Step or a Repeat group.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.brand.textSecondary)

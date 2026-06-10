@@ -26,6 +26,17 @@ Two opinions drive everything below:
 
 ---
 
+## Theme variants
+
+Every `Color.brand.*` token resolves dynamically per
+`UIUserInterfaceStyle`. SwiftUI picks the right value when the system
+theme changes — no view-level branching needed. The implementation
+uses `UIColor(dynamicProvider:)` wrapped as a `Color`, so the same
+property reference returns the light or dark hex.
+
+Views must **not** apply `.preferredColorScheme(.dark)` any more —
+let the system propagate the user's choice.
+
 ## Tokens
 
 All tokens live on `Color.brand.*`. Import `DesignSystem` in any view
@@ -33,37 +44,49 @@ file that needs them.
 
 ### Surfaces
 
-| Token | Hex | Use for |
-|-------|-----|---------|
-| `brand.background` | `#000000` | App background, every tab |
-| `brand.surface` | `#1A1B2E` | Cards, banners, list rows on the background |
-| `brand.surfaceElevated` | `#212138` | One step up — modal sheets if customised |
+| Token | Light | Dark | Use for |
+|-------|-------|------|---------|
+| `brand.background` | `#F2F2F7` | `#000000` | App background, every tab |
+| `brand.surface` | `#FFFFFF` | `#1A1B2E` | Cards, banners, list rows on the background |
+| `brand.surfaceElevated` | `#FFFFFF` | `#212138` | One step up — modal sheets if customised |
 
-> **Why not `Color.black` everywhere?** OLED-pure black is right for the
-> backdrop, but a single layer of surface (`#1A1B2E`, a near-black with
-> a hint of blue) separates *the thing you tap* from *the canvas*.
-> Without it, cards disappear visually.
+> **Why not pure white as `background` in light?** Pure-white edges
+> look harsh next to white surface cards — the cards disappear
+> visually. iOS's `systemGroupedBackground` is a soft warm grey
+> (~`#F2F2F7`) for exactly this reason; we mirror that.
+>
+> **Why `#1A1B2E` in dark?** OLED-pure black is right for the
+> backdrop, but a single layer of surface (near-black with a hint of
+> blue) separates *the thing you tap* from *the canvas*.
 
 ### Text
 
-| Token | Approx contrast on `surface` | Use for |
-|-------|------------------------------|---------|
-| `brand.textPrimary` (white) | 18:1 | Headlines, primary content |
-| `brand.textSecondary` (~74 % white) | ~5:1 (passes WCAG AA) | Captions, helper text, metadata |
-| `brand.textTertiary` (~55 % white) | ~3:1 | Disclaimers, watermarks, *non-essential* only |
+| Token | Light | Dark | Notes |
+|-------|-------|------|-------|
+| `brand.textPrimary` | `#1C1C1E` | `#FFFFFF` | Headlines, primary content. AA on both surfaces. |
+| `brand.textSecondary` | `#6B6B72` | ~74 % white | Captions, helper text. Calibrated for ≥4.5:1 (WCAG AA) on *both* surfaces. |
+| `brand.textTertiary` | `#8E8E93` | ~55 % white | Disclaimers, watermarks, *non-essential* only — ~3:1. |
 
 > **Why not `.secondary`?** SwiftUI's stock `.secondary` resolves to
 > ~60 % white on dark, which lands ~3.5 : 1 on pure black — below WCAG
 > AA's 4.5 : 1 for body text. `textSecondary` is calibrated to clear
-> the bar. Inside `Form` views with grouped backgrounds, stock
-> `.secondary` is fine — only swap on raw dark surfaces.
+> the bar in both modes. Inside `Form` views with grouped backgrounds,
+> stock `.secondary` is fine — only swap on raw brand surfaces.
 
 ### Accent
 
-| Token | Hex | Use for |
-|-------|-----|---------|
-| `brand.accent` | `#00D4FF` (Electric Cyan) | Primary CTA, focus, "now" markers, VDOT highlights |
-| `brand.accentMuted` | `accent` @ 18 % opacity | Chip fills, banner stroke, badge backgrounds |
+| Token | Light | Dark | Use for |
+|-------|-------|------|---------|
+| `brand.accent` | `#0099CC` | `#00D4FF` (Electric Cyan) | Primary CTA, focus, "now" markers, VDOT highlights |
+| `brand.accentMuted` | `accent` @ 18 % | `accent` @ 18 % | Chip fills, banner stroke, badge backgrounds |
+
+> **Why two cyans?** `#00D4FF` is too bright on white — pure cyan
+> text on white background lands ~2.5 : 1 (fails AA). The light-mode
+> variant `#0099CC` keeps the cyan-ness while clearing AA on white.
+> In dark mode the brighter cyan is correct.
+>
+> **Button text colour**: black in both modes. Black-on-cyan reads at
+> 11 : 1 (dark) and 5.8 : 1 (light) — both well above the threshold.
 
 > **Why cyan, not lime?** Apple's Workout app already owns lime
 > (`#B7FF40`) as a sports-app accent. Cyan keeps the OLED-friendly
@@ -77,14 +100,18 @@ file that needs them.
 
 ### Semantic
 
-| Token | Hex | Meaning |
-|-------|-----|---------|
-| `brand.success` | `#4DAF50` | Completed sessions, success badges |
-| `brand.caution` | `#FFC107` | Recovery banner, threshold alerts, "watch this" |
-| `brand.danger` | `#F44336` | Destructive buttons, error states |
+| Token | Light | Dark | Meaning |
+|-------|-------|------|---------|
+| `brand.success` | `#2E7D32` | `#4DAF50` | Completed sessions, success badges |
+| `brand.caution` | `#E65100` | `#FFC107` | Recovery banner, threshold alerts, "watch this" |
+| `brand.danger` | `#C62828` | `#F44336` | Destructive buttons, error states |
 
-> Pair every semantic colour with an icon or label. WCAG `color-not-only`
-> — colour-blind users can't read state from hue alone.
+> **Why caution swaps hue in light mode?** Amber (`#FFC107`) fails AA
+> on white text (1.7 : 1). The deep orange (`#E65100`) keeps the
+> "watch this" semantic — same place in the warm half of the spectrum
+> — while clearing AA. Pair every semantic colour with an icon or
+> label regardless. WCAG `color-not-only` — colour-blind users can't
+> read state from hue alone.
 
 ### Pace zones
 
@@ -215,14 +242,16 @@ Every animation that **isn't** a tap feedback must respect
 
 Before shipping a new view, verify:
 
-- [ ] All body / caption text on dark surface uses `brand.textSecondary` (not `.secondary`)
+- [ ] All body / caption text on brand surface uses `brand.textSecondary` (not `.secondary`)
+- [ ] No view applies `.preferredColorScheme(.dark)` — system theme wins
+- [ ] Visual check in **both** light and dark mode (Xcode preview variants or simulator toggle)
 - [ ] All tappable elements meet 44 × 44 pt
 - [ ] Numeric text uses `.monospacedDigit()` so it doesn't jitter
 - [ ] Composite rows use `.accessibilityElement(children: .combine)` + a single descriptive `.accessibilityLabel`
 - [ ] Decorative SF Symbols use `.accessibilityHidden(true)`
 - [ ] Charts encode data on **at least two channels** (colour + shape, or colour + position) — never colour alone
 - [ ] Chart legends are visible
-- [ ] Destructive buttons use `Color.brand.danger` *and* a `trash` icon *and* `.tint(.red)` if inside `.swipeActions` (the app-wide lime tint bleeds through otherwise)
+- [ ] Destructive buttons use `Color.brand.danger` *and* a `trash` icon *and* `.tint(.red)` if inside `.swipeActions` (the app-wide accent tint bleeds through otherwise)
 - [ ] Animations respect `accessibilityReduceMotion`
 
 ---

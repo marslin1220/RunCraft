@@ -14,10 +14,13 @@ RunCraft turns Jack Daniels' VDOT methodology into a phone-and-watch experience:
 - Apple Watch is the **coach** — runs the structured workout the iPhone
   scheduled, enforces pace alerts during the session.
 
-The iPhone app is built around two surfaces — **Plan** (the dashboard) and
-**Workshop** (the workout library) — connected by a one-way navigation
-delegate. All Apple-framework I/O (HealthKit, WorkoutKit) sits behind TCA
-dependencies; all persistence sits behind SQLiteData.
+The iPhone app is built around four tabs — **Plan** (the dashboard),
+**Workouts** (the workout library, internally still called `WorkshopFeature`
+in code for historical reasons), **Insights** (VDOT trend, weekly mileage,
+predicted race times), and **Settings**. Plan and Workouts are connected by
+a one-way navigation delegate. All Apple-framework I/O (HealthKit, WorkoutKit)
+sits behind TCA dependencies; all persistence sits behind SQLiteData; all
+visual tokens (colours, dynamic light/dark variants) live in `DesignSystem`.
 
 ---
 
@@ -31,6 +34,7 @@ dependencies; all persistence sits behind SQLiteData.
 | **One module per coherent responsibility**                | Splits domain (RunCraftModels), calculation (VDOTEngine), framework adapters (HealthKitClient, AppleWatchSync), and features (TrainingPlanFeature, WorkshopFeature). |
 | **`@Dependency(\.healthKitClient)`, `@Dependency(\.workoutKitClient)`, `@Dependency(\.workoutTemplateRepository)`** | Apple-framework boundaries and persistence are seams. `liveValue` does the real work; `testValue` returns sensible no-ops or fakes so reducers can be exercised in isolation. |
 | **Cross-tab navigation via `delegate` actions**           | A tab never reaches into another tab's state. Instead it emits a `delegate` case that the root `AppFeature` translates into a sibling tab's action. |
+| **`DesignSystem` SPM target for design tokens**           | Every colour token resolves dynamically per `UIUserInterfaceStyle` via `UIColor(dynamicProvider:)`. Views never apply `.preferredColorScheme(.dark)` — system theme propagates. Light and dark variants are tuned for WCAG AA contrast independently. See [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). |
 
 ---
 
@@ -46,46 +50,57 @@ dependencies; all persistence sits behind SQLiteData.
                           ┌───────────────────────────────┐
                           │          AppFeature           │  Tab bar + Settings,
                           │      (root reducer)           │  cross-tab navigation
-                          └────┬──────────────┬───────────┘
-                               │              │
-            ┌──────────────────┘              └─────────────────────┐
-            ▼                                                       ▼
- ┌────────────────────┐                              ┌─────────────────────────┐
- │ TrainingPlanFeature│                              │     WorkshopFeature     │  3-segment list,
- │   Plan tab,        │                              │   editor, detail page,  │  workout authoring
- │   16-week plan UI  │                              │   preset library        │
- └─────────┬──────────┘                              └──────┬──────────────────┘
-           │                                                │
-           │             ┌──────────────────┐               │
-           ├────────────►│  HealthKitClient │               │
-           │             │  (workouts, HRV) │               │
-           │             └──────────────────┘               │
-           │                                                │
-           │                                                ▼
-           │                                  ┌────────────────────────────┐
-           │                                  │     AppleWatchSync         │  WorkoutKit
-           │                                  │ WorkoutKitClient +         │  conversion +
-           │                                  │ WorkoutPlanBuilder         │  scheduler
-           │                                  └────────────┬───────────────┘
-           │                                               │
-           ▼                                               ▼
-      ┌─────────────────────────────────────────────────────────────────────┐
-      │                            RunCraftModels                           │
-      │  @Table types · Schema migration · WorkoutTemplateRepository       │
-      │  PlanSessionAdapter · TrainingWeek.current                          │
-      └────────────────────────────────┬────────────────────────────────────┘
-                                       │
-                                       ▼
+                          └────┬─────────┬─────────┬──────┘
+                               │         │         │
+        ┌──────────────────────┘         │         └──────────────────┐
+        ▼                                ▼                            ▼
+ ┌────────────────────┐    ┌─────────────────────────┐    ┌───────────────────┐
+ │ TrainingPlanFeature│    │     WorkshopFeature     │    │  InsightsFeature  │
+ │ Plan tab, ring,    │    │   "Workouts" tab,       │    │  VDOT trend,      │
+ │ adaptive banners,  │    │   editor, preset lib,   │    │  weekly mileage,  │
+ │ Full Schedule,     │    │   shared WorkoutEditor  │    │  race predictions │
+ │ AdjustVDOT         │    │   (also pushed from     │    └─────────┬─────────┘
+ └────┬─────────┬─────┘    │    Plan's stack)        │              │
+      │         │          └──────┬──────────────────┘              │
+      │         │                 │                                 │
+      │         │ ┌───────────────┴─────────────────┐               │
+      │         ▼ ▼                                 ▼               │
+      │     ┌──────────────────┐         ┌────────────────────┐     │
+      ├────►│  HealthKitClient │         │   AppleWatchSync   │     │
+      │     │  (workouts, HRV) │         │   WorkoutKit +     │     │
+      │     └──────────────────┘         │   WorkoutPlanBuilder│    │
+      │                                  └────────┬───────────┘     │
+      ▼                                           ▼                 ▼
+      ┌───────────────────────────────────────────────────────────────┐
+      │                          RunCraftModels                       │
+      │  @Table types · Schema migration · WorkoutTemplateRepository  │
+      │  PlanSessionAdapter · VDOTSnapshot · TrainingWeek.current     │
+      └──────────────────────────────┬────────────────────────────────┘
+                                     │
+                                     ▼
                           ┌────────────────────────────┐
                           │         VDOTEngine         │  Daniels formula +
                           │  PaceZoneName, PaceZones,  │  pace-zone derivation
-                          │   VDOTCalculator           │
+                          │  VDOTCalculator,           │  + predicted race time
+                          │  PaceUnit                  │
                           └────────────────────────────┘
+
+   ┌────────────────────────────┐
+   │       DesignSystem         │  Color.brand tokens (light/dark dynamic),
+   │  Theme + WorkoutCard +     │  WorkoutCardPalette, TimeWheelPicker.
+   │  TimeWheelPicker           │  Imported by every Feature target.
+   └────────────────────────────┘
 ```
 
-`WatchAppFeature` is a leaf module (skeleton only today — see §8). It depends
-on `TrainingPlanFeature` for shared types but the Watch app target is not yet
-wired in Xcode.
+`DesignSystem` is a leaf UI-token module imported by every feature target.
+It has no logic — just colour tokens (each with a light + dark variant),
+the `WorkoutCard` Apple-Workout-style card, the shared `TimeWheelPicker`,
+and the canonical `Color(hex:)` initialiser.
+
+A `WatchAppFeature` target used to exist for an Apple Watch companion app,
+but was removed once iPhone-side `WorkoutScheduler.shared.schedule()`
+proved sufficient (the native Watch Workout app handles the real-time
+running session itself). See commit `517c325`.
 
 The arrows show **public** dependencies (declared in `Package.swift`).
 Transitive deps reach further than the diagram shows — e.g. `WorkshopFeature`
@@ -179,10 +194,7 @@ The Apple Watch port. Two responsibilities:
   The whole liveValue is gated behind `#if canImport(WorkoutKit)` so the
   module compiles on platforms without WorkoutKit (e.g. macOS host).
 
-`WatchAppFeature` is set up to depend on this module without dragging in
-the Workshop shell or the editor.
-
-### 4.5 TrainingPlanFeature (5 files · VDOTEngine + HealthKitClient + RunCraftModels + ComposableArchitecture)
+### 4.5 TrainingPlanFeature (7+ files · VDOTEngine + HealthKitClient + RunCraftModels + AppleWatchSync + WorkshopFeature + DesignSystem + ComposableArchitecture)
 
 The Plan tab.
 
@@ -237,15 +249,31 @@ The root.
 | File                        | Role                                                       |
 | --------------------------- | ---------------------------------------------------------- |
 | `AppFeature.swift`          | Tab enum, root reducer composing Plan / Workshop / Settings, cross-tab delegate handler. |
-| `AppView.swift`             | `TabView` with the four tabs (Plan / Workshop / Insights placeholder / Settings). |
-| `SettingsFeature.swift`     | Settings reducer (pace unit, HealthKit link state).        |
-| `SettingsView.swift`        | Settings form.                                             |
+| `AppView.swift`             | `TabView` with the four tabs (Plan / Workouts / Insights / Settings). |
+| `SettingsFeature.swift`     | Settings reducer (HealthKit link state — persisted via `@Shared(.appStorage("healthKitLinked"))`). |
+| `SettingsView.swift`        | Settings form. Pace unit Picker writes directly to `@AppStorage("paceUnit")` so the bind sidesteps a BindingReducer + `@Shared` quirk; every other view reads via `@Shared(.appStorage("paceUnit"))`. |
 | `Bootstrap.swift`           | `makeAppStore()` (`@MainActor`) + `bootstrapApp()` (calls `prepareDependencies { try! $0.bootstrapDatabase() }`). |
 
-### 4.8 WatchAppFeature (1 file · TrainingPlanFeature + ComposableArchitecture)
+### 4.8 InsightsFeature (2 files · RunCraftModels + VDOTEngine + ComposableArchitecture + SQLiteData)
 
-Skeleton. Loads today's `PlannedSession` and would display it on the wrist.
-No Watch target is wired in Xcode yet; this module compiles but is unused.
+The Insights tab. Reducer loads `VDOTSnapshot` history (one row per
+VDOT change, sourced as `initial` / `raceTime` / `overperformance` /
+`manual`) and recent `CompletedWorkout` rows. The view renders three
+cards: a VDOT trend line chart with marks shape-coded by source, a
+weekly mileage bar chart aggregated from completed workouts, and a
+predicted-race-times table (5K / 10K / HM / Marathon) computed via
+`VDOTCalculator.predictedTime(distanceMeters:vdot:)` — an iterative
+inversion of the Daniels formula.
+
+### 4.9 DesignSystem (3 files · 0 deps)
+
+UI tokens only. No logic, no state.
+
+| File                  | Contains                                                              |
+| --------------------- | --------------------------------------------------------------------- |
+| `Theme.swift`         | `Color.brand.*` tokens (background, surface, textPrimary, textSecondary, accent, success, caution, danger, zone.*) — each resolves dynamically via `UIColor(dynamicProvider:)`. Plus `WorkoutCardPalette` and the canonical `Color(hex:)` initialiser. |
+| `WorkoutCard.swift`   | The Apple-Workout-style card component used by Plan tab and Workouts list. Tinted background + leading SF Symbol + trailing Play / Chevron / Check. |
+| `TimeWheelPicker.swift` | Two-wheel minute/second picker shared between `EditStepSheet` and `SetupRaceGoalView`. |
 
 ---
 
@@ -477,8 +505,9 @@ products: [
     .library(name: "TrainingPlanFeature", targets: ["TrainingPlanFeature"]),
     .library(name: "AppleWatchSync",      targets: ["AppleWatchSync"]),
     .library(name: "WorkshopFeature",     targets: ["WorkshopFeature"]),
+    .library(name: "InsightsFeature",     targets: ["InsightsFeature"]),
+    .library(name: "DesignSystem",        targets: ["DesignSystem"]),
     .library(name: "AppFeature",          targets: ["AppFeature"]),
-    .library(name: "WatchAppFeature",     targets: ["WatchAppFeature"]),
 ],
 ```
 
@@ -487,9 +516,9 @@ Five test targets:
 | Test target               | Surface                                                          |
 | ------------------------- | ---------------------------------------------------------------- |
 | `VDOTEngineTests`         | Daniels formula reference points; `paceRange(for:vdot:)` parity; iteration safety. |
-| `RunCraftModelsTests`     | `PlanSessionAdapter` (13 tests, branch coverage); `TrainingWeek.current` boundary tests. |
+| `RunCraftModelsTests`     | `PlanSessionAdapter` (13 tests, branch coverage); `TrainingWeek.current` boundary tests; `WorkoutSyncBack` mapping. |
 | `TrainingPlanFeatureTests`| `TrainingPlanGenerator` periodisation structure.                 |
-| `WorkshopFeatureTests`    | `EditStep` validation, `WorkoutDetail` start/edit/duplicate, `WorkoutEditor` persistence via fake repository. |
+| `WorkshopFeatureTests`    | `EditStep` validation, `WorkoutEditor` persistence via fake repository. |
 | `AppleWatchSyncTests`     | `WorkoutPlanBuilder` warmup hoisting and repeat-group iterations. |
 
 ### 7.2 The "no transitive deps in test targets" rule
@@ -521,11 +550,10 @@ macOS host.
 
 | What                                  | Why it isn't done                                                                |
 | ------------------------------------- | -------------------------------------------------------------------------------- |
-| **Watch target wired in Xcode**       | `WatchAppFeature` exists as a module but no `RunCraft Watch App` target is in the Xcode project yet. Adding it is the next concrete caller of `AppleWatchSync`. |
-| **Insights tab**                      | Placeholder view only. P2-roadmap territory: VDOT trend chart, weekly mileage bars, predicted race times. |
-| **WorkoutKit live-run telemetry**     | Today we schedule a workout; we don't yet read what the runner actually did and write a `CompletedWorkout` row back. |
-| **Dynamic VDOT adjustment**           | The roadmap has an adaptive system that watches pace achievement and bumps VDOT up when the runner consistently overperforms. Not started. |
+| **Native Apple Watch companion app**  | Skipped — iPhone-side `WorkoutScheduler.shared.schedule()` makes the planned workout appear on the paired Watch automatically, and the native Workout app handles in-session metrics. A companion would only add value for complications or custom in-workout UI. |
 | **iCloud sync via `SyncEngine`**      | SQLiteData supports CloudKit sync; we haven't enabled it. Single device only today. |
+| **App-level theme override**          | The user's system Appearance setting wins. A future Settings toggle (Auto / Light / Dark) could let runners pin a mode regardless of system. |
+| **HealthKit revocation detection**    | iOS doesn't expose read-authorisation status, so `hasLinkedHealthKit` is "the user once tapped Link successfully." If they revoke in iOS Settings, the pill still reads Linked until they re-tap. |
 
 ---
 

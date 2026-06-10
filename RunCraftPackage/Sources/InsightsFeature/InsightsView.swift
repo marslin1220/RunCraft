@@ -24,9 +24,8 @@ public struct InsightsView: View {
                 .padding(.vertical, 12)
             }
             .navigationTitle("Insights")
-            .background(Color.black)
+            .background(Color.brand.background)
         }
-        .preferredColorScheme(.dark)
         .onAppear { store.send(.onAppear) }
     }
 

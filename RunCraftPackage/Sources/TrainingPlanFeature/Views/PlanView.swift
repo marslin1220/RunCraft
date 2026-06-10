@@ -64,10 +64,9 @@ public struct PlanView: View {
                 }
                 .padding(.horizontal)
             }
-            .background(Color.black)
+            .background(Color.brand.background)
             .navigationTitle("Plan")
             .navigationBarTitleDisplayMode(.large)
-            .preferredColorScheme(.dark)
             .toolbar {
                 if store.hasGoal {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -151,7 +150,7 @@ private struct RaceCountdownRing: View {
         VStack(spacing: 8) {
             ZStack {
                 Circle()
-                    .stroke(Color.white.opacity(0.15), lineWidth: 12)
+                    .stroke(Color.primary.opacity(0.12), lineWidth: 12)
                     .frame(width: 160, height: 160)
 
                 Circle()
@@ -167,7 +166,7 @@ private struct RaceCountdownRing: View {
                 VStack(spacing: 2) {
                     Text("\(max(goal.daysUntilRace, 0))")
                         .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.brand.textPrimary)
                     Text("days")
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
@@ -178,7 +177,7 @@ private struct RaceCountdownRing: View {
 
             Text(goal.name)
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.brand.textPrimary)
 
             if let ctx = phaseContext {
                 Text("Week \(ctx.week) of 16 · \(ctx.phase.displayName)")
@@ -270,7 +269,7 @@ private struct PaceChip: View {
                 .foregroundStyle(color)
             Text(pace.components(separatedBy: " ").first ?? pace)
                 .font(.caption2.monospacedDigit())
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.brand.textPrimary)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
         }
@@ -315,7 +314,7 @@ private struct WeekSessionsSection: View {
             HStack {
                 Text("Week \(week.weekNumber) · \(week.phase.displayName)")
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.brand.textPrimary)
                 Spacer()
                 Text("\(week.targetWeeklyKm, format: .number.precision(.fractionLength(0))) km")
                     .font(.subheadline)
@@ -490,7 +489,7 @@ private struct VDOTUpgradeBanner: View {
                     .accessibilityHidden(true)
                 Text("VDOT improved")
                     .font(.subheadline.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.brand.textPrimary)
                 Spacer()
                 Button {
                     onDismiss()
@@ -566,7 +565,7 @@ private struct RecoveryAdviceBanner: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Recovery looks low today")
                         .font(.subheadline.bold())
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.brand.textPrimary)
                     Text(reason)
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
@@ -630,7 +629,7 @@ private struct EmptyPlanPrompt: View {
             Text("No race goal yet")
                 .font(.title2)
                 .bold()
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.brand.textPrimary)
 
             Text("Create your first race goal and we'll build a personalised 16-week training plan.")
                 .multilineTextAlignment(.center)
@@ -725,10 +724,9 @@ struct WeekScheduleView: View {
             .padding(.top, 12)
             .padding(.bottom, 24)
         }
-        .background(Color.black)
+        .background(Color.brand.background)
         .navigationTitle("Full Schedule")
         .navigationBarTitleDisplayMode(.inline)
-        .preferredColorScheme(.dark)
         .alert($store.scope(state: \.alert, action: \.alert))
         .onAppear(perform: seedExpansionIfNeeded)
     }
@@ -933,7 +931,7 @@ private struct WeekSection: View {
                             )
                         Text(session.sessionType.displayName)
                             .font(.subheadline.bold())
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Color.brand.textPrimary)
                     }
                     if let subtitle = paceSubtitle(for: session) {
                         Text(subtitle)

@@ -38,7 +38,6 @@ public struct AppView: View {
                 .tag(AppFeature.Tab.settings)
         }
         .tint(Color(red: 0.8, green: 1.0, blue: 0.0))   // #CCFF00 Electric Lime
-        .preferredColorScheme(.dark)
     }
 }
 

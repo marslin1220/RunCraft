@@ -17,10 +17,9 @@ public struct WorkshopView: View {
                 segmentPicker
                 content
             }
-            .background(Color.black)
+            .background(Color.brand.background)
             .navigationTitle("Workouts")
             .navigationBarTitleDisplayMode(.large)
-            .preferredColorScheme(.dark)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -48,7 +47,7 @@ public struct WorkshopView: View {
         .pickerStyle(.segmented)
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(Color.black)
+        .background(Color.brand.background)
     }
 
     @ViewBuilder
@@ -185,7 +184,7 @@ private struct EmptyYoursPrompt: View {
                 .foregroundStyle(Color.brand.accent.opacity(0.6))
             Text("No workouts yet")
                 .font(.title3.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.brand.textPrimary)
             Text("Start from a template or build one from scratch.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.brand.textSecondary)
