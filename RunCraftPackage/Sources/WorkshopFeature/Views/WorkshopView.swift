@@ -3,6 +3,7 @@ import DesignSystem
 import RunCraftModels
 import SQLiteData
 import SwiftUI
+import VDOTEngine
 
 public struct WorkshopView: View {
     @Bindable public var store: StoreOf<Workshop>
@@ -119,6 +120,7 @@ private struct WorkoutCardRow: View {
     /// runner can spot "sample preset" vs "my workout" at a glance.
     let isPreset: Bool
     let onTap: () -> Void
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
 
     private var totalSteps: Int {
         template.blocks.reduce(0) { acc, block in
@@ -129,10 +131,9 @@ private struct WorkoutCardRow: View {
         }
     }
 
-    /// Total estimated metres in the template; used as a subtitle the
-    /// runner can scan (km > step count for utility).
-    private var totalKm: Double {
-        let metres = template.blocks.reduce(0.0) { acc, block in
+    /// Total estimated distance-goal metres in the template.
+    private var totalMetres: Double {
+        template.blocks.reduce(0.0) { acc, block in
             switch block {
             case .step(let s):
                 if case .distance(let m) = s.goal { return acc + m }
@@ -145,13 +146,22 @@ private struct WorkoutCardRow: View {
                 return acc + per * Double(g.iterations)
             }
         }
-        return metres / 1_000
     }
 
     private var subtitle: String {
         var parts: [String] = []
-        if totalKm > 0 {
-            parts.append("≈ \(totalKm.formatted(.number.precision(.fractionLength(0...1)))) km")
+        if totalMetres > 0 {
+            let scaled: Double
+            let suffix: String
+            switch paceUnit {
+            case .perKilometre:
+                scaled = totalMetres / 1_000
+                suffix = "km"
+            case .perMile:
+                scaled = totalMetres / 1_609.344
+                suffix = "mi"
+            }
+            parts.append("≈ \(scaled.formatted(.number.precision(.fractionLength(0...1)))) \(suffix)")
         }
         parts.append("\(totalSteps) step\(totalSteps == 1 ? "" : "s")")
         return parts.joined(separator: " · ")

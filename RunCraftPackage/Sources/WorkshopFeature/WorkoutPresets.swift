@@ -14,6 +14,7 @@ public enum WorkoutPresets {
         tempoRun,
         thresholdCruiseIntervals,
         ladderWorkout,
+        monaFartlek,
         easyRecoveryRun,
     ]
 
@@ -152,6 +153,64 @@ public enum WorkoutPresets {
             .step(WorkoutStep(id: stepID("LAD-W5"), kind: .work, goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
             .step(WorkoutStep(
                 id: stepID("LAD-CD"),
+                kind: .cooldown,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+        ]
+    )
+
+    // MARK: - Mona Fartlek
+    //
+    // Steve Moneghetti's signature "speed play" — 20 minutes of varied surges
+    // and equal-duration floats. Four descending blocks teach the legs to
+    // shift gears under fatigue. Float recoveries stay aerobic (E pace), not
+    // standing rests, so it doubles as a tempo-flavoured session.
+
+    public static let monaFartlek: WorkoutTemplate = .init(
+        id: presetID("MONA-FARTLEK"),
+        name: "Mona Fartlek",
+        blocks: [
+            .step(WorkoutStep(
+                id: stepID("MONA-WU"),
+                kind: .warmup,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+            .repeatGroup(RepeatGroup(
+                id: groupID("MONA-90"),
+                iterations: 2,
+                steps: [
+                    WorkoutStep(id: stepID("MONA-90-W"), kind: .work,     goal: .time(seconds: 90), alert: .paceZone(PaceZoneName.interval, vdot: 40)),
+                    WorkoutStep(id: stepID("MONA-90-R"), kind: .recovery, goal: .time(seconds: 90), alert: .paceZone(PaceZoneName.easy,     vdot: 40)),
+                ]
+            )),
+            .repeatGroup(RepeatGroup(
+                id: groupID("MONA-60"),
+                iterations: 4,
+                steps: [
+                    WorkoutStep(id: stepID("MONA-60-W"), kind: .work,     goal: .time(seconds: 60), alert: .paceZone(PaceZoneName.interval, vdot: 40)),
+                    WorkoutStep(id: stepID("MONA-60-R"), kind: .recovery, goal: .time(seconds: 60), alert: .paceZone(PaceZoneName.easy,     vdot: 40)),
+                ]
+            )),
+            .repeatGroup(RepeatGroup(
+                id: groupID("MONA-30"),
+                iterations: 4,
+                steps: [
+                    WorkoutStep(id: stepID("MONA-30-W"), kind: .work,     goal: .time(seconds: 30), alert: .paceZone(PaceZoneName.interval, vdot: 40)),
+                    WorkoutStep(id: stepID("MONA-30-R"), kind: .recovery, goal: .time(seconds: 30), alert: .paceZone(PaceZoneName.easy,     vdot: 40)),
+                ]
+            )),
+            .repeatGroup(RepeatGroup(
+                id: groupID("MONA-15"),
+                iterations: 4,
+                steps: [
+                    WorkoutStep(id: stepID("MONA-15-W"), kind: .work,     goal: .time(seconds: 15), alert: .paceZone(PaceZoneName.repetition, vdot: 40)),
+                    WorkoutStep(id: stepID("MONA-15-R"), kind: .recovery, goal: .time(seconds: 15), alert: .paceZone(PaceZoneName.easy,       vdot: 40)),
+                ]
+            )),
+            .step(WorkoutStep(
+                id: stepID("MONA-CD"),
                 kind: .cooldown,
                 goal: .time(seconds: 10 * 60),
                 alert: .paceZone(PaceZoneName.easy, vdot: 40)

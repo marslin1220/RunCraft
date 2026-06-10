@@ -19,6 +19,7 @@ let package = Package(
         .library(name: "WorkshopFeature", targets: ["WorkshopFeature"]),
         .library(name: "InsightsFeature", targets: ["InsightsFeature"]),
         .library(name: "AppFeature", targets: ["AppFeature"]),
+        .library(name: "RunCraftIntents", targets: ["RunCraftIntents"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.15.0"),
@@ -105,10 +106,26 @@ let package = Package(
                 "DesignSystem",
                 "HealthKitClient",
                 "InsightsFeature",
+                "RunCraftIntents",
                 "TrainingPlanFeature",
                 "VDOTEngine",
                 "WorkshopFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ]
+        ),
+
+        // MARK: - App Intents (Siri / Spotlight / Apple Intelligence)
+
+        .target(
+            name: "RunCraftIntents",
+            dependencies: [
+                "AppleWatchSync",
+                "DesignSystem",
+                "RunCraftModels",
+                "VDOTEngine",
+                "WorkshopFeature",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+                .product(name: "SQLiteData", package: "sqlite-data"),
             ]
         ),
 

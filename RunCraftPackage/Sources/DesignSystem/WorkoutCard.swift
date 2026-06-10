@@ -71,7 +71,7 @@ public struct WorkoutCard<Content: View>: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title)
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.brand.textPrimary)
                         .lineLimit(1)
                     if let subtitle {
                         Text(subtitle)

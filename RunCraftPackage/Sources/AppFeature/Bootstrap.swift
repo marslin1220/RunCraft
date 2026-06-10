@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import RunCraftModels
+@_exported import RunCraftIntents
 
 /// Creates the root store for the iOS app.
 @MainActor

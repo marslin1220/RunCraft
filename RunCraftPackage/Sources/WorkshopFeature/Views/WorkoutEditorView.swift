@@ -105,8 +105,17 @@ public struct WorkoutEditorView: View {
         List {
             ForEach(store.blocks) { block in
                 BlockCardView(block: block)
-                    .listRowBackground(Color.brand.surface)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.brand.textSecondary.opacity(0.10), lineWidth: 0.5)
+                    )
+                    .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
                     .contentShape(Rectangle())
                     .onTapGesture { store.send(.blockTapped(id: block.id)) }
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -329,7 +338,7 @@ private struct RepeatGroupRow: View {
                         .frame(width: 16)
                     Text(step.kind.displayName)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.85))
+                        .foregroundStyle(Color.brand.textPrimary.opacity(0.85))
                     Spacer()
                     Text(step.goal.displayText)
                         .font(.caption)
