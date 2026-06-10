@@ -101,17 +101,35 @@ public extension Color {
 
         // MARK: - Pace zones
         //
-        // Same hex in both modes — pace-zone colours are used at low alpha
-        // as card backgrounds with `textPrimary` overlaid, and as small
-        // letter labels (E / M / T / I / R). The mid-saturation values
-        // here read well against both white and black surfaces.
+        // Used in two roles: as small letter labels (E / M / T / I / R) and
+        // as card backgrounds at low alpha. Letter contrast against the
+        // *surface* is what matters — the dark-mode palette was a mid-
+        // saturation tone that read on black but failed AA on white, so
+        // light mode darkens each hue independently.
+        //
+        // The cool→warm heat ramp is preserved in both modes.
 
         public enum zone {
-            public static let easy       = Color(red: 0.66, green: 0.71, blue: 0.63)
-            public static let marathon   = Color(red: 0.60, green: 0.71, blue: 0.80)
-            public static let threshold  = Color(red: 0.83, green: 0.77, blue: 0.37)
-            public static let interval   = Color(red: 0.91, green: 0.57, blue: 0.42)
-            public static let repetition = Color(red: 1.00, green: 0.24, blue: 0.00)
+            public static let easy = Color.dynamicBrand(
+                light: Color(red: 0.18, green: 0.49, blue: 0.20), // #2E7D32 forest
+                dark:  Color(red: 0.66, green: 0.71, blue: 0.63)  // muted sage
+            )
+            public static let marathon = Color.dynamicBrand(
+                light: Color(red: 0.08, green: 0.40, blue: 0.75), // #1565C0 deep blue
+                dark:  Color(red: 0.60, green: 0.71, blue: 0.80)  // soft slate
+            )
+            public static let threshold = Color.dynamicBrand(
+                light: Color(red: 0.78, green: 0.51, blue: 0.00), // #C68200 dark amber
+                dark:  Color(red: 0.83, green: 0.77, blue: 0.37)  // mustard
+            )
+            public static let interval = Color.dynamicBrand(
+                light: Color(red: 0.83, green: 0.18, blue: 0.18), // #D32F2F deep red
+                dark:  Color(red: 0.91, green: 0.57, blue: 0.42)  // burnt orange
+            )
+            public static let repetition = Color.dynamicBrand(
+                light: Color(red: 0.72, green: 0.11, blue: 0.11), // #B71C1C deeper red
+                dark:  Color(red: 1.00, green: 0.24, blue: 0.00)  // fire red
+            )
         }
     }
 

@@ -802,6 +802,22 @@ private extension TrainingPhase {
 }
 
 private struct WeekSection: View {
+    /// Resolves a SessionType onto the brand zone palette (dynamic per
+    /// light/dark). Keeps Full Schedule row tints adapting cleanly to
+    /// both modes instead of using SessionType.colorHex (static
+    /// Material swatches that fail AA on white).
+    fileprivate static func sessionColor(_ type: SessionType) -> Color {
+        switch type {
+        case .easy:       Color.brand.zone.easy
+        case .tempo:      Color.brand.zone.threshold
+        case .interval:   Color.brand.zone.interval
+        case .long:       Color.brand.zone.marathon
+        case .repetition: Color.brand.zone.repetition
+        case .rest:       Color.brand.textSecondary
+        }
+    }
+
+
     let week: TrainingWeek
     let sessions: [PlannedSession]
     let completedIds: Set<UUID>
@@ -910,12 +926,17 @@ private struct WeekSection: View {
         Button {
             onTap(session)
         } label: {
+            // Map the session type onto the dynamic brand zone palette so
+            // tints adapt for light + dark instead of using the static
+            // Material hex tied to SessionType.colorHex (those wash out
+            // on white backgrounds).
+            let tint = Self.sessionColor(session.sessionType)
             HStack(spacing: 14) {
                 // Leading stroke SF Symbol in the session-type tint.
                 // Outlined style reads as instrument, not decoration.
                 Image(systemName: session.sessionType.symbolName)
                     .font(.title3)
-                    .foregroundStyle(Color(hex: session.sessionType.colorHex))
+                    .foregroundStyle(tint)
                     .frame(width: 28, height: 28)
                     .accessibilityHidden(true)
 
@@ -923,11 +944,11 @@ private struct WeekSection: View {
                     HStack(spacing: 6) {
                         Text(dayLabel(session.dayOfWeek))
                             .font(.caption.bold())
-                            .foregroundStyle(Color(hex: session.sessionType.colorHex))
+                            .foregroundStyle(tint)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(
-                                Capsule().fill(Color(hex: session.sessionType.colorHex).opacity(0.15))
+                                Capsule().fill(tint.opacity(0.15))
                             )
                         Text(session.sessionType.displayName)
                             .font(.subheadline.bold())

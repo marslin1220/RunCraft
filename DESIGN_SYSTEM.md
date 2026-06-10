@@ -119,22 +119,20 @@ A five-step ramp from cool/soft to hot/intense. The zone letter
 (E / M / T / I / R) is the primary semantic; colour is *visual rhythm*,
 not the only channel.
 
-| Token | Approx hue | Zone |
-|-------|-----------|------|
-| `brand.zone.easy` | muted sage | E — recovery, long runs |
-| `brand.zone.marathon` | soft slate-blue | M — marathon pace |
-| `brand.zone.threshold` | mustard | T — comfortably hard |
-| `brand.zone.interval` | burnt orange | I — VO₂max efforts |
-| `brand.zone.repetition` | fire red | R — top-end speed |
+| Token | Light | Dark | Zone |
+|-------|-------|------|------|
+| `brand.zone.easy` | `#2E7D32` (forest) | muted sage | E — recovery, long runs |
+| `brand.zone.marathon` | `#1565C0` (deep blue) | soft slate-blue | M — marathon pace |
+| `brand.zone.threshold` | `#C68200` (dark amber) | mustard | T — comfortably hard |
+| `brand.zone.interval` | `#D32F2F` (deep red) | burnt orange | I — VO₂max efforts |
+| `brand.zone.repetition` | `#B71C1C` (deeper red) | fire red | R — top-end speed |
 
-> **Why this palette over the previous Material Design swatches?**
-> The old `#4CAF50 / #2196F3 / #FFC107 / #FF5722 / #F44336` were five
-> independent traffic-lights — visually loud, no relationship to brand.
-> The new ramp reads as a *progression*: as effort climbs, colour gets
-> warmer and brighter, ending in fire red for the hardest zone. The
-> heat ramp deliberately *doesn't* end at the cyan brand accent —
-> mixing cool brand into a warm pace progression would break the
-> intensity-as-heat metaphor.
+> **Why two palettes?** The dark-mode hues are mid-saturation tones
+> calibrated for OLED black — they fail AA contrast on white. Light
+> mode darkens each hue independently while preserving the cool→warm
+> progression. The heat ramp deliberately doesn't end at the cyan
+> brand accent in either mode — mixing cool brand into a warm pace
+> progression would break the intensity-as-heat metaphor.
 
 ---
 

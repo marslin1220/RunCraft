@@ -43,34 +43,6 @@ public struct SettingsView: View {
                     .pickerStyle(.segmented)
                 }
 
-                Section {
-                    HStack {
-                        Label("HealthKit", systemImage: "heart.fill")
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        if store.hasLinkedHealthKit {
-                            HStack(spacing: 4) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Color.brand.success)
-                                Text("Linked")
-                                    .foregroundStyle(.secondary)
-                            }
-                        } else {
-                            Button("Link") {
-                                store.send(.linkHealthKitTapped)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(Color.brand.accent)
-                            .foregroundStyle(.black)
-                        }
-                    }
-                } header: {
-                    Text("Connections")
-                } footer: {
-                    Text("RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days.")
-                        .font(.caption)
-                }
-
                 Section("About") {
                     HStack {
                         Text("Version")

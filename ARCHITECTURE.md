@@ -250,7 +250,7 @@ The root.
 | --------------------------- | ---------------------------------------------------------- |
 | `AppFeature.swift`          | Tab enum, root reducer composing Plan / Workshop / Settings, cross-tab delegate handler. |
 | `AppView.swift`             | `TabView` with the four tabs (Plan / Workouts / Insights / Settings). |
-| `SettingsFeature.swift`     | Settings reducer (HealthKit link state — persisted via `@Shared(.appStorage("healthKitLinked"))`). |
+| `SettingsFeature.swift`     | Settings reducer — minimal today (just an `onAppear`). HealthKit linking is intentionally **not** in Settings: per HIG, authorisation is requested at point-of-use (Setup Race Goal's Auto-detect button), not pre-emptively from a Settings toggle. |
 | `SettingsView.swift`        | Settings form. Pace unit Picker writes directly to `@AppStorage("paceUnit")` so the bind sidesteps a BindingReducer + `@Shared` quirk; every other view reads via `@Shared(.appStorage("paceUnit"))`. |
 | `Bootstrap.swift`           | `makeAppStore()` (`@MainActor`) + `bootstrapApp()` (calls `prepareDependencies { try! $0.bootstrapDatabase() }`). |
 
@@ -553,7 +553,7 @@ macOS host.
 | **Native Apple Watch companion app**  | Skipped — iPhone-side `WorkoutScheduler.shared.schedule()` makes the planned workout appear on the paired Watch automatically, and the native Workout app handles in-session metrics. A companion would only add value for complications or custom in-workout UI. |
 | **iCloud sync via `SyncEngine`**      | SQLiteData supports CloudKit sync; we haven't enabled it. Single device only today. |
 | **App-level theme override**          | The user's system Appearance setting wins. A future Settings toggle (Auto / Light / Dark) could let runners pin a mode regardless of system. |
-| **HealthKit revocation detection**    | iOS doesn't expose read-authorisation status, so `hasLinkedHealthKit` is "the user once tapped Link successfully." If they revoke in iOS Settings, the pill still reads Linked until they re-tap. |
+| **HealthKit revocation handling**     | iOS doesn't expose read-authorisation status. If the runner revokes Health permission in iOS Settings, our HealthKit-backed features (HRV banner, race-time detection, completed-workout sync-back) silently return empty data instead of failing loudly. A "Health permission lost — re-grant in Settings" banner would be the right escalation. |
 
 ---
 
