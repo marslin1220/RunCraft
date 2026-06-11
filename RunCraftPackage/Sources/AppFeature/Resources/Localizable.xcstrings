@@ -10,6 +10,204 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "關於" } }
       }
     },
+    "Daily nudge at the time you pick. Tap to open RunCraft and dispatch today's session to Apple Watch." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "指定した時刻に毎日リマインド。タップで RunCraft を開いて今日のセッションを Apple Watch に送信できます。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "지정한 시간에 매일 알림. 탭해서 RunCraft을 열고 오늘 세션을 Apple Watch로 보낼 수 있습니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在你选定的时间每天提醒。点一下打开 RunCraft，把今天的训练派送到 Apple Watch。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "在你選定的時間每天提醒。點一下打開 RunCraft，把今天的訓練派送到 Apple Watch。" } }
+      }
+    },
+    "Daily training reminder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "毎日のトレーニングリマインド" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "매일 훈련 알림" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "每日训练提醒" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "每日訓練提醒" } }
+      }
+    },
+    "Notifications" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "通知" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "알림" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "通知" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "通知" } }
+      }
+    },
+    "Open RunCraft to see your session and dispatch it to Apple Watch." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft を開いて今日のセッションを確認し、Apple Watch へ送信しましょう。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft을 열어 세션을 확인하고 Apple Watch로 전송하세요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开 RunCraft 查看你的训练，并派送到 Apple Watch。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "打開 RunCraft 查看你的訓練，並派送到 Apple Watch。" } }
+      }
+    },
+    "Time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "時刻" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "시간" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "时间" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "時間" } }
+      }
+    },
+    "Today's RunCraft training is ready" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日の RunCraft トレーニングが用意できました" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘의 RunCraft 훈련이 준비되었습니다" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天的 RunCraft 训练已就绪" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天的 RunCraft 訓練已就緒" } }
+      }
+    },
+    "Built on VDOT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT が核" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 기반" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "以 VDOT 为核心" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "以 VDOT 為核心" } }
+      }
+    },
+    "Enter a race time — or let HealthKit pull your best — and RunCraft derives your five training pace zones from the Daniels formula." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レースタイムを入力するか、HealthKit からベストを取得すると、RunCraft が Daniels 公式から 5 つのトレーニングペースを算出します。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레이스 기록을 입력하거나 HealthKit에서 최고 기록을 가져오면 RunCraft가 Daniels 공식으로 5가지 훈련 페이스를 산출합니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "输入近期比赛成绩，或让 HealthKit 自动找出最佳值，RunCraft 用 Daniels 公式推导你的五个训练配速区间。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "輸入近期比賽成績，或讓 HealthKit 自動找出最佳值，RunCraft 用 Daniels 公式推導你的五個訓練配速區間。" } }
+      }
+    },
+    "Forty years of Jack Daniels' coaching" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Jack Daniels の 40 年のコーチング" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Jack Daniels의 40년 코칭" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Jack Daniels 四十年教练心法" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "Jack Daniels 四十年教練心法" } }
+      }
+    },
+    "Get started" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "はじめる" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "시작하기" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始使用" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開始使用" } }
+      }
+    },
+    "Just ask Siri" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Siri に聞くだけ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Siri에게 물어보세요" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "直接问 Siri" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "直接問 Siri" } }
+      }
+    },
+    "Next" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "次へ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "다음" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "下一步" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "下一步" } }
+      }
+    },
+    "One tap to your wrist" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワンタップで手首へ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "원 탭으로 손목까지" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "一键直达手表" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "一鍵直達手錶" } }
+      }
+    },
+    "Periodised plans, real Apple Watch dispatch, and Siri-driven control — everything a serious runner needs in one app." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ピリオダイズされたプラン、Apple Watch への直接ディスパッチ、Siri 制御 — シリアスランナーに必要なものをひとつの App に。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "주기화된 계획, 실제 Apple Watch 디스패치, Siri 음성 제어 — 진지한 러너에게 필요한 모든 것이 하나의 앱에." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "周期化计划、Apple Watch 派送、Siri 语音控制 — 严肃跑者需要的全在一个 App。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "週期化計畫、Apple Watch 派送、Siri 語音控制 — 嚴肅跑者需要的全在一個 App。" } }
+      }
+    },
+    "Send any workout to your paired Apple Watch with a single button. Pace alerts run on-wrist — no menu hunting mid-stride." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ペアリング済みの Apple Watch にワークアウトをワンボタンで送信。ペースアラートは手首で鳴る — 走行中にメニューを探す必要はありません。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "페어링된 Apple Watch에 운동을 한 번의 버튼으로 전송. 페이스 알림은 손목에서 — 달리는 중 메뉴를 뒤질 필요 없습니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "一键把任何训练传到配对的 Apple Watch。配速警示在手腕上即时提醒 — 跑步中不必滑选单。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "一鍵把任何訓練傳到配對的 Apple Watch。配速警示在手腕上即時提醒 — 跑步中不必滑選單。" } }
+      }
+    },
+    "Skip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "スキップ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "건너뛰기" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "略过" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "略過" } }
+      }
+    },
+    "Skip onboarding" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "オンボーディングをスキップ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "온보딩 건너뛰기" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "略过引导" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "略過介紹" } }
+      }
+    },
+    "Train with the science" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "科学でトレーニング" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "과학으로 훈련하다" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "用科学训练" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "用科學訓練" } }
+      }
+    },
+    "Voice-first control" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "音声ファースト" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "음성 우선 제어" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "语音优先控制" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "語音優先控制" } }
+      }
+    },
+    "Welcome to RunCraft" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft へようこそ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft에 오신 것을 환영합니다" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "欢迎使用 RunCraft" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "歡迎使用 RunCraft" } }
+      }
+    },
+    "WorkoutKit handoff" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "WorkoutKit で受け渡し" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "WorkoutKit 핸드오프" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "WorkoutKit 同步" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "WorkoutKit 同步" } }
+      }
+    },
+    "\"What's today's training?\" · \"Start Yasso 800.\" · \"Set my VDOT to 52.\" RunCraft answers, dispatches, and saves." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "「今日のトレーニングは？」「Yasso 800 を開始」「VDOT を 52 に設定」— RunCraft が回答し、送信し、保存します。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "\"오늘의 훈련은?\" · \"Yasso 800 시작\" · \"VDOT을 52로 설정\" — RunCraft가 답하고, 전송하고, 저장합니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "「今天的训练是什么？」「开始 Yasso 800」「把 VDOT 设为 52」— RunCraft 回答、派送、储存。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "「今天的訓練是什麼？」「開始 Yasso 800」「把 VDOT 設為 52」— RunCraft 回答、派送、儲存。" } }
+      }
+    },
     "About Jack Daniels VDOT" : {
       "extractionState" : "manual",
       "localizations" : {

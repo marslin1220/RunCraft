@@ -3,6 +3,7 @@ import ComposableArchitecture
 import DesignSystem
 import RunCraftModels
 import SwiftUI
+import VDOTEngine
 
 public struct InsightsView: View {
     @Bindable public var store: StoreOf<InsightsFeature>
@@ -18,6 +19,7 @@ public struct InsightsView: View {
                     fitnessTrendCard
                     weeklyMileageCard
                     predictedRacesCard
+                    recentRunsCard
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
@@ -251,6 +253,34 @@ public struct InsightsView: View {
         }
     }
 
+    /// Last ten completed runs. Each row reads as a single sentence —
+    /// date, distance, duration, average pace — so the runner can scan
+    /// the column. A small arrow ↑/↓ next to the pace flags whether the
+    /// run beat or missed the target session pace (when linked to one).
+    @ViewBuilder
+    private var recentRunsCard: some View {
+        sectionCard(title: "Recent runs") {
+            let runs = Array(store.state.recentWorkouts.prefix(10))
+            if runs.isEmpty {
+                emptyState("No completed runs yet. They'll appear here after HealthKit syncs or after you log a run by voice.")
+            } else {
+                VStack(spacing: 10) {
+                    ForEach(runs) { run in
+                        RecentRunRow(run: run, paceUnit: paceUnit)
+                        if run.id != runs.last?.id {
+                            Divider().opacity(0.25)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Pace-unit preference written by Settings. Reading at view scope
+    /// (not from store) so the row updates instantly when the runner
+    /// flips km/mi.
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+
     // MARK: - Helpers
 
     @ViewBuilder
@@ -319,5 +349,102 @@ private extension VDOTSnapshot.Source {
         case .overperformance: "Workout"
         case .manual:          "Manual"
         }
+    }
+}
+
+/// One row in the Recent Runs list. Three monospaced metrics + a date —
+/// designed to read as a single line on iPhone widths, wrap gracefully
+/// on Dynamic Type up to xxxLarge.
+///
+/// `paceAchievementRatio` interpretation: `< 1.0` means the runner was
+/// faster than the planned pace. We surface that as an upward arrow on
+/// the pace column; symmetric ↓ for "slower than planned." No icon if
+/// the run wasn't linked to a planned session.
+private struct RecentRunRow: View {
+    let run: CompletedWorkout
+    let paceUnit: PaceUnit
+
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .none
+        return f
+    }()
+
+    private var distanceText: String {
+        let value: Double
+        let suffix: String
+        switch paceUnit {
+        case .perKilometre:
+            value = run.actualDistanceKm
+            suffix = "km"
+        case .perMile:
+            value = run.actualDistanceKm / 1.609344
+            suffix = "mi"
+        }
+        return "\(value.formatted(.number.precision(.fractionLength(0...1)))) \(suffix)"
+    }
+
+    private var durationText: String {
+        let totalSeconds = Int(run.actualDurationSec)
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        if hours > 0 {
+            return "\(hours):\(String(format: "%02d", minutes))"
+        }
+        let seconds = totalSeconds % 60
+        return "\(minutes):\(String(format: "%02d", seconds))"
+    }
+
+    private var paceText: String {
+        let scale = paceUnit == .perKilometre ? 1.0 : 1.609344
+        let secs = Int(run.avgPaceSecPerKm * scale)
+        return "\(secs / 60):\(String(format: "%02d", secs % 60))"
+    }
+
+    private var achievementIcon: (symbol: String, color: Color)? {
+        guard run.plannedSessionId != nil else { return nil }
+        if run.paceAchievementRatio < 0.95 {
+            return ("arrow.up", Color.brand.success)
+        }
+        if run.paceAchievementRatio > 1.05 {
+            return ("arrow.down", Color.brand.caution)
+        }
+        return nil
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(Self.dateFormatter.string(from: run.completedAt))
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color.brand.textPrimary)
+                Text(distanceText)
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+            Spacer(minLength: 8)
+            VStack(alignment: .trailing, spacing: 2) {
+                HStack(spacing: 4) {
+                    if let achievement = achievementIcon {
+                        Image(systemName: achievement.symbol)
+                            .font(.caption.bold())
+                            .foregroundStyle(achievement.color)
+                            .accessibilityHidden(true)
+                    }
+                    Text(paceText)
+                        .font(.subheadline.monospacedDigit())
+                        .foregroundStyle(Color.brand.textPrimary)
+                    Text(paceUnit == .perKilometre ? "/km" : "/mi")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+                Text(durationText)
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(Self.dateFormatter.string(from: run.completedAt)), \(distanceText), \(durationText), pace \(paceText) \(paceUnit == .perKilometre ? "per kilometre" : "per mile")")
     }
 }

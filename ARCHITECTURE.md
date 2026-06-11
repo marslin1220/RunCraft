@@ -646,6 +646,7 @@ macOS host.
 | **iCloud sync via `SyncEngine`**      | SQLiteData supports CloudKit sync; we haven't enabled it. Single device only today. |
 | **App-level theme override**          | The user's system Appearance setting wins. A future Settings toggle (Auto / Light / Dark) could let runners pin a mode regardless of system. |
 | **HealthKit revocation handling**     | iOS doesn't expose read-authorisation status. If the runner revokes Health permission in iOS Settings, our HealthKit-backed features (HRV banner, race-time detection, completed-workout sync-back) silently return empty data instead of failing loudly. A "Health permission lost — re-grant in Settings" banner would be the right escalation. |
+| **Today's-session widget (deferred to v1.1)** | Home Screen + Lock Screen widget for today's planned session, tap-to-StartWorkoutIntent. Blocked on **App Groups entitlement** which requires the paid Apple Developer Program ($99/yr). Widget extension must live in the Xcode project (not SPM), so target wiring happens via the Xcode UI when the dev account is upgraded. Until then it's framed as a "free v1.1 update" for v1.0 buyers — feeds the grandfather narrative around the eventual Freemium transition (see PRICING.md). |
 
 ---
 

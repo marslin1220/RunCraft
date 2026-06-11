@@ -73,6 +73,24 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "需要 VDOT 歷史紀錄與 VO₂max 樣本才能計算差值。" } }
       }
     },
+    "No completed runs yet. They'll appear here after HealthKit syncs or after you log a run by voice." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "まだ完走ログがありません。HealthKit 同期後、または音声でランを記録するとここに表示されます。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "완료된 러닝이 없습니다. HealthKit이 동기화되거나 음성으로 러닝을 기록하면 여기에 표시됩니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "尚无完成的跑步记录。HealthKit 同步后或语音记录跑步后会出现在这里。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "尚無完成的跑步紀錄。HealthKit 同步後或語音記錄跑步後會出現在這裡。" } }
+      }
+    },
+    "Recent runs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "最近のラン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "최근 러닝" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "最近的跑步" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "最近的跑步" } }
+      }
+    },
     "No completed runs yet. They'll appear here after HealthKit syncs." : {
       "extractionState" : "manual",
       "localizations" : {

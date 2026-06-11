@@ -7,6 +7,10 @@ import WorkshopFeature
 
 public struct AppView: View {
     @Bindable public var store: StoreOf<AppFeature>
+    /// Hides the first-launch onboarding flow forever once dismissed.
+    /// Plain `@AppStorage` (same pattern as the pace-unit picker in
+    /// Settings) so the flag persists without going through TCA state.
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
 
     public init(store: StoreOf<AppFeature>) {
         self.store = store
@@ -39,6 +43,18 @@ public struct AppView: View {
                 .tag(AppFeature.Tab.settings)
         }
         .tint(Color.brand.accent)
+        .fullScreenCover(isPresented: Binding(
+            get: { !hasCompletedOnboarding },
+            set: { _ in /* dismissal handled via onComplete */ }
+        )) {
+            OnboardingView(onComplete: {
+                hasCompletedOnboarding = true
+                // Land on the Plan tab — that's where the SetupRaceGoal
+                // prompt lives. Onboarding ends with "let's build your
+                // first plan," so we want the runner to see it.
+                store.send(.tabSelected(.plan))
+            })
+        }
     }
 }
 

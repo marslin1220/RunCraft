@@ -48,3 +48,6 @@ skills-lock.json
 .idea/
 *.swp
 *~
+
+# Pricing strategy — keep local, not for the public repo yet
+PRICING.md

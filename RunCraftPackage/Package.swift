@@ -121,6 +121,7 @@ let package = Package(
                 "VDOTEngine",
                 "WorkshopFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
             ],
             resources: [.process("Resources/Localizable.xcstrings")]
         ),
