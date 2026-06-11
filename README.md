@@ -98,4 +98,13 @@ RunCraftPackage/                   Local SPM package — the bulk of the code
 
 ## License
 
-See [`LICENSE`](LICENSE).
+RunCraft is released under the **GNU Affero General Public License v3.0**
+(AGPL-3.0). See [`LICENSE`](LICENSE) for the full text.
+
+The short version: you can use, copy, and modify the source for any
+purpose, but any **derivative work distributed publicly — including a
+network-accessible service — must be released under AGPL-3.0 with full
+source available.** This prevents closed-source forks of RunCraft from
+competing on the App Store.
+
+Copyright © 2026 Cheng Lung Lin.
