@@ -104,6 +104,10 @@ public struct SettingsView: View {
                     Link(destination: URL(string: "https://vdoto2.com")!) {
                         Label("About Jack Daniels VDOT", systemImage: "info.circle.fill")
                     }
+
+                    Link(destination: URL(string: "https://marslin1220.github.io/RunCraft/privacy/")!) {
+                        Label("Privacy Policy", systemImage: "lock.shield")
+                    }
                 }
             }
             .navigationTitle("Settings")

@@ -37,6 +37,15 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "通知" } }
       }
     },
+    "Privacy Policy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プライバシーポリシー" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "개인정보 처리방침" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "隐私政策" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "隱私政策" } }
+      }
+    },
     "Open RunCraft to see your session and dispatch it to Apple Watch." : {
       "extractionState" : "manual",
       "localizations" : {
