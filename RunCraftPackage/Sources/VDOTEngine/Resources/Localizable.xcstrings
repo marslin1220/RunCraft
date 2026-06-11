@@ -4,56 +4,46 @@
     "Easy" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "輕鬆"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "イージー" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이지" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "轻松" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "輕鬆" } }
       }
     },
     "Interval" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "間歇"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "インターバル" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "인터벌" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "间歇" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "間歇" } }
       }
     },
     "Marathon" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "馬拉松"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "マラソン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "마라톤" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "马拉松" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "馬拉松" } }
       }
     },
     "Repetition" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "反覆衝刺"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レペティション" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레피티션" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "反复冲刺" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "反覆衝刺" } }
       }
     },
     "Threshold" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "乳酸閾值"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "閾値" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "임계값" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "乳酸阈值" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "乳酸閾值" } }
       }
     }
   },

@@ -4,122 +4,100 @@
     "Base" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "基礎期"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ベース期" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "베이스 단계" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "基础期" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "基礎期" } }
       }
     },
     "Build" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "進階期"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ビルド期" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "빌드 단계" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "进阶期" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "進階期" } }
       }
     },
     "Easy Run" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "輕鬆跑"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "イージーラン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이지런" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "轻松跑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "輕鬆跑" } }
       }
     },
     "Half Marathon" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "半程馬拉松"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ハーフマラソン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "하프 마라톤" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "半程马拉松" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "半程馬拉松" } }
       }
     },
     "Intervals" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "間歇跑"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "インターバル" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "인터벌" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "间歇跑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "間歇跑" } }
       }
     },
     "Long Run" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "長距離跑"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ロングラン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "롱런" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "长距离跑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "長距離跑" } }
       }
     },
     "Peak" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "巔峰期"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ピーク期" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "피크 단계" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "巅峰期" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "巔峰期" } }
       }
     },
     "Repetitions" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "反覆衝刺"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レペティション" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레피티션" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "反复冲刺" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "反覆衝刺" } }
       }
     },
     "Rest" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "休息日"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レスト" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "휴식" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "休息日" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "休息日" } }
       }
     },
     "Taper" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "減量期"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "テーパー期" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "테이퍼 단계" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "减量期" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "減量期" } }
       }
     },
     "Tempo Run" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "節奏跑"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "テンポラン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "템포런" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "节奏跑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "節奏跑" } }
       }
     }
   },

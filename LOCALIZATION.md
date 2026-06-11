@@ -1,9 +1,13 @@
 # Localization Plan
 
 This file is the source of truth for RunCraft's multi-language strategy.
-First locale is **Traditional Chinese (zh-Hant)**, mirroring Apple's
-Taiwan localization conventions where they exist (e.g. the Watch's
-Workouts app is "體能訓練" in Apple's own zh-Hant build).
+Supported locales:
+
+- **English (en)** — source language
+- **Traditional Chinese (zh-Hant)** — Taiwan running conventions
+- **Simplified Chinese (zh-Hans)** — mainland conventions (计划 / 训练 / 模板)
+- **Japanese (ja)** — katakana for loanwords (テンポラン / インターバル) matching JP running culture
+- **Korean (ko)** — mix of Hangul + loanwords (이지런 / 인터벌) matching KR running culture
 
 The doc is in three parts:
 

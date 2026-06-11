@@ -15,6 +15,10 @@ public enum WorkoutPresets {
         thresholdCruiseIntervals,
         ladderWorkout,
         monaFartlek,
+        hillRepeats,
+        progressionRun,
+        speedPyramid,
+        michiganWorkout,
         easyRecoveryRun,
     ]
 
@@ -213,6 +217,157 @@ public enum WorkoutPresets {
             )),
             .step(WorkoutStep(
                 id: stepID("MONA-CD"),
+                kind: .cooldown,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+        ]
+    )
+
+    // MARK: - Hill Repeats
+    //
+    // Short uphill efforts at interval-pace effort with walk-jog downhill
+    // recoveries. Hills add strength + cardiovascular load without
+    // joint impact — a track substitute when no oval is available.
+    // Effort-based: the runner picks any hill and runs hard up.
+
+    public static let hillRepeats: WorkoutTemplate = .init(
+        id: presetID("HILL-REPEATS"),
+        name: String(localized: "Hill Repeats", bundle: .module),
+        blocks: [
+            .step(WorkoutStep(
+                id: stepID("HILL-WU"),
+                kind: .warmup,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+            .repeatGroup(RepeatGroup(
+                id: groupID("HILL-REP"),
+                iterations: 8,
+                steps: [
+                    WorkoutStep(
+                        id: stepID("HILL-UP"),
+                        kind: .work,
+                        goal: .time(seconds: 60),
+                        alert: .paceZone(PaceZoneName.interval, vdot: 40)
+                    ),
+                    WorkoutStep(
+                        id: stepID("HILL-DOWN"),
+                        kind: .recovery,
+                        goal: .time(seconds: 90),
+                        alert: .paceZone(PaceZoneName.easy, vdot: 40)
+                    ),
+                ]
+            )),
+            .step(WorkoutStep(
+                id: stepID("HILL-CD"),
+                kind: .cooldown,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+        ]
+    )
+
+    // MARK: - Progression Run
+    //
+    // 60 minutes that ramps from Easy through Marathon to Threshold pace.
+    // Teaches the body to handle pace transitions and accelerates fatigued
+    // — a near-perfect race-rehearsal session for marathon training blocks.
+
+    public static let progressionRun: WorkoutTemplate = .init(
+        id: presetID("PROGRESSION"),
+        name: String(localized: "Progression Run", bundle: .module),
+        blocks: [
+            .step(WorkoutStep(
+                id: stepID("PROG-E"),
+                kind: .work,
+                goal: .time(seconds: 20 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+            .step(WorkoutStep(
+                id: stepID("PROG-M"),
+                kind: .work,
+                goal: .time(seconds: 20 * 60),
+                alert: .paceZone(PaceZoneName.marathon, vdot: 40)
+            )),
+            .step(WorkoutStep(
+                id: stepID("PROG-T"),
+                kind: .work,
+                goal: .time(seconds: 20 * 60),
+                alert: .paceZone(PaceZoneName.threshold, vdot: 40)
+            )),
+        ]
+    )
+
+    // MARK: - Speed Pyramid
+    //
+    // 200 → 400 → 600 → 800 → 600 → 400 → 200 at I pace with mostly
+    // 400m recoveries. Pyramid structure builds confidence — the longest
+    // rep sits at the top, after which the descending efforts feel
+    // increasingly achievable.
+
+    public static let speedPyramid: WorkoutTemplate = .init(
+        id: presetID("SPEED-PYRAMID"),
+        name: String(localized: "Speed Pyramid", bundle: .module),
+        blocks: [
+            .step(WorkoutStep(
+                id: stepID("PYR-WU"),
+                kind: .warmup,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+            // Ascending
+            .step(WorkoutStep(id: stepID("PYR-W1"), kind: .work,     goal: .distance(metres: 200), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-R1"), kind: .recovery, goal: .distance(metres: 200), alert: .paceZone(PaceZoneName.easy,     vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-W2"), kind: .work,     goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-R2"), kind: .recovery, goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.easy,     vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-W3"), kind: .work,     goal: .distance(metres: 600), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-R3"), kind: .recovery, goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.easy,     vdot: 40))),
+            // Peak
+            .step(WorkoutStep(id: stepID("PYR-W4"), kind: .work,     goal: .distance(metres: 800), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-R4"), kind: .recovery, goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.easy,     vdot: 40))),
+            // Descending
+            .step(WorkoutStep(id: stepID("PYR-W5"), kind: .work,     goal: .distance(metres: 600), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-R5"), kind: .recovery, goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.easy,     vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-W6"), kind: .work,     goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-R6"), kind: .recovery, goal: .distance(metres: 400), alert: .paceZone(PaceZoneName.easy,     vdot: 40))),
+            .step(WorkoutStep(id: stepID("PYR-W7"), kind: .work,     goal: .distance(metres: 200), alert: .paceZone(PaceZoneName.interval, vdot: 40))),
+            .step(WorkoutStep(
+                id: stepID("PYR-CD"),
+                kind: .cooldown,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+        ]
+    )
+
+    // MARK: - Michigan Workout
+    //
+    // Ron Warhurst's signature session — 1600 → 1200 → 800 → 400 at
+    // threshold pace with short jog recoveries, last 400m at I pace.
+    // Named after the University of Michigan track team. Kept in English
+    // because the name carries cultural weight in the running world.
+
+    public static let michiganWorkout: WorkoutTemplate = .init(
+        id: presetID("MICHIGAN"),
+        // Proper noun — never localized.
+        name: "Michigan Workout",
+        blocks: [
+            .step(WorkoutStep(
+                id: stepID("MICH-WU"),
+                kind: .warmup,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+            .step(WorkoutStep(id: stepID("MICH-W1"), kind: .work,     goal: .distance(metres: 1609), alert: .paceZone(PaceZoneName.threshold, vdot: 40))),
+            .step(WorkoutStep(id: stepID("MICH-R1"), kind: .recovery, goal: .time(seconds: 4 * 60), alert: .paceZone(PaceZoneName.easy,      vdot: 40))),
+            .step(WorkoutStep(id: stepID("MICH-W2"), kind: .work,     goal: .distance(metres: 1200), alert: .paceZone(PaceZoneName.threshold, vdot: 40))),
+            .step(WorkoutStep(id: stepID("MICH-R2"), kind: .recovery, goal: .time(seconds: 3 * 60), alert: .paceZone(PaceZoneName.easy,      vdot: 40))),
+            .step(WorkoutStep(id: stepID("MICH-W3"), kind: .work,     goal: .distance(metres: 800),  alert: .paceZone(PaceZoneName.threshold, vdot: 40))),
+            .step(WorkoutStep(id: stepID("MICH-R3"), kind: .recovery, goal: .time(seconds: 2 * 60), alert: .paceZone(PaceZoneName.easy,      vdot: 40))),
+            .step(WorkoutStep(id: stepID("MICH-W4"), kind: .work,     goal: .distance(metres: 400),  alert: .paceZone(PaceZoneName.interval,  vdot: 40))),
+            .step(WorkoutStep(
+                id: stepID("MICH-CD"),
                 kind: .cooldown,
                 goal: .time(seconds: 10 * 60),
                 alert: .paceZone(PaceZoneName.easy, vdot: 40)

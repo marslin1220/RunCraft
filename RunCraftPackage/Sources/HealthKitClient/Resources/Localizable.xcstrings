@@ -4,45 +4,37 @@
     "15–60 min" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "15–60 分鐘"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "15〜60 分" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "15–60분" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "15–60 分钟" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "15–60 分鐘" } }
       }
     },
     "1h 10m–3h" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 小時 10 分 – 3 小時"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "1 時間 10 分〜3 時間" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "1시간 10분–3시간" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "1 小时 10 分 – 3 小时" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "1 小時 10 分 – 3 小時" } }
       }
     },
     "30–90 min" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30–90 分鐘"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "30〜90 分" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "30–90분" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "30–90 分钟" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "30–90 分鐘" } }
       }
     },
     "Half Marathon" : {
       "extractionState" : "manual",
       "localizations" : {
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "半程馬拉松"
-          }
-        }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ハーフマラソン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "하프 마라톤" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "半程马拉松" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "半程馬拉松" } }
       }
     }
   },

@@ -6,6 +6,9 @@
 	<array>
 		<string>en</string>
 		<string>zh-Hant</string>
+		<string>zh-Hans</string>
+		<string>ja</string>
+		<string>ko</string>
 	</array>
 	<key>NSHealthShareUsageDescription</key>
 	<string>RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days for your training plan.</string>
