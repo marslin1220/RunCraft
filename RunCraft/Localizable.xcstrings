@@ -1,0 +1,204 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Adjust ${applicationName} VDOT to \\(\\.$vdot)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整 ${applicationName} 的 VDOT 為 \\(\\.$vdot)"
+          }
+        }
+      }
+    },
+    "Log a completed run in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 記錄一筆完成的跑步"
+          }
+        }
+      }
+    },
+    "Log a run in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 記錄一筆跑步"
+          }
+        }
+      }
+    },
+    "Log Run" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記錄跑步"
+          }
+        }
+      }
+    },
+    "Record a run in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 記錄跑步"
+          }
+        }
+      }
+    },
+    "Run \\(\\.$workout) in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 跑 \\(\\.$workout)"
+          }
+        }
+      }
+    },
+    "Send \\(\\.$workout) to my Watch in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把 \\(\\.$workout) 從 ${applicationName} 傳到我的 Apple Watch"
+          }
+        }
+      }
+    },
+    "Set my VDOT to \\(\\.$vdot) in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把 ${applicationName} 的 VDOT 設為 \\(\\.$vdot)"
+          }
+        }
+      }
+    },
+    "Set VDOT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定 VDOT"
+          }
+        }
+      }
+    },
+    "Show today's run in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示 ${applicationName} 今天的跑步"
+          }
+        }
+      }
+    },
+    "Start \\(\\.$workout) in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 開始 \\(\\.$workout)"
+          }
+        }
+      }
+    },
+    "Start \\(\\.$workout) workout in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 開始 \\(\\.$workout) 訓練"
+          }
+        }
+      }
+    },
+    "Start Workout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始訓練"
+          }
+        }
+      }
+    },
+    "Today's Training" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的訓練"
+          }
+        }
+      }
+    },
+    "Update ${applicationName} VDOT to \\(\\.$vdot)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新 ${applicationName} 的 VDOT 為 \\(\\.$vdot)"
+          }
+        }
+      }
+    },
+    "${applicationName} today's session" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 今天的訓練"
+          }
+        }
+      }
+    },
+    "What's today's ${applicationName} training" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的 ${applicationName} 訓練是什麼"
+          }
+        }
+      }
+    },
+    "What's today's training in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 今天的訓練是什麼"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -21,7 +21,8 @@ public struct AdjustVDOTView: View {
                                 .font(.system(size: 56, weight: .bold, design: .rounded))
                                 .foregroundStyle(Color.brand.accent)
                                 .monospacedDigit()
-                            Text("VDOT")
+                            // Acronym — never localized. See LOCALIZATION.md §2.2.
+                            Text(verbatim: "VDOT")
                                 .font(.headline)
                                 .foregroundStyle(.secondary)
                         }

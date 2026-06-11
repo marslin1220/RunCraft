@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>zh-Hant</string>
+	</array>
 	<key>NSHealthShareUsageDescription</key>
 	<string>RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days for your training plan.</string>
 	<key>NSHealthUpdateUsageDescription</key>

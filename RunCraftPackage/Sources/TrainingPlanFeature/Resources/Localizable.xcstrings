@@ -1,0 +1,655 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Adjust VDOT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整 VDOT"
+          }
+        }
+      }
+    },
+    "Adjust VDOT manually" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手動調整 VDOT"
+          }
+        }
+      }
+    },
+    "Auto-detect from HealthKit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從 HealthKit 自動偵測"
+          }
+        }
+      }
+    },
+    "Beginner" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "初學者"
+          }
+        }
+      }
+    },
+    "Best detected VDOT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "偵測到的最佳 VDOT"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        }
+      }
+    },
+    "Competitive club" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "競技俱樂部"
+          }
+        }
+      }
+    },
+    "Create Race Goal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "建立比賽目標"
+          }
+        }
+      }
+    },
+    "Create your first race goal and we'll build a personalised 16-week training plan." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "建立你的第一個比賽目標，我們會為你打造 16 週的個人化訓練計畫。"
+          }
+        }
+      }
+    },
+    "days" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "天"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除"
+          }
+        }
+      }
+    },
+    "Delete plan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除計畫"
+          }
+        }
+      }
+    },
+    "Dismiss recovery advice" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉恢復建議"
+          }
+        }
+      }
+    },
+    "Dismiss VDOT upgrade" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關閉 VDOT 提升通知"
+          }
+        }
+      }
+    },
+    "Distance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "距離"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        }
+      }
+    },
+    "Edit goal / recalculate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯目標／重新計算"
+          }
+        }
+      }
+    },
+    "Edit Race Goal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編輯比賽目標"
+          }
+        }
+      }
+    },
+    "Elite amateur" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "業餘菁英"
+          }
+        }
+      }
+    },
+    "Enter a goal name to continue." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請輸入目標名稱以繼續。"
+          }
+        }
+      }
+    },
+    "Enter a recent race time (e.g. 5K in 25 min) and the app uses the Jack Daniels formula to derive your VDOT. A faster race time = higher VDOT." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入近期的比賽成績（例如 5K 跑 25 分鐘），App 會用 Jack Daniels 公式推算你的 VDOT。成績愈快、VDOT 愈高。"
+          }
+        }
+      }
+    },
+    "Enter a recent race time, or tap Auto-detect, so we can calculate your VDOT." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入近期比賽成績、或按下「自動偵測」，我們就能算出你的 VDOT。"
+          }
+        }
+      }
+    },
+    "Finish time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完賽時間"
+          }
+        }
+      }
+    },
+    "Fitness Level (VDOT)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "體能水準（VDOT）"
+          }
+        }
+      }
+    },
+    "Full Schedule" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完整課表"
+          }
+        }
+      }
+    },
+    "How is it calculated?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "怎麼計算的？"
+          }
+        }
+      }
+    },
+    "New Race Goal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增比賽目標"
+          }
+        }
+      }
+    },
+    "No race goal yet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未設定比賽目標"
+          }
+        }
+      }
+    },
+    "Or auto-detect" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "或自動偵測"
+          }
+        }
+      }
+    },
+    "Plan starts in %lld day%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "計畫將在 %lld 天%@後開始"
+          }
+        }
+      }
+    },
+    "Professional" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "職業選手"
+          }
+        }
+      }
+    },
+    "Race date" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "比賽日期"
+          }
+        }
+      }
+    },
+    "Race Goal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "比賽目標"
+          }
+        }
+      }
+    },
+    "Recovery looks low today" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天恢復狀況不佳"
+          }
+        }
+      }
+    },
+    "Recreational" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "休閒跑者"
+          }
+        }
+      }
+    },
+    "Resulting Paces" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "得出的配速"
+          }
+        }
+      }
+    },
+    "RunCraft uses your VDOT to set your five training pace zones — Easy, Marathon, Threshold, Interval, and Repetition — so every session targets the right physiological adaptation." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RunCraft 用你的 VDOT 設定五個訓練配速區間 — 輕鬆、馬拉松、乳酸閾值、間歇、反覆衝刺 — 讓每次訓練都打到對的生理適應。"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存"
+          }
+        }
+      }
+    },
+    "Scans your HealthKit running history for a best 5K, 10K or half marathon time." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "掃描你 HealthKit 中的跑步紀錄，找出最佳的 5K、10K 或半馬成績。"
+          }
+        }
+      }
+    },
+    "Sending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "傳送中"
+          }
+        }
+      }
+    },
+    "Start" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始"
+          }
+        }
+      }
+    },
+    "Swap to Easy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "改為輕鬆跑"
+          }
+        }
+      }
+    },
+    "THIS WEEK" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本週"
+          }
+        }
+      }
+    },
+    "Training Paces" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訓練配速"
+          }
+        }
+      }
+    },
+    "Typical VDOT ranges" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "常見 VDOT 區間"
+          }
+        }
+      }
+    },
+    "Update paces" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新配速"
+          }
+        }
+      }
+    },
+    "Update your training paces to match?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要更新訓練配速來搭配嗎？"
+          }
+        }
+      }
+    },
+    "Use the stepper to adjust. Changes only commit when you tap Save." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用步進器調整。按下「儲存」後才會生效。"
+          }
+        }
+      }
+    },
+    "VDOT improved" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VDOT 提升了"
+          }
+        }
+      }
+    },
+    "VDOT is a number that represents your current running fitness, developed by coach Jack Daniels. It is calculated from a recent race result and reflects the effective VO₂max you demonstrated on race day." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VDOT 是代表你目前跑步體能的數字，由 Jack Daniels 教練提出。它從近期的比賽成績推算而來，反映你比賽當天實際展現的 VO₂max。"
+          }
+        }
+      }
+    },
+    "We can swap today's hard session for an easy 5 km run." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我們可以把今天的高強度訓練換成 5 公里的輕鬆跑。"
+          }
+        }
+      }
+    },
+    "Week %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 %lld 週"
+          }
+        }
+      }
+    },
+    "Week %lld · %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 %lld 週 · %@"
+          }
+        }
+      }
+    },
+    "Week %lld of 16 · %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 %lld 週／共 16 週 · %@"
+          }
+        }
+      }
+    },
+    "Week 1 preview · %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 1 週預覽 · %@"
+          }
+        }
+      }
+    },
+    "What is VDOT?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "什麼是 VDOT？"
+          }
+        }
+      }
+    },
+    "Why does it matter?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "為什麼重要？"
+          }
+        }
+      }
+    },
+    "Your Training Paces" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的訓練配速"
+          }
+        }
+      }
+    },
+    "Your VDOT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的 VDOT"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -33,7 +33,7 @@ public struct SetupRaceGoalView: View {
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
-                        Text("km")
+                        Text(verbatim: "km")
                             .foregroundStyle(.secondary)
                         Stepper("Distance", value: $store.distanceKm, in: 1...100, step: 1)
                             .labelsHidden()

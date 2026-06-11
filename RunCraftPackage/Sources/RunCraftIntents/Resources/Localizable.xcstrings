@@ -1,0 +1,413 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Daniels' VDOT score. Typically 30 (beginner) to 85 (elite)." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daniels VDOT 數值。一般落在 30（初學者）到 85（菁英）之間。"
+          }
+        }
+      }
+    },
+    "Distance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "距離"
+          }
+        }
+      }
+    },
+    "Duration" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時長"
+          }
+        }
+      }
+    },
+    "How far you ran, in kilometres." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跑了多遠（公里）。"
+          }
+        }
+      }
+    },
+    "How long the run took, in minutes." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跑了多久（分鐘）。"
+          }
+        }
+      }
+    },
+    "How many kilometres did you run?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跑了幾公里？"
+          }
+        }
+      }
+    },
+    "How many minutes did it take?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "花了幾分鐘？"
+          }
+        }
+      }
+    },
+    "I don't see a RunCraft plan for today. Open the app and set up a race goal to generate one." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天沒有 RunCraft 的訓練。打開 App 設定比賽目標就會產生計畫。"
+          }
+        }
+      }
+    },
+    "Log a completed run" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記錄完成的跑步"
+          }
+        }
+      }
+    },
+    "Logged to RunCraft" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已記錄到 RunCraft"
+          }
+        }
+      }
+    },
+    "Manually adjust the VDOT that RunCraft uses to compute pace zones." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手動調整 RunCraft 用來計算配速區間的 VDOT。"
+          }
+        }
+      }
+    },
+    "No plan yet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚無計畫"
+          }
+        }
+      }
+    },
+    "Open RunCraft and set up a race goal to generate a training plan." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打開 RunCraft 設定比賽目標來產生訓練計畫。"
+          }
+        }
+      }
+    },
+    "Read the planned RunCraft session for today out loud, with target distance, duration and pace." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把今天 RunCraft 的訓練念給你聽，包括目標距離、時長與配速。"
+          }
+        }
+      }
+    },
+    "Run recorded" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已記錄跑步"
+          }
+        }
+      }
+    },
+    "Save a run you finished without HealthKit tracking. Records distance, duration and average pace." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記錄沒有透過 HealthKit 追蹤的跑步，會儲存距離、時長與平均配速。"
+          }
+        }
+      }
+    },
+    "Send a RunCraft workout to your paired Apple Watch and start it in the Workout app." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把 RunCraft 的訓練傳到配對的 Apple Watch，並在「體能訓練」App 中啟動。"
+          }
+        }
+      }
+    },
+    "Sent to Apple Watch" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已傳送到 Apple Watch"
+          }
+        }
+      }
+    },
+    "Set VDOT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定 VDOT"
+          }
+        }
+      }
+    },
+    "Start a workout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始一份訓練"
+          }
+        }
+      }
+    },
+    "Start Workout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始訓練"
+          }
+        }
+      }
+    },
+    "Today's training" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的訓練"
+          }
+        }
+      }
+    },
+    "Today's Training" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的訓練"
+          }
+        }
+      }
+    },
+    "Today's Training Session" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的訓練"
+          }
+        }
+      }
+    },
+    "Training" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訓練"
+          }
+        }
+      }
+    },
+    "VDOT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VDOT"
+          }
+        }
+      }
+    },
+    "VDOT updated" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VDOT 已更新"
+          }
+        }
+      }
+    },
+    "Visible in the Insights tab." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可在「數據分析」分頁查看。"
+          }
+        }
+      }
+    },
+    "Watch unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch 無法使用"
+          }
+        }
+      }
+    },
+    "What's today's training?" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的訓練是什麼？"
+          }
+        }
+      }
+    },
+    "Which template to send to your Apple Watch." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要把哪一份範本傳到 Apple Watch。"
+          }
+        }
+      }
+    },
+    "WorkoutKit isn't available on this device." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這台裝置無法使用 WorkoutKit。"
+          }
+        }
+      }
+    },
+    "Open Workouts on your Apple Watch within a minute." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請在一分鐘內打開 Apple Watch 上的「體能訓練」。"
+          }
+        }
+      }
+    },
+    "Open RunCraft and try Start Workout from the editor." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打開 RunCraft，在編輯器中按「開始訓練」再試一次。"
+          }
+        }
+      }
+    },
+    "Couldn't send" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法傳送"
+          }
+        }
+      }
+    },
+    "Log Run" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記錄跑步"
+          }
+        }
+      }
+    },
+    "Workout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訓練"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

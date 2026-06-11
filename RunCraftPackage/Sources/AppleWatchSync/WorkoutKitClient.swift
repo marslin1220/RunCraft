@@ -42,10 +42,14 @@ public enum WorkoutKitError: LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .unsupportedPlatform: "WorkoutKit requires iOS 17 or later."
-        case .watchNotPaired:      "No paired Apple Watch found. Pair a Watch in the Watch app."
-        case .notAuthorized:       "Apple Watch workout sync is not authorised. Tap to allow in Settings."
-        case .conversionFailed(let r): "Could not convert workout: \(r)"
+        case .unsupportedPlatform:
+            return String(localized: "WorkoutKit requires iOS 17 or later.", bundle: .module)
+        case .watchNotPaired:
+            return String(localized: "No paired Apple Watch found. Pair a Watch in the Watch app.", bundle: .module)
+        case .notAuthorized:
+            return String(localized: "Apple Watch workout sync is not authorised. Tap to allow in Settings.", bundle: .module)
+        case .conversionFailed(let r):
+            return String(localized: "Could not convert workout: \(r)", bundle: .module)
         }
     }
 }

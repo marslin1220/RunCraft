@@ -11,12 +11,12 @@ public enum SessionType: String, Sendable, Equatable, CaseIterable, Codable, Que
 
     public var displayName: String {
         switch self {
-        case .easy:       "Easy Run"
-        case .tempo:      "Tempo Run"
-        case .interval:   "Intervals"
-        case .long:       "Long Run"
-        case .repetition: "Repetitions"
-        case .rest:       "Rest"
+        case .easy:       String(localized: "Easy Run",   bundle: .module)
+        case .tempo:      String(localized: "Tempo Run",  bundle: .module)
+        case .interval:   String(localized: "Intervals",  bundle: .module)
+        case .long:       String(localized: "Long Run",   bundle: .module)
+        case .repetition: String(localized: "Repetitions", bundle: .module)
+        case .rest:       String(localized: "Rest",       bundle: .module)
         }
     }
 

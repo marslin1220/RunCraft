@@ -1,0 +1,50 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Apple Watch workout sync is not authorised. Tap to allow in Settings." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch 訓練同步尚未授權。請至「設定」中允許。"
+          }
+        }
+      }
+    },
+    "Could not convert workout: %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法轉換訓練：%@"
+          }
+        }
+      }
+    },
+    "No paired Apple Watch found. Pair a Watch in the Watch app." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找不到配對的 Apple Watch。請在 Watch app 中配對手錶。"
+          }
+        }
+      }
+    },
+    "WorkoutKit requires iOS 17 or later." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WorkoutKit 需要 iOS 17 或更新版本。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -81,18 +81,18 @@ public enum RaceDistanceQuery: String, Sendable, CaseIterable, Equatable, Hashab
 
     public var displayName: String {
         switch self {
-        case .fiveK:        "5K"
+        case .fiveK:        "5K"  // universal — never localized
         case .tenK:         "10K"
-        case .halfMarathon: "Half Marathon"
+        case .halfMarathon: String(localized: "Half Marathon", bundle: .module)
         }
     }
 
     /// Typical finish time range hint shown in UI.
     public var typicalRange: String {
         switch self {
-        case .fiveK:        "15–60 min"
-        case .tenK:         "30–90 min"
-        case .halfMarathon: "1h 10m–3h"
+        case .fiveK:        String(localized: "15–60 min",   bundle: .module)
+        case .tenK:         String(localized: "30–90 min",   bundle: .module)
+        case .halfMarathon: String(localized: "1h 10m–3h",   bundle: .module)
         }
     }
 }

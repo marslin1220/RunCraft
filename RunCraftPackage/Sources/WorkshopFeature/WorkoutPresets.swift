@@ -64,7 +64,9 @@ public enum WorkoutPresets {
     /// Continuous 20-minute effort at T pace. Pure threshold training.
     public static let tempoRun: WorkoutTemplate = .init(
         id: presetID("TEMPO-RUN"),
-        name: "Tempo Run",
+        // Descriptive — translated per locale. Named-after-person presets
+        // (Yasso, Mona) stay English as proper nouns. See LOCALIZATION.md §2.4.
+        name: String(localized: "Tempo Run", bundle: .module),
         blocks: [
             .step(WorkoutStep(
                 id: stepID("TEMPO-WU"),
@@ -92,7 +94,7 @@ public enum WorkoutPresets {
     /// Daniels-style cruise intervals: 3×1 mile at T pace with 60s recoveries.
     public static let thresholdCruiseIntervals: WorkoutTemplate = .init(
         id: presetID("CRUISE-3M"),
-        name: "Cruise Intervals 3×1 mile",
+        name: String(localized: "Cruise Intervals 3×1 mile", bundle: .module),
         blocks: [
             .step(WorkoutStep(
                 id: stepID("CRUISE-WU"),
@@ -132,7 +134,7 @@ public enum WorkoutPresets {
     /// Pyramid: 400-800-1200-800-400 at I pace. Classic variety session.
     public static let ladderWorkout: WorkoutTemplate = .init(
         id: presetID("LADDER"),
-        name: "Ladder 400→1200→400",
+        name: String(localized: "Ladder 400→1200→400", bundle: .module),
         blocks: [
             .step(WorkoutStep(
                 id: stepID("LAD-WU"),
@@ -223,7 +225,7 @@ public enum WorkoutPresets {
     /// Short E-pace shake-out run, ideal for the day after a hard session.
     public static let easyRecoveryRun: WorkoutTemplate = .init(
         id: presetID("EASY-RECOVERY"),
-        name: "Easy Recovery Run",
+        name: String(localized: "Easy Recovery Run", bundle: .module),
         blocks: [
             .step(WorkoutStep(
                 id: stepID("EASY-RUN"),

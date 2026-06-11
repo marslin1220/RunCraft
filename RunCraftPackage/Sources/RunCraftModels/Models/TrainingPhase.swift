@@ -9,10 +9,10 @@ public enum TrainingPhase: String, Sendable, Equatable, CaseIterable, Codable, Q
 
     public var displayName: String {
         switch self {
-        case .base:  "Base"
-        case .build: "Build"
-        case .peak:  "Peak"
-        case .taper: "Taper"
+        case .base:  String(localized: "Base",  bundle: .module)
+        case .build: String(localized: "Build", bundle: .module)
+        case .peak:  String(localized: "Peak",  bundle: .module)
+        case .taper: String(localized: "Taper", bundle: .module)
         }
     }
 }

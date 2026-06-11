@@ -145,7 +145,7 @@ struct EditStepSheet: View {
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.leading)
                     .frame(width: 36)
-                Text("/km").font(.caption).foregroundStyle(.secondary)
+                Text(verbatim: "/km").font(.caption).foregroundStyle(.secondary)
             }
         }
     }

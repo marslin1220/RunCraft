@@ -30,13 +30,17 @@ let package = Package(
     targets: [
         // MARK: - Core Logic
 
-        .target(name: "VDOTEngine"),
+        .target(
+            name: "VDOTEngine",
+            resources: [.process("Resources/Localizable.xcstrings")]
+        ),
 
         .target(
             name: "HealthKitClient",
             dependencies: [
                 .product(name: "Dependencies", package: "swift-dependencies"),
-            ]
+            ],
+            resources: [.process("Resources/Localizable.xcstrings")]
         ),
 
         .target(
@@ -46,7 +50,8 @@ let package = Package(
                 .product(name: "SQLiteData", package: "sqlite-data"),
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
-            ]
+            ],
+            resources: [.process("Resources/Localizable.xcstrings")]
         ),
 
         // MARK: - UI
@@ -65,7 +70,8 @@ let package = Package(
                 "RunCraftModels",
                 "WorkshopFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            ]
+            ],
+            resources: [.process("Resources/Localizable.xcstrings")]
         ),
 
         .target(
@@ -73,7 +79,8 @@ let package = Package(
             dependencies: [
                 "RunCraftModels",
                 .product(name: "Dependencies", package: "swift-dependencies"),
-            ]
+            ],
+            resources: [.process("Resources/Localizable.xcstrings")]
         ),
 
         .target(
@@ -86,7 +93,8 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
                 .product(name: "SQLiteData", package: "sqlite-data"),
-            ]
+            ],
+            resources: [.process("Resources/Localizable.xcstrings")]
         ),
 
         .target(
@@ -98,7 +106,8 @@ let package = Package(
                 "VDOTEngine",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SQLiteData", package: "sqlite-data"),
-            ]
+            ],
+            resources: [.process("Resources/Localizable.xcstrings")]
         ),
 
         .target(
@@ -112,7 +121,8 @@ let package = Package(
                 "VDOTEngine",
                 "WorkshopFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-            ]
+            ],
+            resources: [.process("Resources/Localizable.xcstrings")]
         ),
 
         // MARK: - App Intents (Siri / Spotlight / Apple Intelligence)
@@ -127,7 +137,8 @@ let package = Package(
                 "WorkshopFeature",
                 .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "SQLiteData", package: "sqlite-data"),
-            ]
+            ],
+            resources: [.process("Resources/Localizable.xcstrings")]
         ),
 
         // MARK: - Tests

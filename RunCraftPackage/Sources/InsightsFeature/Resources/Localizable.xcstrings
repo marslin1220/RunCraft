@@ -1,0 +1,182 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Apple Watch estimate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch 估計值"
+          }
+        }
+      }
+    },
+    "Apple Watch hasn't recorded enough VO₂max samples yet. They appear after outdoor runs with strong GPS + heart-rate signal." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch 還沒記錄到足夠的 VO₂max 樣本。GPS 與心率訊號良好的戶外跑步後才會出現。"
+          }
+        }
+      }
+    },
+    "Drives your plan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "驅動你的訓練計畫"
+          }
+        }
+      }
+    },
+    "Fitness trend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "體能趨勢"
+          }
+        }
+      }
+    },
+    "Initial" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "初始"
+          }
+        }
+      }
+    },
+    "Insights" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "數據分析"
+          }
+        }
+      }
+    },
+    "Manual" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手動"
+          }
+        }
+      }
+    },
+    "Need both VDOT history and VO₂max samples to compute the gap." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要 VDOT 歷史紀錄與 VO₂max 樣本才能計算差值。"
+          }
+        }
+      }
+    },
+    "No completed runs yet. They'll appear here after HealthKit syncs." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚無完成的跑步紀錄。HealthKit 同步後會出現在這裡。"
+          }
+        }
+      }
+    },
+    "Not enough history yet — log a race or finish a few hard sessions." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "還沒有足夠的歷史資料 — 記錄一場比賽，或完成幾次高強度訓練。"
+          }
+        }
+      }
+    },
+    "Predicted race times" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "預估比賽成績"
+          }
+        }
+      }
+    },
+    "Race time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "比賽成績"
+          }
+        }
+      }
+    },
+    "Set a VDOT in the Plan tab to see predictions." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「計畫」分頁設定 VDOT，這裡就會出現預估。"
+          }
+        }
+      }
+    },
+    "VDOT − VO₂max" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VDOT − VO₂max"
+          }
+        }
+      }
+    },
+    "Weekly mileage · last 8 weeks" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "週跑量 · 近 8 週"
+          }
+        }
+      }
+    },
+    "Workout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訓練"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

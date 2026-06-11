@@ -1,0 +1,50 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "15–60 min" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15–60 分鐘"
+          }
+        }
+      }
+    },
+    "1h 10m–3h" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 小時 10 分 – 3 小時"
+          }
+        }
+      }
+    },
+    "30–90 min" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30–90 分鐘"
+          }
+        }
+      }
+    },
+    "Half Marathon" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "半程馬拉松"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -25,11 +25,11 @@ public enum PaceZoneName: String, CaseIterable, Equatable, Sendable, Codable {
 
     public var displayName: String {
         switch self {
-        case .easy:       "Easy"
-        case .marathon:   "Marathon"
-        case .threshold:  "Threshold"
-        case .interval:   "Interval"
-        case .repetition: "Repetition"
+        case .easy:       String(localized: "Easy",       bundle: .module)
+        case .marathon:   String(localized: "Marathon",   bundle: .module)
+        case .threshold:  String(localized: "Threshold",  bundle: .module)
+        case .interval:   String(localized: "Interval",   bundle: .module)
+        case .repetition: String(localized: "Repetition", bundle: .module)
         }
     }
 }

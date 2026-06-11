@@ -17,9 +17,9 @@ public enum RaceDistance: Sendable, Equatable, Codable {
 
     public var displayName: String {
         switch self {
-        case .fiveK:           "5K"
+        case .fiveK:           "5K"  // universal — never localized
         case .tenK:            "10K"
-        case .halfMarathon:    "Half Marathon"
+        case .halfMarathon:    String(localized: "Half Marathon", bundle: .module)
         case .custom(let km):  "\(km.formatted(.number.precision(.fractionLength(0...1)))) km"
         }
     }
