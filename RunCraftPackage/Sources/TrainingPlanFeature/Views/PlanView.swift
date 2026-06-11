@@ -54,6 +54,15 @@ public struct PlanView: View {
                                 onSessionTap: { store.send(.sessionTapped($0)) },
                                 onQuickStart: { store.send(.quickStartSession($0)) }
                             )
+                        } else if let upcoming = firstUpcomingWeek {
+                            // No current week but the plan exists — runner is
+                            // in the "race is more than 16 weeks out" gap.
+                            // Show when the plan kicks in plus a greyed-out
+                            // preview of week 1 so the page doesn't look empty.
+                            PrePlanPreviewSection(
+                                week: upcoming,
+                                vdot: store.currentVDOT
+                            )
                         }
 
                         if let zones = store.paceZones {
@@ -124,6 +133,17 @@ public struct PlanView: View {
 
     private var currentWeek: TrainingWeek? {
         TrainingWeek.current(in: allWeeks)
+    }
+
+    /// The next `TrainingWeek` to begin, used when `currentWeek` is nil
+    /// because the runner set a race more than 16 weeks out. Returns the
+    /// earliest week whose `startDate` is still in the future.
+    private var firstUpcomingWeek: TrainingWeek? {
+        guard currentWeek == nil else { return nil }
+        let today = Calendar.current.startOfDay(for: Date())
+        return allWeeks
+            .filter { $0.startDate > today }
+            .min(by: { $0.startDate < $1.startDate })
     }
 }
 
@@ -362,6 +382,160 @@ private struct WeekSessionsSection: View {
                     .order(by: \.dayOfWeek)
             )
         }
+    }
+}
+
+// MARK: - Pre-plan preview
+
+/// Surface for the "race is more than 16 weeks out" gap. Tells the runner
+/// when the plan kicks in and previews week 1 in a muted style so they
+/// know what's coming without the affordance to start it early.
+///
+/// No quick-start, no tap-into-editor — these sessions live in the future.
+private struct PrePlanPreviewSection: View {
+    let week: TrainingWeek
+    let vdot: Double
+    @FetchAll(PlannedSession.none) var sessions: [PlannedSession]
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+
+    private var daysUntilStart: Int {
+        Calendar.current.dateComponents(
+            [.day],
+            from: Calendar.current.startOfDay(for: Date()),
+            to: Calendar.current.startOfDay(for: week.startDate)
+        ).day ?? 0
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            startBanner
+            previewHeader
+            previewList
+        }
+        .task(id: week.id) { await loadSessions() }
+    }
+
+    /// Hero callout — the most important piece of info on this screen
+    /// when the plan hasn't started. Uses caution-tint so it reads as
+    /// "heads up" rather than "ready to go."
+    private var startBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "calendar.badge.clock")
+                .font(.title2)
+                .foregroundStyle(Color.brand.caution)
+                .frame(width: 36, height: 36)
+                .background(Color.brand.caution.opacity(0.15), in: Circle())
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Plan starts in \(daysUntilStart) day\(daysUntilStart == 1 ? "" : "s")")
+                    .font(.headline)
+                    .foregroundStyle(Color.brand.textPrimary)
+                Text(week.startDate, format: .dateTime.weekday(.wide).month().day())
+                    .font(.subheadline)
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color.brand.caution.opacity(0.3), lineWidth: 1)
+        )
+    }
+
+    private var previewHeader: some View {
+        HStack {
+            Text("Week 1 preview · \(week.phase.displayName)")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.brand.textSecondary)
+            Spacer()
+            Text("\(week.targetWeeklyKm, format: .number.precision(.fractionLength(0))) km")
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(Color.brand.textSecondary)
+        }
+        .padding(.horizontal, 4)
+        .padding(.top, 6)
+    }
+
+    /// Sessions render at 0.55 opacity to read as "not actionable yet."
+    /// Skip rest days for visual density — the preview is about giving
+    /// the runner a feel for the work, not a day-by-day shopping list.
+    @ViewBuilder
+    private var previewList: some View {
+        let runSessions = sessions.filter { $0.sessionType != .rest }
+        VStack(spacing: 8) {
+            ForEach(runSessions) { session in
+                PreviewSessionRow(session: session, vdot: vdot, paceUnit: paceUnit)
+            }
+        }
+        .opacity(0.55)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Week 1 preview, \(runSessions.count) sessions")
+    }
+
+    private func loadSessions() async {
+        _ = await withErrorReporting {
+            try await $sessions.load(
+                PlannedSession
+                    .where { $0.weekId.eq(week.id) }
+                    .order(by: \.dayOfWeek)
+            )
+        }
+    }
+}
+
+/// Lightweight row for the pre-plan preview. Deliberately simpler than
+/// `SessionCard` — no play button, no chevron, no quick-start. The whole
+/// list is rendered at reduced opacity by the parent.
+private struct PreviewSessionRow: View {
+    let session: PlannedSession
+    let vdot: Double
+    let paceUnit: PaceUnit
+
+    private var dayLabel: String {
+        let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        let idx = session.dayOfWeek - 1
+        guard idx >= 0, idx < days.count else { return "" }
+        return days[idx]
+    }
+
+    private var subtitle: String {
+        var pieces: [String] = []
+        if let km = session.targetDistanceKm {
+            pieces.append("\(km.formatted(.number.precision(.fractionLength(0...1)))) km")
+        } else if let min = session.targetDurationMin {
+            pieces.append("\(min) min")
+        }
+        if let zone = session.targetPaceZone, vdot > 0 {
+            let range = VDOTCalculator.paceRange(for: zone, vdot: vdot)
+            pieces.append(range.formatted(unit: paceUnit))
+        }
+        return pieces.joined(separator: " · ")
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: session.sessionType.symbolName)
+                .font(.subheadline)
+                .foregroundStyle(Color.brand.textSecondary)
+                .frame(width: 28, height: 28)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(dayLabel) · \(session.sessionType.displayName)")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.brand.textPrimary)
+                if !subtitle.isEmpty {
+                    Text(subtitle)
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

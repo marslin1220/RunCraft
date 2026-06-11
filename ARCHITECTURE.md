@@ -236,6 +236,14 @@ quick-start), then pace-zone chips at the bottom. The week strip sits
 do I run today?" — paces are reference data, the schedule is the
 action. Apple Workout follows the same hierarchy.
 
+**Pre-plan period.** When the race is more than 16 weeks out,
+`TrainingWeek.current(in:)` returns nil. `PlanView.firstUpcomingWeek`
+picks the earliest week whose `startDate` is still in the future, and
+`PrePlanPreviewSection` renders a caution-tinted "Plan starts in N
+days" banner plus a 55%-opacity preview of week 1 (rest days omitted).
+The preview rows are read-only — no quick-start, no tap-into-editor —
+because those sessions live in the future.
+
 **Cross-tab delegate.** `TrainingPlanFeature.Action` includes a
 `delegate(.openWorkoutInWorkshop(WorkoutTemplate, source))` case. The
 Plan tab emits it when the user taps a pace chip, a day in this week's
@@ -638,7 +646,6 @@ macOS host.
 | **iCloud sync via `SyncEngine`**      | SQLiteData supports CloudKit sync; we haven't enabled it. Single device only today. |
 | **App-level theme override**          | The user's system Appearance setting wins. A future Settings toggle (Auto / Light / Dark) could let runners pin a mode regardless of system. |
 | **HealthKit revocation handling**     | iOS doesn't expose read-authorisation status. If the runner revokes Health permission in iOS Settings, our HealthKit-backed features (HRV banner, race-time detection, completed-workout sync-back) silently return empty data instead of failing loudly. A "Health permission lost — re-grant in Settings" banner would be the right escalation. |
-| **Pre-plan period UX**                | `TrainingPlanGenerator` rolls 16 weeks backward from the race date: a race more than 16 weeks out leaves a gap where the plan exists in the DB but `TrainingWeek.current(in:)` returns `nil`, so the Plan tab renders countdown + paces only — no schedule strip. A "Plan starts in N days" badge plus a greyed-out preview of week 1 would close this loop. |
 
 ---
 
