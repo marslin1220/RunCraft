@@ -1,339 +1,1108 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "Couldn't send" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "送信できませんでした" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "전송할 수 없습니다" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法传送" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "無法傳送" } }
+  "sourceLanguage": "en",
+  "strings": {
+    "Couldn't send": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "送信できませんでした"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전송할 수 없습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法传送"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法傳送"
+          }
+        }
       }
     },
-    "Daniels' VDOT score. Typically 30 (beginner) to 85 (elite)." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Daniels VDOT スコア。通常は 30（初心者）〜85（エリート）の範囲です。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Daniels VDOT 점수. 보통 30(초보자)에서 85(엘리트) 사이입니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Daniels VDOT 数值。一般落在 30（初学者）到 85（精英）之间。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "Daniels VDOT 數值。一般落在 30（初學者）到 85（菁英）之間。" } }
+    "Daniels' VDOT score. Typically 30 (beginner) to 85 (elite).": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daniels VDOT スコア。通常は 30（初心者）〜85（エリート）の範囲です。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daniels VDOT 점수. 보통 30(초보자)에서 85(엘리트) 사이입니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daniels VDOT 数值。一般落在 30（初学者）到 85（精英）之间。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daniels VDOT 數值。一般落在 30（初學者）到 85（菁英）之間。"
+          }
+        }
       }
     },
-    "Distance" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "距離" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "거리" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "距离" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "距離" } }
+    "Distance": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距離"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "거리"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距离"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距離"
+          }
+        }
       }
     },
-    "Duration" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "時間" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "시간" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "时长" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "時長" } }
+    "Duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時間"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시간"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时长"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時長"
+          }
+        }
       }
     },
-    "How far you ran, in kilometres." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "走った距離（キロメートル）。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "달린 거리(킬로미터)." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "跑了多远（公里）。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "跑了多遠（公里）。" } }
+    "How far you ran, in kilometres.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "走った距離（キロメートル）。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "달린 거리(킬로미터)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跑了多远（公里）。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跑了多遠（公里）。"
+          }
+        }
       }
     },
-    "How long the run took, in minutes." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ランの所要時間（分）。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "달린 시간(분)." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "跑了多久（分钟）。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "跑了多久（分鐘）。" } }
+    "How long the run took, in minutes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ランの所要時間（分）。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "달린 시간(분)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跑了多久（分钟）。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跑了多久（分鐘）。"
+          }
+        }
       }
     },
-    "How many kilometres did you run?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "何キロ走りましたか？" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "몇 킬로미터 달렸나요?" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "跑了几公里？" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "跑了幾公里？" } }
+    "How many kilometres did you run?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "何キロ走りましたか？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "몇 킬로미터 달렸나요?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跑了几公里？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跑了幾公里？"
+          }
+        }
       }
     },
-    "How many minutes did it take?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "何分かかりましたか？" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "몇 분 걸렸나요?" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "花了几分钟？" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "花了幾分鐘？" } }
+    "How many minutes did it take?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "何分かかりましたか？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "몇 분 걸렸나요?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "花了几分钟？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "花了幾分鐘？"
+          }
+        }
       }
     },
-    "I don't see a RunCraft plan for today. Open the app and set up a race goal to generate one." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日の RunCraft プランは見つかりません。App を開いてレース目標を設定してください。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘 RunCraft 계획이 없습니다. 앱을 열어 레이스 목표를 설정하세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天没有 RunCraft 的训练。打开 App 设定比赛目标就会产生计划。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天沒有 RunCraft 的訓練。打開 App 設定比賽目標就會產生計畫。" } }
+    "I don't see a RunCraft plan for today. Open the app and set up a race goal to generate one.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日の RunCraft プランは見つかりません。App を開いてレース目標を設定してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘 RunCraft 계획이 없습니다. 앱을 열어 레이스 목표를 설정하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天没有 RunCraft 的训练。打开 App 设定比赛目标就会产生计划。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天沒有 RunCraft 的訓練。打開 App 設定比賽目標就會產生計畫。"
+          }
+        }
       }
     },
-    "Log a completed run" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "完了したランを記録" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "완료된 러닝 기록" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "记录完成的跑步" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "記錄完成的跑步" } }
+    "Log Run": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ランを記録"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "러닝 기록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录跑步"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記錄跑步"
+          }
+        }
       }
     },
-    "Log Run" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ランを記録" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "러닝 기록" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "记录跑步" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "記錄跑步" } }
+    "Log a completed run": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了したランを記録"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료된 러닝 기록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录完成的跑步"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記錄完成的跑步"
+          }
+        }
       }
     },
-    "Logged to RunCraft" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft に記録しました" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft에 기록되었습니다" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已记录到 RunCraft" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已記錄到 RunCraft" } }
+    "Logged to RunCraft": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft に記録しました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft에 기록되었습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已记录到 RunCraft"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已記錄到 RunCraft"
+          }
+        }
       }
     },
-    "Manually adjust the VDOT that RunCraft uses to compute pace zones." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft がペースゾーンを計算するために使う VDOT を手動で調整します。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft가 페이스 존을 계산하는 데 사용하는 VDOT을 수동으로 조정합니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "手动调整 RunCraft 用来计算配速区间的 VDOT。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "手動調整 RunCraft 用來計算配速區間的 VDOT。" } }
+    "Manually adjust the VDOT that RunCraft uses to compute pace zones.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft がペースゾーンを計算するために使う VDOT を手動で調整します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft가 페이스 존을 계산하는 데 사용하는 VDOT을 수동으로 조정합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手动调整 RunCraft 用来计算配速区间的 VDOT。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手動調整 RunCraft 用來計算配速區間的 VDOT。"
+          }
+        }
       }
     },
-    "No plan yet" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プラン未設定" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "계획 없음" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "尚无计划" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "尚無計畫" } }
+    "No plan yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プラン未設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계획 없음"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚无计划"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無計畫"
+          }
+        }
       }
     },
-    "Open RunCraft and set up a race goal to generate a training plan." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft を開いてレース目標を設定すると、トレーニングプランが生成されます。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft을 열어 레이스 목표를 설정하면 훈련 계획이 생성됩니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开 RunCraft 设定比赛目标来产生训练计划。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "打開 RunCraft 設定比賽目標來產生訓練計畫。" } }
+    "Open RunCraft and set up a race goal to generate a training plan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft を開いてレース目標を設定すると、トレーニングプランが生成されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft을 열어 레이스 목표를 설정하면 훈련 계획이 생성됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 RunCraft 设定比赛目标来产生训练计划。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打開 RunCraft 設定比賽目標來產生訓練計畫。"
+          }
+        }
       }
     },
-    "Open RunCraft and try Start Workout from the editor." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft を開いて、エディタから「ワークアウトを開始」をタップしてください。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft을 열어 에디터에서 \"운동 시작\"을 다시 눌러보세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开 RunCraft，在编辑器中按「开始训练」再试一次。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "打開 RunCraft，在編輯器中按「開始訓練」再試一次。" } }
+    "Open RunCraft and try Start Workout from the editor.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft を開いて、エディタから「ワークアウトを開始」をタップしてください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft을 열어 에디터에서 \"운동 시작\"을 다시 눌러보세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 RunCraft，在编辑器中按「开始训练」再试一次。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打開 RunCraft，在編輯器中按「開始訓練」再試一次。"
+          }
+        }
       }
     },
-    "Open Workouts on your Apple Watch within a minute." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "1 分以内に Apple Watch の「ワークアウト」を開いてください。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "1분 이내에 Apple Watch의 \"운동\"을 여세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请在一分钟内打开 Apple Watch 上的「体能训练」。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "請在一分鐘內打開 Apple Watch 上的「體能訓練」。" } }
+    "Open Workouts on your Apple Watch within a minute.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 分以内に Apple Watch の「ワークアウト」を開いてください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1분 이내에 Apple Watch의 \"운동\"을 여세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在一分钟内打开 Apple Watch 上的「体能训练」。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請在一分鐘內打開 Apple Watch 上的「體能訓練」。"
+          }
+        }
       }
     },
-    "Read the planned RunCraft session for today out loud, with target distance, duration and pace." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日の RunCraft セッションを目標距離・時間・ペース付きで読み上げます。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘의 RunCraft 세션을 목표 거리, 시간, 페이스와 함께 읽어줍니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "把今天 RunCraft 的训练念给你听，包括目标距离、时长与配速。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "把今天 RunCraft 的訓練念給你聽，包括目標距離、時長與配速。" } }
+    "Read the planned RunCraft session for today out loud, with target distance, duration and pace.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日の RunCraft セッションを目標距離・時間・ペース付きで読み上げます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘의 RunCraft 세션을 목표 거리, 시간, 페이스와 함께 읽어줍니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把今天 RunCraft 的训练念给你听，包括目标距离、时长与配速。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把今天 RunCraft 的訓練念給你聽，包括目標距離、時長與配速。"
+          }
+        }
       }
     },
-    "Run recorded" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ラン記録完了" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "러닝 기록됨" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已记录跑步" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已記錄跑步" } }
+    "Run recorded": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ラン記録完了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "러닝 기록됨"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已记录跑步"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已記錄跑步"
+          }
+        }
       }
     },
-    "Save a run you finished without HealthKit tracking. Records distance, duration and average pace." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "HealthKit で計測していないランを保存します。距離・時間・平均ペースを記録します。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "HealthKit으로 추적하지 않은 러닝을 저장합니다. 거리, 시간, 평균 페이스를 기록합니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "记录没有透过 HealthKit 追踪的跑步，会储存距离、时长与平均配速。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "記錄沒有透過 HealthKit 追蹤的跑步，會儲存距離、時長與平均配速。" } }
+    "Save a run you finished without HealthKit tracking. Records distance, duration and average pace.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HealthKit で計測していないランを保存します。距離・時間・平均ペースを記録します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HealthKit으로 추적하지 않은 러닝을 저장합니다. 거리, 시간, 평균 페이스를 기록합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录没有透过 HealthKit 追踪的跑步，会储存距离、时长与平均配速。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記錄沒有透過 HealthKit 追蹤的跑步，會儲存距離、時長與平均配速。"
+          }
+        }
       }
     },
-    "Send a RunCraft workout to your paired Apple Watch and start it in the Workout app." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ペアリング済みの Apple Watch に RunCraft ワークアウトを送信し、「ワークアウト」アプリで開始します。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "페어링된 Apple Watch에 RunCraft 운동을 보내고 \"운동\" 앱에서 시작합니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "把 RunCraft 的训练传到配对的 Apple Watch，并在「体能训练」App 中启动。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "把 RunCraft 的訓練傳到配對的 Apple Watch，並在「體能訓練」App 中啟動。" } }
+    "Send a RunCraft workout to your paired Apple Watch and start it in the Workout app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ペアリング済みの Apple Watch に RunCraft ワークアウトを送信し、「ワークアウト」アプリで開始します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페어링된 Apple Watch에 RunCraft 운동을 보내고 \"운동\" 앱에서 시작합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把 RunCraft 的训练传到配对的 Apple Watch，并在「体能训练」App 中启动。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把 RunCraft 的訓練傳到配對的 Apple Watch，並在「體能訓練」App 中啟動。"
+          }
+        }
       }
     },
-    "Sent to Apple Watch" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch に送信しました" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch로 전송됨" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已传送到 Apple Watch" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已傳送到 Apple Watch" } }
+    "Sent to Apple Watch": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch に送信しました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch로 전송됨"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已传送到 Apple Watch"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已傳送到 Apple Watch"
+          }
+        }
       }
     },
-    "Set VDOT" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT を設定" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 설정" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设定 VDOT" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "設定 VDOT" } }
+    "Set VDOT": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT を設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 설정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设定 VDOT"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定 VDOT"
+          }
+        }
       }
     },
-    "Start a workout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウトを開始" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동 시작" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始一份训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開始一份訓練" } }
+    "Set up a race goal in RunCraft to apply this to your plan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft でレース目標を設定すると、この変更がプランに適用されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft에서 레이스 목표를 설정하면 이 변경이 계획에 적용됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 RunCraft 设定比赛目标，这个变更才会应用到你的计划。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 RunCraft 設定比賽目標，這個變更才會套用到你的計畫。"
+          }
+        }
       }
     },
-    "Start Workout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウトを開始" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동 시작" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開始訓練" } }
+    "Start Workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウトを開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동 시작"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始訓練"
+          }
+        }
       }
     },
-    "Today's training" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日のトレーニング" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘의 훈련" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天的训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天的訓練" } }
+    "Start a workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウトを開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동 시작"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始一份训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始一份訓練"
+          }
+        }
       }
     },
-    "Today's Training" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日のトレーニング" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘의 훈련" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天的训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天的訓練" } }
+    "Today's Training": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日のトレーニング"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘의 훈련"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的訓練"
+          }
+        }
       }
     },
-    "Today's Training Session" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日のトレーニング" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘의 훈련" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天的训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天的訓練" } }
+    "Today's Training Session": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日のトレーニング"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘의 훈련"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的訓練"
+          }
+        }
       }
     },
-    "Training" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "トレーニング" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "훈련" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "訓練" } }
+    "Today's training": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日のトレーニング"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘의 훈련"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的訓練"
+          }
+        }
       }
     },
-    "VDOT" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "VDOT" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "VDOT" } }
+    "Training": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トレーニング"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "훈련"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訓練"
+          }
+        }
       }
     },
-    "VDOT updated" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT を更新しました" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 업데이트됨" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 已更新" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 已更新" } }
+    "VDOT": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT"
+          }
+        }
       }
     },
-    "Visible in the Insights tab." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "「インサイト」タブで確認できます。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "\"인사이트\" 탭에서 확인할 수 있습니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "可在「数据分析」分页查看。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "可在「數據分析」分頁查看。" } }
+    "VDOT updated": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT を更新しました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 업데이트됨"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 已更新"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 已更新"
+          }
+        }
       }
     },
-    "Watch unavailable" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch を利用できません" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 사용 불가" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 无法使用" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 無法使用" } }
+    "Visible in the Insights tab.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「インサイト」タブで確認できます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"인사이트\" 탭에서 확인할 수 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可在「数据分析」分页查看。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可在「數據分析」分頁查看。"
+          }
+        }
       }
     },
-    "What's today's training?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日のトレーニングは？" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘 훈련은 뭐예요?" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天的训练是什么？" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天的訓練是什麼？" } }
+    "Watch unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch を利用できません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch 사용 불가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch 无法使用"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch 無法使用"
+          }
+        }
       }
     },
-    "Which template to send to your Apple Watch." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch に送信するテンプレートを選択。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch에 보낼 템플릿을 선택하세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "要把哪一份模板传到 Apple Watch。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "要把哪一份範本傳到 Apple Watch。" } }
+    "What's today's training?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日のトレーニングは？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘 훈련은 뭐예요?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的训练是什么？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的訓練是什麼？"
+          }
+        }
       }
     },
-    "Workout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウト" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "訓練" } }
+    "Which template to send to your Apple Watch.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch に送信するテンプレートを選択。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch에 보낼 템플릿을 선택하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要把哪一份模板传到 Apple Watch。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要把哪一份範本傳到 Apple Watch。"
+          }
+        }
       }
     },
-    "WorkoutKit isn't available on this device." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "このデバイスでは WorkoutKit を利用できません。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이 기기에서는 WorkoutKit을 사용할 수 없습니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "这台设备无法使用 WorkoutKit。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "這台裝置無法使用 WorkoutKit。" } }
+    "Workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訓練"
+          }
+        }
+      }
+    },
+    "WorkoutKit isn't available on this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイスでは WorkoutKit を利用できません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기에서는 WorkoutKit을 사용할 수 없습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台设备无法使用 WorkoutKit。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這台裝置無法使用 WorkoutKit。"
+          }
+        }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

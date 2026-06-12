@@ -1,168 +1,731 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "Apple Watch estimate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 推定値" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 추정치" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 估算值" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 估計值" } }
+  "sourceLanguage": "en",
+  "strings": {
+    "%@ predicted time %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 予測タイム %2$@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 예측 기록 %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 预估成绩 %2$@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 預估成績 %2$@"
+          }
+        }
       }
     },
-    "Apple Watch hasn't recorded enough VO₂max samples yet. They appear after outdoor runs with strong GPS + heart-rate signal." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch にはまだ十分な VO₂max データがありません。GPS と心拍が安定した屋外ランの後に記録されます。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch에 VO₂max 샘플이 충분하지 않습니다. GPS와 심박이 안정적인 야외 러닝 후에 기록됩니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 还没有记录足够的 VO₂max 样本。在 GPS 和心率信号良好的户外跑步后才会出现。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 還沒記錄到足夠的 VO₂max 樣本。GPS 與心率訊號良好的戶外跑步後才會出現。" } }
+    "%@ update on %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ の %1$@ 更新"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@의 %1$@ 업데이트"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ 的 %1$@ 更新"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ 的 %1$@ 更新"
+          }
+        }
       }
     },
-    "Drives your plan" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プランの基準" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "계획의 기준" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "驱动你的训练计划" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "驅動你的訓練計畫" } }
+    "%@, %@, %@, pace %@ %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@、%2$@、%3$@、ペース %4$@ %5$@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$@, 페이스 %4$@ %5$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@，%2$@，%3$@，配速 %4$@ %5$@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@，%2$@，%3$@，配速 %4$@ %5$@"
+          }
+        }
       }
     },
-    "Fitness trend" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "体力トレンド" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "체력 추이" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "体能趋势" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "體能趨勢" } }
+    "Apple Watch estimate": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch 推定値"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch 추정치"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch 估算值"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch 估計值"
+          }
+        }
       }
     },
-    "Initial" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "初期値" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "초기" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "初始" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "初始" } }
+    "Apple Watch hasn't recorded enough VO₂max samples yet. They appear after outdoor runs with strong GPS + heart-rate signal.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch にはまだ十分な VO₂max データがありません。GPS と心拍が安定した屋外ランの後に記録されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch에 VO₂max 샘플이 충분하지 않습니다. GPS와 심박이 안정적인 야외 러닝 후에 기록됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch 还没有记录足够的 VO₂max 样本。在 GPS 和心率信号良好的户外跑步后才会出现。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch 還沒記錄到足夠的 VO₂max 樣本。GPS 與心率訊號良好的戶外跑步後才會出現。"
+          }
+        }
       }
     },
-    "Insights" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "インサイト" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "인사이트" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "数据分析" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "數據分析" } }
+    "Delta on %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ の差分"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@의 차이"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的差值"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的差值"
+          }
+        }
       }
     },
-    "Manual" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "手動" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "수동" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "手动" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "手動" } }
+    "Drives your plan": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プランの基準"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계획의 기준"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "驱动你的训练计划"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "驅動你的訓練計畫"
+          }
+        }
       }
     },
-    "Need both VDOT history and VO₂max samples to compute the gap." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "差分を計算するには、VDOT 履歴と VO₂max データの両方が必要です。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "차이를 계산하려면 VDOT 기록과 VO₂max 샘플이 모두 필요합니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "需要 VDOT 历史记录与 VO₂max 样本才能计算差值。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "需要 VDOT 歷史紀錄與 VO₂max 樣本才能計算差值。" } }
+    "Fitness trend": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体力トレンド"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체력 추이"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体能趋势"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "體能趨勢"
+          }
+        }
       }
     },
-    "No completed runs yet. They'll appear here after HealthKit syncs or after you log a run by voice." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "まだ完走ログがありません。HealthKit 同期後、または音声でランを記録するとここに表示されます。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "완료된 러닝이 없습니다. HealthKit이 동기화되거나 음성으로 러닝을 기록하면 여기에 표시됩니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "尚无完成的跑步记录。HealthKit 同步后或语音记录跑步后会出现在这里。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "尚無完成的跑步紀錄。HealthKit 同步後或語音記錄跑步後會出現在這裡。" } }
+    "Initial": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "初期値"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "초기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "初始"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "初始"
+          }
+        }
       }
     },
-    "Recent runs" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "最近のラン" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "최근 러닝" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "最近的跑步" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "最近的跑步" } }
+    "Insights": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インサイト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "인사이트"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据分析"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "數據分析"
+          }
+        }
       }
     },
-    "No completed runs yet. They'll appear here after HealthKit syncs." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "まだ完走ログがありません。HealthKit が同期されるとここに表示されます。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "완료된 러닝이 없습니다. HealthKit이 동기화되면 여기에 표시됩니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "尚无完成的跑步记录。HealthKit 同步后会出现在这里。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "尚無完成的跑步紀錄。HealthKit 同步後會出現在這裡。" } }
+    "Manual": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手動"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수동"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手动"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手動"
+          }
+        }
       }
     },
-    "Not enough history yet — log a race or finish a few hard sessions." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "まだ十分な履歴がありません — レースを記録するか、ハードなセッションをこなしてください。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "아직 기록이 부족합니다 — 레이스를 기록하거나 강도 높은 훈련을 완수하세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "还没有足够的历史数据 — 记录一场比赛，或完成几次高强度训练。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "還沒有足夠的歷史資料 — 記錄一場比賽，或完成幾次高強度訓練。" } }
+    "Need both VDOT history and VO₂max samples to compute the gap.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "差分を計算するには、VDOT 履歴と VO₂max データの両方が必要です。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "차이를 계산하려면 VDOT 기록과 VO₂max 샘플이 모두 필요합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要 VDOT 历史记录与 VO₂max 样本才能计算差值。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要 VDOT 歷史紀錄與 VO₂max 樣本才能計算差值。"
+          }
+        }
       }
     },
-    "Predicted race times" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "予測タイム" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "예측 기록" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "预估比赛成绩" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "預估比賽成績" } }
+    "No completed runs yet. They'll appear here after HealthKit syncs or after you log a run by voice.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まだ完走ログがありません。HealthKit 同期後、または音声でランを記録するとここに表示されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료된 러닝이 없습니다. HealthKit이 동기화되거나 음성으로 러닝을 기록하면 여기에 표시됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚无完成的跑步记录。HealthKit 同步后或语音记录跑步后会出现在这里。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無完成的跑步紀錄。HealthKit 同步後或語音記錄跑步後會出現在這裡。"
+          }
+        }
       }
     },
-    "Race time" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レースタイム" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레이스 기록" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "比赛成绩" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "比賽成績" } }
+    "No completed runs yet. They'll appear here after HealthKit syncs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まだ完走ログがありません。HealthKit が同期されるとここに表示されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료된 러닝이 없습니다. HealthKit이 동기화되면 여기에 표시됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚无完成的跑步记录。HealthKit 同步后会出现在这里。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無完成的跑步紀錄。HealthKit 同步後會出現在這裡。"
+          }
+        }
       }
     },
-    "Set a VDOT in the Plan tab to see predictions." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "「プラン」タブで VDOT を設定すると予測が表示されます。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "\"계획\" 탭에서 VDOT을 설정하면 예측이 표시됩니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在「计划」分页设定 VDOT，这里就会出现预测。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "在「計畫」分頁設定 VDOT，這裡就會出現預估。" } }
+    "Not enough history yet — log a race or finish a few hard sessions.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まだ十分な履歴がありません — レースを記録するか、ハードなセッションをこなしてください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아직 기록이 부족합니다 — 레이스를 기록하거나 강도 높은 훈련을 완수하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有足够的历史数据 — 记录一场比赛，或完成几次高强度训练。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "還沒有足夠的歷史資料 — 記錄一場比賽，或完成幾次高強度訓練。"
+          }
+        }
       }
     },
-    "VDOT − VO₂max" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT − VO₂max" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT − VO₂max" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "VDOT − VO₂max" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "VDOT − VO₂max" } }
+    "Predicted race times": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "予測タイム"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "예측 기록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "预估比赛成绩"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預估比賽成績"
+          }
+        }
       }
     },
-    "Weekly mileage · last 8 weeks" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "週間距離 · 直近 8 週間" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "주간 거리 · 최근 8주" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "周跑量 · 近 8 周" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "週跑量 · 近 8 週" } }
+    "Race time": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レースタイム"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "레이스 기록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "比赛成绩"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "比賽成績"
+          }
+        }
       }
     },
-    "Workout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウト" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "訓練" } }
+    "Recent runs": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近のラン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최근 러닝"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近的跑步"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近的跑步"
+          }
+        }
+      }
+    },
+    "Series": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "シリーズ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시리즈"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系列"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系列"
+          }
+        }
+      }
+    },
+    "Set a VDOT in the Plan tab to see predictions.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「プラン」タブで VDOT を設定すると予測が表示されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"계획\" 탭에서 VDOT을 설정하면 예측이 표시됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在「计划」分页设定 VDOT，这里就会出现预测。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在「計畫」分頁設定 VDOT，這裡就會出現預估。"
+          }
+        }
+      }
+    },
+    "VDOT − VO₂max": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT − VO₂max"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT − VO₂max"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT − VO₂max"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT − VO₂max"
+          }
+        }
+      }
+    },
+    "VO2max on %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ の VO2max"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@의 VO2max"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的 VO2max"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的 VO2max"
+          }
+        }
+      }
+    },
+    "Week of %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ の週"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 주"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 当周"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 當週"
+          }
+        }
+      }
+    },
+    "Weekly mileage · last 8 weeks": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週間距離 · 直近 8 週間"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주간 거리 · 최근 8주"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周跑量 · 近 8 周"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週跑量 · 近 8 週"
+          }
+        }
+      }
+    },
+    "Workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訓練"
+          }
+        }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

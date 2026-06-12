@@ -494,10 +494,7 @@ private struct PreviewSessionRow: View {
     let paceUnit: PaceUnit
 
     private var dayLabel: String {
-        let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        let idx = session.dayOfWeek - 1
-        guard idx >= 0, idx < days.count else { return "" }
-        return days[idx]
+        weekdayLabel(session.dayOfWeek)
     }
 
     private var subtitle: String {
@@ -606,10 +603,7 @@ private struct SessionCard: View {
     }
 
     private var dayLabel: String {
-        let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        let idx = session.dayOfWeek - 1
-        guard idx >= 0, idx < days.count else { return "" }
-        return days[idx]
+        weekdayLabel(session.dayOfWeek)
     }
 }
 
@@ -637,10 +631,7 @@ private struct RestSessionLine: View {
     }
 
     private var dayLabel: String {
-        let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        let idx = session.dayOfWeek - 1
-        guard idx >= 0, idx < days.count else { return "" }
-        return days[idx]
+        weekdayLabel(session.dayOfWeek)
     }
 }
 
@@ -1313,8 +1304,19 @@ private struct WeekSection: View {
     }
 
     private func dayLabel(_ day: Int) -> String {
-        let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        let idx = day - 1
-        return (idx >= 0 && idx < days.count) ? days[idx] : "?"
+        weekdayLabel(day)
     }
+}
+
+// MARK: - Weekday label helper
+
+/// Locale-aware short weekday label for a schema day index (Mon=1 … Sun=7).
+/// `Calendar.shortWeekdaySymbols` is Sunday-first, so `dayOfWeek % 7` maps
+/// Mon=1→index 1 … Sat=6→index 6 and Sun=7→index 0. Replaces four
+/// hardcoded English ["Mon"…] arrays that broke all non-English locales.
+fileprivate func weekdayLabel(_ dayOfWeek: Int) -> String {
+    let symbols = Calendar.current.shortWeekdaySymbols
+    let idx = dayOfWeek % 7
+    guard symbols.indices.contains(idx) else { return "?" }
+    return symbols[idx]
 }

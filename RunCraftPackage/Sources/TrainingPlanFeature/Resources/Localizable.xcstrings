@@ -1,537 +1,2239 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "Adjust VDOT" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT を調整" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 조정" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "调整 VDOT" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "調整 VDOT" } }
+  "sourceLanguage": "en",
+  "strings": {
+    "%@ pace, %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ペース、%@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 페이스, %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 配速，%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 配速，%@"
+          }
+        }
       }
     },
-    "Adjust VDOT manually" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT を手動で調整" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 수동 조정" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "手动调整 VDOT" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "手動調整 VDOT" } }
+    "%@ phase, %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 期、%@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 단계, %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 阶段，%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 階段，%@"
+          }
+        }
       }
     },
-    "Auto-detect from HealthKit" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "HealthKit から自動検出" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "HealthKit에서 자동 감지" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "从 HealthKit 自动检测" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "從 HealthKit 自動偵測" } }
+    "%@ · Rest": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · レスト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · 휴식"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · 休息"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · 休息"
+          }
+        }
       }
     },
-    "Beginner" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "初心者" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "초보자" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "初学者" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "初學者" } }
+    "%@, rest day": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@、休息日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, 휴식일"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，休息日"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，休息日"
+          }
+        }
       }
     },
-    "Best detected VDOT" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "検出された最高 VDOT" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "감지된 최고 VDOT" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "检测到的最佳 VDOT" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "偵測到的最佳 VDOT" } }
+    "%lld min": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 分"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld분"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 分钟"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 分鐘"
+          }
+        }
       }
     },
-    "Cancel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "キャンセル" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "취소" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "取消" } }
+    "%lld of %lld done": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld／%2$lld 完了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld/%2$lld 완료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成 %1$lld／%2$lld"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成 %1$lld／%2$lld"
+          }
+        }
       }
     },
-    "Competitive club" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "競技クラブ" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "경쟁 클럽" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "竞技俱乐部" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "競技俱樂部" } }
+    "About VDOT": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT について"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 정보"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关于 VDOT"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關於 VDOT"
+          }
+        }
       }
     },
-    "Create Race Goal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レース目標を作成" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레이스 목표 만들기" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "建立比赛目标" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "建立比賽目標" } }
+    "Adjust VDOT": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT を調整"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 조정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调整 VDOT"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "調整 VDOT"
+          }
+        }
       }
     },
-    "Create your first race goal and we'll build a personalised 16-week training plan." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "最初のレース目標を作成すると、16 週間のパーソナルトレーニングプランを作成します。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "첫 번째 레이스 목표를 만들면 16주짜리 맞춤형 훈련 계획을 만들어드립니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "建立你的第一个比赛目标，我们会为你打造 16 周的个人化训练计划。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "建立你的第一個比賽目標，我們會為你打造 16 週的個人化訓練計畫。" } }
+    "Adjust VDOT manually": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT を手動で調整"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 수동 조정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手动调整 VDOT"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手動調整 VDOT"
+          }
+        }
       }
     },
-    "days" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "日" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "일" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "天" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "天" } }
+    "Auto-detect from HealthKit": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HealthKit から自動検出"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HealthKit에서 자동 감지"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从 HealthKit 自动检测"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從 HealthKit 自動偵測"
+          }
+        }
       }
     },
-    "Delete" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "削除" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "삭제" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "删除" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "刪除" } }
+    "Beginner": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "初心者"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "초보자"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "初学者"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "初學者"
+          }
+        }
       }
     },
-    "Delete plan" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プランを削除" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "계획 삭제" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "删除计划" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "刪除計畫" } }
+    "Best detected VDOT": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "検出された最高 VDOT"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "감지된 최고 VDOT"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "检测到的最佳 VDOT"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "偵測到的最佳 VDOT"
+          }
+        }
       }
     },
-    "Dismiss recovery advice" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "リカバリーアドバイスを閉じる" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "회복 조언 닫기" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关闭恢复建议" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "關閉恢復建議" } }
+    "Builds a workout in the %@ zone": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ゾーンのワークアウトを作成します"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 존 운동을 만듭니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建 %@ 区间的训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建立 %@ 區間的訓練"
+          }
+        }
       }
     },
-    "Dismiss VDOT upgrade" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 更新通知を閉じる" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 상승 알림 닫기" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关闭 VDOT 提升通知" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "關閉 VDOT 提升通知" } }
+    "Cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャンセル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "취소"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
       }
     },
-    "Distance" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "距離" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "거리" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "距离" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "距離" } }
+    "Changes by %@%@ from %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "変更 %@%@（元の値 %@）。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@%@ 변동됨 (이전 값: %@)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "变动 %@%@（原为 %@）。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "變動 %@%@（原為 %@）。"
+          }
+        }
       }
     },
-    "Done" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "完了" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "완료" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "完成" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "完成" } }
+    "Competitive club": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "競技クラブ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "경쟁 클럽"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "竞技俱乐部"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "競技俱樂部"
+          }
+        }
       }
     },
-    "Edit goal / recalculate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "目標を編集／再計算" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "목표 편집 / 재계산" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑目标／重新计算" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "編輯目標／重新計算" } }
+    "Create Race Goal": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レース目標を作成"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "레이스 목표 만들기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建立比赛目标"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建立比賽目標"
+          }
+        }
       }
     },
-    "Edit Race Goal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レース目標を編集" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레이스 목표 편집" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑比赛目标" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "編輯比賽目標" } }
+    "Create your first race goal and we'll build a personalised 16-week training plan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最初のレース目標を作成すると、16 週間のパーソナルトレーニングプランを作成します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "첫 번째 레이스 목표를 만들면 16주짜리 맞춤형 훈련 계획을 만들어드립니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建立你的第一个比赛目标，我们会为你打造 16 周的个人化训练计划。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建立你的第一個比賽目標，我們會為你打造 16 週的個人化訓練計畫。"
+          }
+        }
       }
     },
-    "Elite amateur" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "トップアマチュア" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "엘리트 아마추어" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "业余精英" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "業餘菁英" } }
+    "Delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "삭제"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除"
+          }
+        }
       }
     },
-    "Enter a goal name to continue." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "目標名を入力してください。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "계속하려면 목표 이름을 입력하세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请输入目标名称以继续。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "請輸入目標名稱以繼續。" } }
+    "Delete plan": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プランを削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계획 삭제"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除计划"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除計畫"
+          }
+        }
       }
     },
-    "Enter a recent race time (e.g. 5K in 25 min) and the app uses the Jack Daniels formula to derive your VDOT. A faster race time = higher VDOT." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "直近のレースタイム（例：5K を 25 分）を入力すると、Jack Daniels の公式で VDOT を算出します。タイムが速いほど VDOT が高くなります。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "최근 레이스 기록(예: 5K 25분)을 입력하면 Jack Daniels 공식으로 VDOT을 계산합니다. 빠를수록 VDOT이 높아집니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "输入近期的比赛成绩（例如 5K 跑 25 分钟），App 会用 Jack Daniels 公式推算你的 VDOT。成绩越快、VDOT 越高。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "輸入近期的比賽成績（例如 5K 跑 25 分鐘），App 會用 Jack Daniels 公式推算你的 VDOT。成績愈快、VDOT 愈高。" } }
+    "Dismiss VDOT upgrade": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 更新通知を閉じる"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 상승 알림 닫기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭 VDOT 提升通知"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉 VDOT 提升通知"
+          }
+        }
       }
     },
-    "Enter a recent race time, or tap Auto-detect, so we can calculate your VDOT." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "直近のレースタイムを入力するか、「自動検出」をタップすると VDOT を計算します。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "최근 레이스 기록을 입력하거나 \"자동 감지\"를 누르면 VDOT을 계산합니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "输入近期比赛成绩、或按下「自动检测」，我们就能算出你的 VDOT。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "輸入近期比賽成績、或按下「自動偵測」，我們就能算出你的 VDOT。" } }
+    "Dismiss recovery advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リカバリーアドバイスを閉じる"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "회복 조언 닫기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭恢复建议"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉恢復建議"
+          }
+        }
       }
     },
-    "Finish time" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "完走タイム" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "완주 시간" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "完赛时间" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "完賽時間" } }
+    "Distance": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距離"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "거리"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距离"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距離"
+          }
+        }
       }
     },
-    "Fitness Level (VDOT)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "フィットネスレベル（VDOT）" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "체력 수준(VDOT)" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "体能水平（VDOT）" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "體能水準（VDOT）" } }
+    "Done": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
       }
     },
-    "Full Schedule" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "全スケジュール" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "전체 일정" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "完整课表" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "完整課表" } }
+    "Edit Race Goal": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レース目標を編集"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "레이스 목표 편집"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑比赛目标"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯比賽目標"
+          }
+        }
       }
     },
-    "How is it calculated?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "どう計算するの？" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "어떻게 계산하나요?" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "怎么计算的？" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "怎麼計算的？" } }
+    "Edit goal / recalculate": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目標を編集／再計算"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "목표 편집 / 재계산"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑目标／重新计算"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯目標／重新計算"
+          }
+        }
       }
     },
-    "New Race Goal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "新しいレース目標" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "새 레이스 목표" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "新增比赛目标" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "新增比賽目標" } }
+    "Elite amateur": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トップアマチュア"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "엘리트 아마추어"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "业余精英"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "業餘菁英"
+          }
+        }
       }
     },
-    "No race goal yet" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レース目標はまだありません" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레이스 목표가 없습니다" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "尚未设定比赛目标" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "尚未設定比賽目標" } }
+    "Enter a goal name to continue.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目標名を入力してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계속하려면 목표 이름을 입력하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请输入目标名称以继续。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入目標名稱以繼續。"
+          }
+        }
       }
     },
-    "Or auto-detect" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "または自動検出" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "또는 자동 감지" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "或自动检测" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "或自動偵測" } }
+    "Enter a recent race time (e.g. 5K in 25 min) and the app uses the Jack Daniels formula to derive your VDOT. A faster race time = higher VDOT.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直近のレースタイム（例：5K を 25 分）を入力すると、Jack Daniels の公式で VDOT を算出します。タイムが速いほど VDOT が高くなります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최근 레이스 기록(예: 5K 25분)을 입력하면 Jack Daniels 공식으로 VDOT을 계산합니다. 빠를수록 VDOT이 높아집니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入近期的比赛成绩（例如 5K 跑 25 分钟），App 会用 Jack Daniels 公式推算你的 VDOT。成绩越快、VDOT 越高。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入近期的比賽成績（例如 5K 跑 25 分鐘），App 會用 Jack Daniels 公式推算你的 VDOT。成績愈快、VDOT 愈高。"
+          }
+        }
       }
     },
-    "Plan starts in %lld day%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プラン開始まであと %lld 日%@" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "계획 시작까지 %lld일%@ 남음" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "计划将在 %lld 天%@后开始" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "計畫將在 %lld 天%@後開始" } }
+    "Enter a recent race time, or tap Auto-detect, so we can calculate your VDOT.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直近のレースタイムを入力するか、「自動検出」をタップすると VDOT を計算します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최근 레이스 기록을 입력하거나 \"자동 감지\"를 누르면 VDOT을 계산합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入近期比赛成绩、或按下「自动检测」，我们就能算出你的 VDOT。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入近期比賽成績、或按下「自動偵測」，我們就能算出你的 VDOT。"
+          }
+        }
       }
     },
-    "Professional" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プロ" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "프로 선수" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "职业选手" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "職業選手" } }
+    "Finish time": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完走タイム"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완주 시간"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完赛时间"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完賽時間"
+          }
+        }
       }
     },
-    "Race date" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レース日" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레이스 날짜" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "比赛日期" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "比賽日期" } }
+    "Fitness Level (VDOT)": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィットネスレベル（VDOT）"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체력 수준(VDOT)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体能水平（VDOT）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "體能水準（VDOT）"
+          }
+        }
       }
     },
-    "Race Goal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レース目標" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레이스 목표" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "比赛目标" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "比賽目標" } }
+    "Full Schedule": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全スケジュール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전체 일정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完整课表"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完整課表"
+          }
+        }
       }
     },
-    "Recovery looks low today" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日はリカバリーが低めです" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘 회복 상태가 낮습니다" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天恢复状况不佳" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天恢復狀況不佳" } }
+    "Goal name (e.g. Sun Moon Lake 29K)": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目標名（例：Sun Moon Lake 29K）"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "목표 이름 (예: Sun Moon Lake 29K)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目标名称（例：日月潭 29K）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目標名稱（例：日月潭 29K）"
+          }
+        }
       }
     },
-    "Recreational" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "趣味ランナー" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "취미 러너" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "休闲跑者" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "休閒跑者" } }
+    "How is it calculated?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "どう計算するの？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "어떻게 계산하나요?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "怎么计算的？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "怎麼計算的？"
+          }
+        }
       }
     },
-    "Resulting Paces" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "算出されたペース" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "산출된 페이스" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "得出的配速" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "得出的配速" } }
+    "New Race Goal": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新しいレース目標"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 레이스 목표"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增比赛目标"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增比賽目標"
+          }
+        }
       }
     },
-    "RunCraft uses your VDOT to set your five training pace zones — Easy, Marathon, Threshold, Interval, and Repetition — so every session targets the right physiological adaptation." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft は VDOT をもとに 5 つのトレーニングペースゾーン — イージー、マラソン、閾値、インターバル、レペティション — を設定し、各セッションが正しい生理適応を狙うようにします。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft은 VDOT을 기반으로 5 가지 훈련 페이스 존(이지, 마라톤, 임계값, 인터벌, 레피티션)을 설정해 매 세션이 적절한 생리적 적응을 노리도록 합니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft 用你的 VDOT 设定五个训练配速区间 — 轻松、马拉松、乳酸阈值、间歇、反复冲刺 — 让每次训练都打到对的生理适应。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft 用你的 VDOT 設定五個訓練配速區間 — 輕鬆、馬拉松、乳酸閾值、間歇、反覆衝刺 — 讓每次訓練都打到對的生理適應。" } }
+    "No race goal yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レース目標はまだありません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "레이스 목표가 없습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未设定比赛目标"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未設定比賽目標"
+          }
+        }
       }
     },
-    "Save" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "保存" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "저장" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "儲存" } }
+    "Or auto-detect": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "または自動検出"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "또는 자동 감지"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "或自动检测"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "或自動偵測"
+          }
+        }
       }
     },
-    "Scans your HealthKit running history for a best 5K, 10K or half marathon time." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "HealthKit のラン履歴から、5K・10K・ハーフマラソンのベストタイムを探します。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "HealthKit 러닝 기록에서 5K, 10K 또는 하프 마라톤 최고 기록을 찾습니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "扫描你 HealthKit 中的跑步纪录，找出最佳的 5K、10K 或半马成绩。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "掃描你 HealthKit 中的跑步紀錄，找出最佳的 5K、10K 或半馬成績。" } }
+    "Plan": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プラン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계획"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "计划"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "計畫"
+          }
+        }
       }
     },
-    "Sending" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "送信中" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "전송 중" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "传送中" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "傳送中" } }
+    "Plan starts in %lld day%@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プラン開始まであと %1$lld 日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계획 시작까지 %1$lld일 남음"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "计划将在 %1$lld 天后开始"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "計畫將在 %1$lld 天後開始"
+          }
+        }
       }
     },
-    "Start" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "開始" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "시작" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開始" } }
+    "Professional": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プロ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "프로 선수"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "职业选手"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "職業選手"
+          }
+        }
       }
     },
-    "Swap to Easy" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "イージーに変更" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이지로 변경" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "改为轻松跑" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "改為輕鬆跑" } }
+    "Race Goal": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レース目標"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "레이스 목표"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "比赛目标"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "比賽目標"
+          }
+        }
       }
     },
-    "THIS WEEK" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今週" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이번 주" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本周" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "本週" } }
+    "Race date": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レース日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "레이스 날짜"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "比赛日期"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "比賽日期"
+          }
+        }
       }
     },
-    "Training Paces" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "トレーニングペース" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "훈련 페이스" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练配速" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "訓練配速" } }
+    "Recovery looks low today": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日はリカバリーが低めです"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘 회복 상태가 낮습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天恢复状况不佳"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天恢復狀況不佳"
+          }
+        }
       }
     },
-    "Typical VDOT ranges" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "一般的な VDOT の範囲" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "일반적인 VDOT 범위" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "常见 VDOT 区间" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "常見 VDOT 區間" } }
+    "Recreational": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "趣味ランナー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "취미 러너"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休闲跑者"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休閒跑者"
+          }
+        }
       }
     },
-    "Update paces" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ペースを更新" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "페이스 업데이트" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "更新配速" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "更新配速" } }
+    "Replaces today's hard session with an easy 5 km run": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日のハードなセッションを 5 km のイージーランに置き換えます"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘의 고강도 세션을 5 km 이지런으로 바꿉니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将今天的高强度训练换成 5 公里轻松跑"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將今天的高強度訓練換成 5 公里輕鬆跑"
+          }
+        }
       }
     },
-    "Update your training paces to match?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "それに合わせてトレーニングペースを更新しますか？" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이에 맞춰 훈련 페이스를 업데이트할까요?" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "要更新训练配速来搭配吗？" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "要更新訓練配速來搭配嗎？" } }
+    "Resulting Paces": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "算出されたペース"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "산출된 페이스"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "得出的配速"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "得出的配速"
+          }
+        }
       }
     },
-    "Use the stepper to adjust. Changes only commit when you tap Save." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ステッパーで調整してください。「保存」をタップしたときだけ変更が反映されます。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "스텝퍼로 조정하세요. \"저장\"을 눌러야 변경 사항이 적용됩니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "用步进器调整。按下「保存」后才会生效。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "用步進器調整。按下「儲存」後才會生效。" } }
+    "RunCraft uses your VDOT to set your five training pace zones — Easy, Marathon, Threshold, Interval, and Repetition — so every session targets the right physiological adaptation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft は VDOT をもとに 5 つのトレーニングペースゾーン — イージー、マラソン、閾値、インターバル、レペティション — を設定し、各セッションが正しい生理適応を狙うようにします。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft은 VDOT을 기반으로 5 가지 훈련 페이스 존(이지, 마라톤, 임계값, 인터벌, 레피티션)을 설정해 매 세션이 적절한 생리적 적응을 노리도록 합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft 用你的 VDOT 设定五个训练配速区间 — 轻松、马拉松、乳酸阈值、间歇、反复冲刺 — 让每次训练都打到对的生理适应。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RunCraft 用你的 VDOT 設定五個訓練配速區間 — 輕鬆、馬拉松、乳酸閾值、間歇、反覆衝刺 — 讓每次訓練都打到對的生理適應。"
+          }
+        }
       }
     },
-    "VDOT improved" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT が向上しました" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT이 향상되었습니다" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 提升了" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 提升了" } }
+    "Save": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲存"
+          }
+        }
       }
     },
-    "VDOT is a number that represents your current running fitness, developed by coach Jack Daniels. It is calculated from a recent race result and reflects the effective VO₂max you demonstrated on race day." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT は Jack Daniels コーチが提唱した、現在のラン体力を示す数値です。直近のレース結果から算出され、レース当日に発揮した実効 VO₂max を反映します。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT은 Jack Daniels 코치가 제안한 현재 러닝 체력을 나타내는 수치입니다. 최근 레이스 기록으로 계산되며, 레이스 당일 실제로 보여준 VO₂max를 반영합니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 是代表你目前跑步体能的数字，由 Jack Daniels 教练提出。它从近期的比赛成绩推算而来，反映你比赛当天实际展现的 VO₂max。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "VDOT 是代表你目前跑步體能的數字，由 Jack Daniels 教練提出。它從近期的比賽成績推算而來，反映你比賽當天實際展現的 VO₂max。" } }
+    "Scans your HealthKit running history for a best 5K, 10K or half marathon time.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HealthKit のラン履歴から、5K・10K・ハーフマラソンのベストタイムを探します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HealthKit 러닝 기록에서 5K, 10K 또는 하프 마라톤 최고 기록을 찾습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扫描你 HealthKit 中的跑步纪录，找出最佳的 5K、10K 或半马成绩。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "掃描你 HealthKit 中的跑步紀錄，找出最佳的 5K、10K 或半馬成績。"
+          }
+        }
       }
     },
-    "We can swap today's hard session for an easy 5 km run." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日のハードなセッションを 5 km のイージーランに切り替えられます。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘의 강도 높은 세션을 5 km 이지런으로 바꿀 수 있습니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "我们可以把今天的高强度训练换成 5 公里的轻松跑。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "我們可以把今天的高強度訓練換成 5 公里的輕鬆跑。" } }
+    "Sending": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "送信中"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전송 중"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "传送中"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傳送中"
+          }
+        }
       }
     },
-    "Week %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "第 %lld 週" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "%lld주차" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "第 %lld 周" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "第 %lld 週" } }
+    "Start": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시작"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始"
+          }
+        }
       }
     },
-    "Week %lld · %@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "第 %lld 週 · %@" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "%lld주차 · %@" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "第 %lld 周 · %@" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "第 %lld 週 · %@" } }
+    "Start %@ on Apple Watch": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch で %@ を開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch에서 %@ 시작"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Apple Watch 开始 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Apple Watch 開始 %@"
+          }
+        }
       }
     },
-    "Week %lld of 16 · %@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "第 %lld 週／全 16 週 · %@" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "%lld / 16주차 · %@" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "第 %lld 周／共 16 周 · %@" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "第 %lld 週／共 16 週 · %@" } }
+    "Swap to Easy": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "イージーに変更"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이지로 변경"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "改为轻松跑"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "改為輕鬆跑"
+          }
+        }
       }
     },
-    "Week 1 preview · %@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "第 1 週プレビュー · %@" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "1주차 미리보기 · %@" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "第 1 周预览 · %@" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "第 1 週預覽 · %@" } }
+    "THIS WEEK": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今週"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이번 주"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本週"
+          }
+        }
       }
     },
-    "What is VDOT?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "VDOT とは？" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "VDOT이란?" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "什么是 VDOT？" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "什麼是 VDOT？" } }
+    "Training Paces": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トレーニングペース"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "훈련 페이스"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练配速"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訓練配速"
+          }
+        }
       }
     },
-    "Why does it matter?" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "なぜ重要？" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "왜 중요한가요?" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "为什么重要？" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "為什麼重要？" } }
+    "Typical VDOT ranges": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一般的な VDOT の範囲"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "일반적인 VDOT 범위"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "常见 VDOT 区间"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "常見 VDOT 區間"
+          }
+        }
       }
     },
-    "Your Training Paces" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "あなたのトレーニングペース" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "내 훈련 페이스" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "你的训练配速" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "你的訓練配速" } }
+    "Update paces": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ペースを更新"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페이스 업데이트"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新配速"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新配速"
+          }
+        }
       }
     },
-    "Your VDOT" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "あなたの VDOT" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "내 VDOT" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "你的 VDOT" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "你的 VDOT" } }
+    "Update your training paces to match?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "それに合わせてトレーニングペースを更新しますか？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이에 맞춰 훈련 페이스를 업데이트할까요?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要更新训练配速来搭配吗？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要更新訓練配速來搭配嗎？"
+          }
+        }
+      }
+    },
+    "Updates your pace zones to use the new VDOT": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ペースゾーンを新しい VDOT に更新します"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페이스 존을 새 VDOT으로 업데이트합니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将配速区间更新为新的 VDOT"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將配速區間更新為新的 VDOT"
+          }
+        }
+      }
+    },
+    "Use the stepper to adjust. Changes only commit when you tap Save.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステッパーで調整してください。「保存」をタップしたときだけ変更が反映されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스텝퍼로 조정하세요. \"저장\"을 눌러야 변경 사항이 적용됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用步进器调整。按下「保存」后才会生效。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用步進器調整。按下「儲存」後才會生效。"
+          }
+        }
+      }
+    },
+    "VDOT improved": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT が向上しました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT이 향상되었습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 提升了"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 提升了"
+          }
+        }
+      }
+    },
+    "VDOT improved from %@ to %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT が %@ から %@ に向上"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT이 %@에서 %@(으)로 향상"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 从 %@ 提升到 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 從 %@ 提升到 %@"
+          }
+        }
+      }
+    },
+    "VDOT is a number that represents your current running fitness, developed by coach Jack Daniels. It is calculated from a recent race result and reflects the effective VO₂max you demonstrated on race day.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT は Jack Daniels コーチが提唱した、現在のラン体力を示す数値です。直近のレース結果から算出され、レース当日に発揮した実効 VO₂max を反映します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT은 Jack Daniels 코치가 제안한 현재 러닝 체력을 나타내는 수치입니다. 최근 레이스 기록으로 계산되며, 레이스 당일 실제로 보여준 VO₂max를 반영합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 是代表你目前跑步体能的数字，由 Jack Daniels 教练提出。它从近期的比赛成绩推算而来，反映你比赛当天实际展现的 VO₂max。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 是代表你目前跑步體能的數字，由 Jack Daniels 教練提出。它從近期的比賽成績推算而來，反映你比賽當天實際展現的 VO₂max。"
+          }
+        }
+      }
+    },
+    "We can swap today's hard session for an easy 5 km run.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日のハードなセッションを 5 km のイージーランに切り替えられます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘의 강도 높은 세션을 5 km 이지런으로 바꿀 수 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我们可以把今天的高强度训练换成 5 公里的轻松跑。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我們可以把今天的高強度訓練換成 5 公里的輕鬆跑。"
+          }
+        }
+      }
+    },
+    "Week %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 週"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld주차"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 周"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 週"
+          }
+        }
+      }
+    },
+    "Week %lld of 16 · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 週／全 16 週 · %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld / 16주차 · %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 周／共 16 周 · %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 週／共 16 週 · %@"
+          }
+        }
+      }
+    },
+    "Week %lld · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 週 · %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld주차 · %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 周 · %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 週 · %@"
+          }
+        }
+      }
+    },
+    "Week %lld, %@, %lld of %lld completed, %lld kilometres": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 週、%@、%lld／%lld 完了、%lld km"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld주차, %@, %lld/%lld 완료, %lld km"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 周，%@，已完成 %lld／共 %lld，%lld 公里"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 週，%@，已完成 %lld／共 %lld，%lld 公里"
+          }
+        }
+      }
+    },
+    "Week 1 preview · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 1 週プレビュー · %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1주차 미리보기 · %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 1 周预览 · %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 1 週預覽 · %@"
+          }
+        }
+      }
+    },
+    "Week 1 preview, %lld sessions": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 1 週プレビュー、%lld セッション"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1주차 미리보기, 세션 %lld개"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 1 周预览，%lld 次训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 1 週預覽，%lld 次訓練"
+          }
+        }
+      }
+    },
+    "What is VDOT?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT とは？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT이란?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "什么是 VDOT？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "什麼是 VDOT？"
+          }
+        }
+      }
+    },
+    "Why does it matter?": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "なぜ重要？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "왜 중요한가요?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为什么重要？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "為什麼重要？"
+          }
+        }
+      }
+    },
+    "Your Training Paces": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あなたのトレーニングペース"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내 훈련 페이스"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的训练配速"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的訓練配速"
+          }
+        }
+      }
+    },
+    "Your VDOT": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あなたの VDOT"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내 VDOT"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的 VDOT"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的 VDOT"
+          }
+        }
+      }
+    },
+    "days": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "일"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "天"
+          }
+        }
+      }
+    },
+    "tap to build": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タップして作成"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "탭하여 만들기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击创建"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "點擊建立"
+          }
+        }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

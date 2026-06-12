@@ -1,447 +1,1659 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "+ New workout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "+ 新規ワークアウト" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "+ 새 운동" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "+ 新增训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "+ 新增訓練" } }
+  "sourceLanguage": "en",
+  "strings": {
+    "%lld step%@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ステップ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스텝 %1$lld개"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld 个步骤"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld 個步驟"
+          }
+        }
       }
     },
-    "Add Repeat" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "リピートを追加" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "반복 추가" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "加入重复组" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "加入重複組" } }
+    "+ New workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ 新規ワークアウト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ 새 운동"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ 新增训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ 新增訓練"
+          }
+        }
       }
     },
-    "Add step" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ステップを追加" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "스텝 추가" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "加入步骤" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "加入步驟" } }
+    "Add Repeat": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リピートを追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "반복 추가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入重复组"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入重複組"
+          }
+        }
       }
     },
-    "Add Step" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ステップを追加" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "스텝 추가" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "加入步骤" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "加入步驟" } }
+    "Add Step": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステップを追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스텝 추가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入步骤"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入步驟"
+          }
+        }
       }
     },
-    "Alert" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "アラート" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "알림" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "警示" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "警示" } }
+    "Add step": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステップを追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스텝 추가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入步骤"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入步驟"
+          }
+        }
       }
     },
-    "Browse Templates" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "テンプレートを見る" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "템플릿 둘러보기" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "浏览模板" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "瀏覽範本" } }
+    "Alert": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アラート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알림"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "警示"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "警示"
+          }
+        }
       }
     },
-    "Build a workout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウトを作る" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동 만들기" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打造训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "打造訓練" } }
+    "Browse Templates": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テンプレートを見る"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "템플릿 둘러보기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "浏览模板"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "瀏覽範本"
+          }
+        }
       }
     },
-    "Cancel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "キャンセル" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "취소" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "取消" } }
+    "Build a workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウトを作る"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동 만들기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打造训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打造訓練"
+          }
+        }
       }
     },
-    "Cool-down" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "クールダウン" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "쿨다운" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "缓和" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "緩和" } }
+    "Cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャンセル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "취소"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
       }
     },
-    "Cruise Intervals 3×1 mile" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "クルーズインターバル 3×1 マイル" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "크루즈 인터벌 3×1 마일" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "巡航间歇 3×1 英里" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "巡航間歇 3×1 英里" } }
+    "Cool-down": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クールダウン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "쿨다운"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缓和"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "緩和"
+          }
+        }
       }
     },
-    "Delete" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "削除" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "삭제" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "删除" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "刪除" } }
+    "Cruise Intervals 3×1 mile": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クルーズインターバル 3×1 マイル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "크루즈 인터벌 3×1 마일"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "巡航间歇 3×1 英里"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "巡航間歇 3×1 英里"
+          }
+        }
       }
     },
-    "Distance" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "距離" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "거리" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "距离" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "距離" } }
+    "Delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "삭제"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除"
+          }
+        }
       }
     },
-    "Done" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "完了" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "완료" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "完成" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "完成" } }
+    "Distance": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距離"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "거리"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距离"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距離"
+          }
+        }
       }
     },
-    "Duplicate" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "複製" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "복제" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "复制" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "複製" } }
+    "Done": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
       }
     },
-    "Easy Recovery Run" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "リカバリーラン" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "리커버리 런" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "轻松恢复跑" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "輕鬆恢復跑" } }
+    "Duplicate": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "複製"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복제"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "複製"
+          }
+        }
       }
     },
-    "Edit Repeat" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "リピートを編集" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "반복 편집" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑重复组" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "編輯重複組" } }
+    "Easy Recovery Run": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リカバリーラン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "리커버리 런"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轻松恢复跑"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輕鬆恢復跑"
+          }
+        }
       }
     },
-    "Edit Step" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ステップを編集" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "스텝 편집" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑步骤" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "編輯步驟" } }
+    "Edit Repeat": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リピートを編集"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "반복 편집"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑重复组"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯重複組"
+          }
+        }
       }
     },
-    "Edit Workout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウトを編集" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동 편집" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "编辑训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "編輯訓練" } }
+    "Edit Step": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステップを編集"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스텝 편집"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑步骤"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯步驟"
+          }
+        }
       }
     },
-    "Failed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "失敗" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "실패" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "失败" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "失敗" } }
+    "Edit Workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウトを編集"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동 편집"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯訓練"
+          }
+        }
       }
     },
-    "From template — Save creates a copy" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "テンプレートから — 保存するとコピーが作成されます" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "템플릿에서 — 저장하면 사본이 만들어집니다" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "来自模板 — 按下保存会建立副本" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "來自範本 — 按下儲存會建立副本" } }
+    "Failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "失敗"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "실패"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "失败"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "失敗"
+          }
+        }
       }
     },
-    "Hill Repeats" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ヒルリピート" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "힐 리피트" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "山坡反复跑" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "山坡反覆跑" } }
+    "From template — Save creates a copy": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テンプレートから — 保存するとコピーが作成されます"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "템플릿에서 — 저장하면 사본이 만들어집니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来自模板 — 按下保存会建立副本"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "來自範本 — 按下儲存會建立副本"
+          }
+        }
       }
     },
-    "Include from workout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウトから取り込む" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동에서 가져오기" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "从训练中加入" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "從訓練中加入" } }
+    "Goal": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ゴール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "목표"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目标"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目標"
+          }
+        }
       }
     },
-    "Iterations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "回数" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "횟수" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "次数" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "次數" } }
+    "Hill Repeats": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ヒルリピート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "힐 리피트"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "山坡反复跑"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "山坡反覆跑"
+          }
+        }
       }
     },
-    "Ladder 400→1200→400" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ラダー 400→1200→400" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "래더 400→1200→400" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "阶梯 400→1200→400" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "階梯 400→1200→400" } }
+    "Include from workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウトから取り込む"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동에서 가져오기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从训练中加入"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從訓練中加入"
+          }
+        }
       }
     },
-    "No pace or heart-rate target" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ペース・心拍ターゲットなし" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "페이스 또는 심박 목표 없음" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有配速或心率目标" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "沒有配速或心率目標" } }
+    "Iterations": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回数"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "횟수"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次數"
+          }
+        }
       }
     },
-    "No steps yet — tap an option above, or add a new step." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ステップがまだありません — 上のオプションを選ぶか、新しいステップを追加してください。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "스텝이 없습니다 — 위 옵션을 누르거나 새 스텝을 추가하세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "尚无步骤 — 点选上方选项，或加入新的步骤。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "尚無步驟 — 點選上方選項，或加入新的步驟。" } }
+    "Ladder 400→1200→400": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ラダー 400→1200→400"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "래더 400→1200→400"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "阶梯 400→1200→400"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "階梯 400→1200→400"
+          }
+        }
       }
     },
-    "No workouts yet" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウトはまだありません" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동이 없습니다" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "尚无训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "尚無訓練" } }
+    "No pace or heart-rate target": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ペース・心拍ターゲットなし"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페이스 또는 심박 목표 없음"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有配速或心率目标"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有配速或心率目標"
+          }
+        }
       }
     },
-    "Progression Run" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "プログレッションラン" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "프로그레션 런" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "提速跑" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "提速跑" } }
+    "No steps yet — tap an option above, or add a new step.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステップがまだありません — 上のオプションを選ぶか、新しいステップを追加してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스텝이 없습니다 — 위 옵션을 누르거나 새 스텝을 추가하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚无步骤 — 点选上方选项，或加入新的步骤。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無步驟 — 點選上方選項，或加入新的步驟。"
+          }
+        }
       }
     },
-    "Recovery" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "リカバリー" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "리커버리" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "恢复" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "恢復" } }
+    "No workouts yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウトはまだありません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동이 없습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚无训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無訓練"
+          }
+        }
       }
     },
-    "Repeat %lld×" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%lld 回繰り返し" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "%lld회 반복" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重复 %lld 次" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "重複 %lld 次" } }
+    "Progression Run": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プログレッションラン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "프로그레션 런"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提速跑"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提速跑"
+          }
+        }
       }
     },
-    "Runs until you tap Lap" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "「ラップ」をタップするまで継続" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "\"랩\"을 누를 때까지 진행" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "持续到你按下「Lap」" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "持續到你按下「Lap」" } }
+    "Recovery": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リカバリー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "리커버리"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢復"
+          }
+        }
       }
     },
-    "Save" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "保存" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "저장" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "儲存" } }
+    "Repeat %lld×": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 回繰り返し"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld회 반복"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重复 %lld 次"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重複 %lld 次"
+          }
+        }
       }
     },
-    "Saved" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "保存しました" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "저장됨" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已保存" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已儲存" } }
+    "Repetitions": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回数"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "횟수"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "次數"
+          }
+        }
       }
     },
-    "Saving" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "保存中" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "저장 중" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "保存中" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "儲存中" } }
+    "Runs until you tap Lap": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「ラップ」をタップするまで継続"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"랩\"을 누를 때까지 진행"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "持续到你按下「Lap」"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "持續到你按下「Lap」"
+          }
+        }
       }
     },
-    "Speed Pyramid" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "スピードピラミッド" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "스피드 피라미드" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "速度金字塔" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "速度金字塔" } }
+    "Save": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲存"
+          }
+        }
       }
     },
-    "Start from a template or build one from scratch." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "テンプレートから始めるか、ゼロから作成しましょう。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "템플릿에서 시작하거나 처음부터 만들어보세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "从模板开始、或从头打造一份训练。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "從範本開始、或從頭打造一份訓練。" } }
+    "Saved": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存しました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장됨"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已保存"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已儲存"
+          }
+        }
       }
     },
-    "Start Workout" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウトを開始" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동 시작" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "开始训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "開始訓練" } }
+    "Saving": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存中"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장 중"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存中"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲存中"
+          }
+        }
       }
     },
-    "Started · Check Apple Watch" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "開始 · Apple Watch を確認" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "시작됨 · Apple Watch 확인" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已启动 · 请查看 Apple Watch" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "已啟動 · 請查看 Apple Watch" } }
+    "Segment": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "セグメント"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "세그먼트"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "区段"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "區段"
+          }
+        }
       }
     },
-    "Starting…" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "開始中…" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "시작 중…" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "启动中…" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "啟動中…" } }
+    "Speed Pyramid": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スピードピラミッド"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스피드 피라미드"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "速度金字塔"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "速度金字塔"
+          }
+        }
       }
     },
-    "Steps in repeat" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "リピート内のステップ" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "반복 내 스텝" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重复组内的步骤" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "重複組內的步驟" } }
+    "Start Workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウトを開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동 시작"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始訓練"
+          }
+        }
       }
     },
-    "Tap ⋯ to add a Step or a Repeat group." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "⋯ をタップしてステップやリピートを追加。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "⋯을 눌러 스텝이나 반복을 추가하세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "点 ⋯ 来新增步骤或重复组。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "點 ⋯ 來新增步驟或重複組。" } }
+    "Start from a template or build one from scratch.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テンプレートから始めるか、ゼロから作成しましょう。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "템플릿에서 시작하거나 처음부터 만들어보세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从模板开始、或从头打造一份训练。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從範本開始、或從頭打造一份訓練。"
+          }
+        }
       }
     },
-    "Tap to copy an existing step into this repeat. The copy is independent — editing it doesn't change the original." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "タップして既存のステップをこのリピートにコピー。コピーは独立しており、元のステップは変わりません。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "기존 스텝을 이 반복에 복사하려면 누르세요. 사본은 원본과 독립적입니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "点一下把现有步骤复制进这个重复组。副本与原版独立，编辑不会互相影响。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "點一下把現有步驟複製進這個重複組。副本與原版獨立，編輯不會互相影響。" } }
+    "Started · Check Apple Watch": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始 · Apple Watch を確認"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시작됨 · Apple Watch 확인"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已启动 · 请查看 Apple Watch"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已啟動 · 請查看 Apple Watch"
+          }
+        }
       }
     },
-    "Templates" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "テンプレート" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "템플릿" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "模板" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "範本" } }
+    "Starting…": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始中…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시작 중…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启动中…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "啟動中…"
+          }
+        }
       }
     },
-    "Tempo Run" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "テンポラン" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "템포런" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "节奏跑" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "節奏跑" } }
+    "Step": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステップ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스텝"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "步骤"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "步驟"
+          }
+        }
       }
     },
-    "Time" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "時間" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "시간" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "时间" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "時間" } }
+    "Steps in repeat": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リピート内のステップ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "반복 내 스텝"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重复组内的步骤"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重複組內的步驟"
+          }
+        }
       }
     },
-    "Warm-up" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ウォームアップ" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "워밍업" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "暖身" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "暖身" } }
+    "Tap a zone to fill from your current VDOT (%lld).": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ゾーンをタップすると現在の VDOT（%lld）から自動入力されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "존을 누르면 현재 VDOT(%lld)으로 자동 입력됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点选区间，以当前的 VDOT（%lld）自动填入。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "點選區間，以目前的 VDOT（%lld）自動填入。"
+          }
+        }
       }
     },
-    "Work" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "メイン" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "메인" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "主训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "主訓練" } }
+    "Tap to copy an existing step into this repeat. The copy is independent — editing it doesn't change the original.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タップして既存のステップをこのリピートにコピー。コピーは独立しており、元のステップは変わりません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기존 스텝을 이 반복에 복사하려면 누르세요. 사본은 원본과 독립적입니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点一下把现有步骤复制进这个重复组。副本与原版独立，编辑不会互相影响。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "點一下把現有步驟複製進這個重複組。副本與原版獨立，編輯不會互相影響。"
+          }
+        }
       }
     },
-    "Workouts" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウト" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "訓練" } }
+    "Tap ⋯ to add a Step or a Repeat group.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⋯ をタップしてステップやリピートを追加。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⋯을 눌러 스텝이나 반복을 추가하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点 ⋯ 来新增步骤或重复组。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "點 ⋯ 來新增步驟或重複組。"
+          }
+        }
       }
     },
-    "Yours" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "マイワークアウト" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "내 운동" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "我的" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "我的" } }
+    "Templates": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テンプレート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "템플릿"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模板"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "範本"
+          }
+        }
+      }
+    },
+    "Tempo Run": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テンポラン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "템포런"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "节奏跑"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "節奏跑"
+          }
+        }
+      }
+    },
+    "Time": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時間"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시간"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時間"
+          }
+        }
+      }
+    },
+    "Type": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タイプ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "유형"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "类型"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "類型"
+          }
+        }
+      }
+    },
+    "Warm-up": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ウォームアップ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "워밍업"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暖身"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暖身"
+          }
+        }
+      }
+    },
+    "Work": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メイン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "메인"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主訓練"
+          }
+        }
+      }
+    },
+    "Workout name": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウト名"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동 이름"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练名称"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訓練名稱"
+          }
+        }
+      }
+    },
+    "Workouts": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "운동"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訓練"
+          }
+        }
+      }
+    },
+    "Yours": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マイワークアウト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내 운동"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的"
+          }
+        }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }
