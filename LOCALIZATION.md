@@ -179,6 +179,7 @@ Named after people stay English; descriptive ones translate.
 | Ladder 400→1200→400          | 翻成「階梯 400→1200→400」(numbers stay) |
 | Tempo Run                    | 翻成「節奏跑」                        |
 | Easy Recovery Run            | 翻成「輕鬆恢復跑」                    |
+| Norwegian 4×4                | 翻成「挪威式4×4」(numbers stay)       |
 
 ### 2.5 Units
 

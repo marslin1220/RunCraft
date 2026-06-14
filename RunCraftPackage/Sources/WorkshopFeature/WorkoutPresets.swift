@@ -19,6 +19,7 @@ public enum WorkoutPresets {
         progressionRun,
         speedPyramid,
         michiganWorkout,
+        norwegian4x4,
         easyRecoveryRun,
     ]
 
@@ -36,6 +37,7 @@ public enum WorkoutPresets {
         progressionRun.id:           .mixed,
         speedPyramid.id:             .interval,
         michiganWorkout.id:          .mixed,
+        norwegian4x4.id:             .interval,
         easyRecoveryRun.id:          .easy,
     ]
 
@@ -390,6 +392,51 @@ public enum WorkoutPresets {
             .step(WorkoutStep(id: stepID("MICH-W4"), kind: .work,     goal: .distance(metres: 400),  alert: .paceZone(PaceZoneName.interval,  vdot: 40))),
             .step(WorkoutStep(
                 id: stepID("MICH-CD"),
+                kind: .cooldown,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+        ]
+    )
+
+    // MARK: - Norwegian 4×4
+    //
+    // The "4x4" VO2max-interval protocol from Norwegian endurance
+    // research (Helgerud et al.), popularized by the Ingebrigtsen
+    // training group: 4×4 minutes at I pace with 3-minute easy jog
+    // recoveries — longer, steadier reps than Yasso 800s' shorter
+    // 800m efforts.
+
+    public static let norwegian4x4: WorkoutTemplate = .init(
+        id: presetID("NOR-4X4"),
+        name: String(localized: "Norwegian 4×4", bundle: .module),
+        blocks: [
+            .step(WorkoutStep(
+                id: stepID("NOR-WU"),
+                kind: .warmup,
+                goal: .time(seconds: 10 * 60),
+                alert: .paceZone(PaceZoneName.easy, vdot: 40)
+            )),
+            .repeatGroup(RepeatGroup(
+                id: groupID("NOR-REP"),
+                iterations: 4,
+                steps: [
+                    WorkoutStep(
+                        id: stepID("NOR-WORK"),
+                        kind: .work,
+                        goal: .time(seconds: 4 * 60),
+                        alert: .paceZone(PaceZoneName.interval, vdot: 40)
+                    ),
+                    WorkoutStep(
+                        id: stepID("NOR-REC"),
+                        kind: .recovery,
+                        goal: .time(seconds: 3 * 60),
+                        alert: .paceZone(PaceZoneName.easy, vdot: 40)
+                    ),
+                ]
+            )),
+            .step(WorkoutStep(
+                id: stepID("NOR-CD"),
                 kind: .cooldown,
                 goal: .time(seconds: 10 * 60),
                 alert: .paceZone(PaceZoneName.easy, vdot: 40)
