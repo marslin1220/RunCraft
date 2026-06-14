@@ -339,8 +339,7 @@ private struct WeekSessionsSection: View {
     }
 
     private var todayDayOfWeek: Int {
-        let weekday = Calendar.current.component(.weekday, from: Date())
-        return weekday == 1 ? 7 : weekday - 1
+        PlannedSession.dayOfWeek(for: Date())
     }
 
     var body: some View {
@@ -847,11 +846,8 @@ struct WeekScheduleView: View {
         Set(completedAll.compactMap(\.plannedSessionId))
     }
 
-    /// Calendar weekday of today, normalised so Mon=1 ... Sun=7 — matches
-    /// PlannedSession.dayOfWeek so "today's row" can be highlighted.
     private var todayDayOfWeek: Int {
-        let weekday = Calendar.current.component(.weekday, from: Date())
-        return weekday == 1 ? 7 : weekday - 1
+        PlannedSession.dayOfWeek(for: Date())
     }
 
     /// Walks `allWeeks` in order and runs them through the phase enum so

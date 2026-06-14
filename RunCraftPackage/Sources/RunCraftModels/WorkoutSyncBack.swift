@@ -27,8 +27,7 @@ public enum WorkoutSyncBack {
 
         // 2. Within that week, find the session with matching day-of-week.
         let session: PlannedSession? = week.flatMap { week in
-            let weekday = calendar.component(.weekday, from: workout.startDate)
-            let dayOfWeek = weekday == 1 ? 7 : weekday - 1
+            let dayOfWeek = PlannedSession.dayOfWeek(for: workout.startDate, calendar: calendar)
             return sessions.first { $0.weekId == week.id && $0.dayOfWeek == dayOfWeek }
         }
 

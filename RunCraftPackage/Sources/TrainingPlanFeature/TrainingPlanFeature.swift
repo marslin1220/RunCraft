@@ -248,8 +248,7 @@ import WorkshopFeature
                 }
                 return .run { [database, healthKitClient] send in
                     // 1. Find today's planned session.
-                    let weekday = Calendar.current.component(.weekday, from: Date())
-                    let dayOfWeek = weekday == 1 ? 7 : weekday - 1  // Sun=1 → 7
+                    let dayOfWeek = PlannedSession.dayOfWeek(for: Date())
                     let todaysType = try? await database.read { db -> SessionType? in
                         try PlannedSession
                             .where { $0.dayOfWeek.eq(dayOfWeek) }
@@ -288,8 +287,7 @@ import WorkshopFeature
                     try await database.write { db in
                         let weeks = try TrainingWeek.all.fetchAll(db)
                         guard let currentWeek = TrainingWeek.current(in: weeks) else { return }
-                        let weekday = Calendar.current.component(.weekday, from: Date())
-                        let dayOfWeek = weekday == 1 ? 7 : weekday - 1
+                        let dayOfWeek = PlannedSession.dayOfWeek(for: Date())
                         try PlannedSession
                             .where { $0.weekId.eq(currentWeek.id) }
                             .where { $0.dayOfWeek.eq(dayOfWeek) }

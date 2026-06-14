@@ -40,9 +40,7 @@ public struct TodaySessionQuery: EntityQuery {
     /// has no scheduled session.
     func loadToday() async throws -> TodaySessionEntity? {
         let database = currentDatabase()
-        let weekday = Calendar.current.component(.weekday, from: Date())
-        // Calendar weekday: Sun=1 … Sat=7. Schema uses Mon=1 … Sun=7.
-        let dayOfWeek = weekday == 1 ? 7 : weekday - 1
+        let dayOfWeek = PlannedSession.dayOfWeek(for: Date())
 
         struct Snapshot {
             let session: PlannedSession

@@ -39,4 +39,11 @@ import VDOTEngine
         self.targetPaceZone = targetPaceZone
         self.notes = notes
     }
+
+    /// Converts a date to the schema's day-of-week numbering (Mon=1 ... Sun=7),
+    /// from `Calendar`'s Sun=1 ... Sat=7.
+    public static func dayOfWeek(for date: Date, calendar: Calendar = .current) -> Int {
+        let weekday = calendar.component(.weekday, from: date)
+        return weekday == 1 ? 7 : weekday - 1
+    }
 }
