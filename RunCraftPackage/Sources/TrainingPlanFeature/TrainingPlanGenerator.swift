@@ -13,7 +13,9 @@ public struct TrainingPlanGenerator {
 
     public static func generate(
         goal: RaceGoal,
-        vdot: Double
+        vdot: Double,
+        availableDays: Set<Int> = Set(1...7),
+        longRunDay: Int? = nil
     ) -> (weeks: [TrainingWeek], sessions: [PlannedSession]) {
         let zones = VDOTCalculator.paceZones(vdot: vdot)
         let today = Calendar.current.startOfDay(for: Date())
@@ -42,7 +44,9 @@ public struct TrainingPlanGenerator {
             )
             weeks.append(week)
 
-            let weekSessions = Self.sessions(for: week, zones: zones)
+            let weekSessions = Self.sessions(
+                for: week, zones: zones, availableDays: availableDays, longRunDay: longRunDay
+            )
             sessions.append(contentsOf: weekSessions)
         }
 
@@ -59,7 +63,8 @@ public struct TrainingPlanGenerator {
     /// the periodized week-1...16 numbering so Full Schedule isn't confused
     /// by a duplicate "Week 1".
     public static func rollingWeek(
-        raceGoalId: UUID, vdot: Double, weekNumber: Int = 1
+        raceGoalId: UUID, vdot: Double, weekNumber: Int = 1,
+        availableDays: Set<Int> = Set(1...7), longRunDay: Int? = nil
     ) -> (week: TrainingWeek, sessions: [PlannedSession]) {
         let zones = VDOTCalculator.paceZones(vdot: vdot)
         let calendar = Calendar.current
@@ -75,7 +80,9 @@ public struct TrainingPlanGenerator {
             startDate: weekStart,
             targetWeeklyKm: baseWeeklyKm(for: 0)
         )
-        return (week, Self.sessions(for: week, zones: zones))
+        return (week, Self.sessions(
+            for: week, zones: zones, availableDays: availableDays, longRunDay: longRunDay
+        ))
     }
 
     // MARK: - Phase
@@ -113,97 +120,221 @@ public struct TrainingPlanGenerator {
 
     // MARK: - Session layout
 
-    private static func sessions(
-        for week: TrainingWeek,
-        zones: PaceZones
-    ) -> [PlannedSession] {
-        sessionTemplate(for: week.phase, weekNumber: week.weekNumber).map { blueprint in
-            PlannedSession(
-                weekId: week.id,
-                dayOfWeek: blueprint.dayOfWeek,
-                sessionType: blueprint.type,
-                targetDistanceKm: blueprint.distanceKm,
-                targetDurationMin: blueprint.durationMin,
-                targetPaceZone: blueprint.paceZone,
-                notes: blueprint.notes
-            )
-        }
-    }
-
-    private struct SessionBlueprint {
-        let dayOfWeek: Int
+    /// A single non-rest session candidate. Pace text is never baked in:
+    /// `paceZone` carries the intent, and the actual sec/km is derived from
+    /// the current VDOT at render time so the schedule stays honest as the
+    /// runner adapts. `notes` carries structural hints only (e.g. "5×1000m").
+    private struct SessionSpec {
         let type: SessionType
         let distanceKm: Double?
-        let durationMin: Int?
         let paceZone: PaceZoneName?
         let notes: String
 
         init(
-            dayOfWeek: Int,
             type: SessionType,
             distanceKm: Double? = nil,
-            durationMin: Int? = nil,
             paceZone: PaceZoneName? = nil,
             notes: String = ""
         ) {
-            self.dayOfWeek = dayOfWeek
             self.type = type
             self.distanceKm = distanceKm
-            self.durationMin = durationMin
             self.paceZone = paceZone
             self.notes = notes
         }
     }
 
-    private static func sessionTemplate(
-        for phase: TrainingPhase,
-        weekNumber: Int
-    ) -> [SessionBlueprint] {
-        // Per-blueprint: pace text never baked. `paceZone` carries the
-        // intent; the actual sec/km is derived from the current VDOT at
-        // render time so the schedule stays honest as the runner adapts.
-        // `notes` carries structural hints only (e.g. "5×1000m").
+    /// Session types that should not land on consecutive days when avoidable.
+    private static let hardSessionTypes: Set<SessionType> = [.long, .tempo, .interval, .repetition]
+
+    /// Priority-ordered "must schedule" sessions for a phase. The long run
+    /// (if any) is always first. When `availableDays` is smaller than this
+    /// list, the lowest-priority (trailing) entries are dropped first.
+    private static func requiredSessionSpecs(for phase: TrainingPhase) -> [SessionSpec] {
         switch phase {
         case .base:
             return [
-                .init(dayOfWeek: 1, type: .easy,       distanceKm: 6,  paceZone: .easy),
-                .init(dayOfWeek: 2, type: .rest),
-                .init(dayOfWeek: 3, type: .easy,       distanceKm: 8,  paceZone: .easy),
-                .init(dayOfWeek: 4, type: .repetition, distanceKm: 5,  paceZone: .repetition, notes: "R strides"),
-                .init(dayOfWeek: 5, type: .rest),
-                .init(dayOfWeek: 6, type: .easy,       distanceKm: 10, paceZone: .easy),
-                .init(dayOfWeek: 7, type: .long,       distanceKm: 14, paceZone: .easy),
+                .init(type: .long,       distanceKm: 14, paceZone: .easy),
+                .init(type: .repetition, distanceKm: 5,  paceZone: .repetition, notes: "R strides"),
             ]
         case .build:
             return [
-                .init(dayOfWeek: 1, type: .easy,  distanceKm: 8,  paceZone: .easy),
-                .init(dayOfWeek: 2, type: .tempo, distanceKm: 8,  paceZone: .threshold),
-                .init(dayOfWeek: 3, type: .easy,  distanceKm: 6,  paceZone: .easy),
-                .init(dayOfWeek: 4, type: .rest),
-                .init(dayOfWeek: 5, type: .easy,  distanceKm: 8,  paceZone: .easy),
-                .init(dayOfWeek: 6, type: .tempo, distanceKm: 10, paceZone: .threshold),
-                .init(dayOfWeek: 7, type: .long,  distanceKm: 18, paceZone: .easy),
+                .init(type: .long,  distanceKm: 18, paceZone: .easy),
+                .init(type: .tempo, distanceKm: 10, paceZone: .threshold),
+                .init(type: .tempo, distanceKm: 8,  paceZone: .threshold),
             ]
         case .peak:
             return [
-                .init(dayOfWeek: 1, type: .easy,     distanceKm: 8,  paceZone: .easy),
-                .init(dayOfWeek: 2, type: .interval, distanceKm: 10, paceZone: .interval,  notes: "5×1000m"),
-                .init(dayOfWeek: 3, type: .easy,     distanceKm: 6,  paceZone: .easy),
-                .init(dayOfWeek: 4, type: .tempo,    distanceKm: 10, paceZone: .threshold),
-                .init(dayOfWeek: 5, type: .rest),
-                .init(dayOfWeek: 6, type: .easy,     distanceKm: 8,  paceZone: .easy),
-                .init(dayOfWeek: 7, type: .long,     distanceKm: 24, paceZone: .easy),
+                .init(type: .long,     distanceKm: 24, paceZone: .easy),
+                .init(type: .interval, distanceKm: 10, paceZone: .interval, notes: "5×1000m"),
+                .init(type: .tempo,    distanceKm: 10, paceZone: .threshold),
             ]
         case .taper:
             return [
-                .init(dayOfWeek: 1, type: .easy,     distanceKm: 6, paceZone: .easy),
-                .init(dayOfWeek: 2, type: .tempo,    distanceKm: 8, paceZone: .threshold),
-                .init(dayOfWeek: 3, type: .easy,     distanceKm: 5, paceZone: .easy),
-                .init(dayOfWeek: 4, type: .rest),
-                .init(dayOfWeek: 5, type: .interval, distanceKm: 6, paceZone: .interval, notes: "3×1000m"),
-                .init(dayOfWeek: 6, type: .easy,     distanceKm: 4, paceZone: .easy),
-                .init(dayOfWeek: 7, type: .rest,     notes: "Rest before race"),
+                .init(type: .tempo,    distanceKm: 8, paceZone: .threshold),
+                .init(type: .interval, distanceKm: 6, paceZone: .interval, notes: "3×1000m"),
             ]
         }
+    }
+
+    /// Easy-run fillers used to round out the week once the required
+    /// sessions are placed (up to 3 of them).
+    private static func optionalFillerSpecs(for phase: TrainingPhase) -> [SessionSpec] {
+        let distances: [Double]
+        switch phase {
+        case .base:  distances = [6, 8, 10]
+        case .build: distances = [8, 8, 8]
+        case .peak:  distances = [8, 8, 6]
+        case .taper: distances = [6, 5, 4]
+        }
+        return distances.map { .init(type: .easy, distanceKm: $0, paceZone: .easy) }
+    }
+
+    private static func sessions(
+        for week: TrainingWeek,
+        zones: PaceZones,
+        availableDays: Set<Int> = Set(1...7),
+        longRunDay: Int? = nil
+    ) -> [PlannedSession] {
+        let days = availableDays.sorted()
+
+        let pool: [SessionSpec]
+        let effectiveLongRunDay: Int?
+        if days.count <= 1 {
+            // Maintenance mode: a single easy run, ignoring phase/periodization.
+            pool = [.init(type: .easy, distanceKm: 5, paceZone: .easy)]
+            effectiveLongRunDay = nil
+        } else {
+            let required = requiredSessionSpecs(for: week.phase)
+            let optional = optionalFillerSpecs(for: week.phase)
+            let usedRequired = Array(required.prefix(min(required.count, days.count)))
+            let fillerCount = min(3, days.count - usedRequired.count)
+            pool = usedRequired + Array(optional.prefix(fillerCount))
+            effectiveLongRunDay = longRunDay
+        }
+
+        let placements = place(pool, into: days, longRunDay: effectiveLongRunDay)
+
+        return (1...7).map { day in
+            if let spec = placements[day] {
+                return PlannedSession(
+                    weekId: week.id,
+                    dayOfWeek: day,
+                    sessionType: spec.type,
+                    targetDistanceKm: spec.distanceKm,
+                    targetPaceZone: spec.paceZone,
+                    notes: spec.notes
+                )
+            } else {
+                return PlannedSession(weekId: week.id, dayOfWeek: day, sessionType: .rest)
+            }
+        }
+    }
+
+    /// Assigns each spec in `pool` to a day in `availableDays`, preferring to
+    /// keep `hardSessionTypes` non-adjacent (on the 7-day cycle, where day 7
+    /// and day 1 are neighbors) and to put the long run on `longRunDay` —
+    /// defaulting to a weekend day when unspecified or unavailable.
+    private static func place(
+        _ pool: [SessionSpec], into days: [Int], longRunDay: Int?
+    ) -> [Int: SessionSpec] {
+        let hardSpecs = pool.filter { hardSessionTypes.contains($0.type) }
+        let easySpecs = pool.filter { !hardSessionTypes.contains($0.type) }
+        let hasLong = hardSpecs.contains { $0.type == .long }
+
+        let hardDays = chooseHardDays(
+            count: hardSpecs.count, from: days, preferring: hasLong ? longRunDay : nil
+        )
+
+        var placements: [Int: SessionSpec] = [:]
+        var remainingHardDays = hardDays
+        var remainingHardSpecs = hardSpecs
+
+        if hasLong, let longIndex = remainingHardSpecs.firstIndex(where: { $0.type == .long }) {
+            let longDay = preferredLongRunDay(among: hardDays, requested: longRunDay)
+            placements[longDay] = remainingHardSpecs.remove(at: longIndex)
+            remainingHardDays.removeAll { $0 == longDay }
+        }
+
+        for (day, spec) in zip(remainingHardDays, remainingHardSpecs) {
+            placements[day] = spec
+        }
+
+        let easyDays = days.filter { placements[$0] == nil }
+        for (day, spec) in zip(easyDays, easySpecs) {
+            placements[day] = spec
+        }
+
+        return placements
+    }
+
+    /// Picks `count` days from `availableDays` for the "hard" sessions,
+    /// preferring a fully circularly-spaced set (no two hard days adjacent,
+    /// wrapping Sun→Mon) when one exists, then a set containing
+    /// `preferredDay`, then one containing Sunday or Saturday.
+    private static func chooseHardDays(
+        count: Int, from availableDays: [Int], preferring preferredDay: Int?
+    ) -> [Int] {
+        guard count > 0 else { return [] }
+        guard count < availableDays.count else { return availableDays }
+
+        let candidates = combinations(of: availableDays, choose: count)
+        let spaced = candidates.filter(isFullySpaced)
+        let pool = spaced.isEmpty ? candidates : spaced
+
+        return pool.min { lhs, rhs in
+            rank(lhs, preferredDay: preferredDay).lexicographicallyPrecedes(rank(rhs, preferredDay: preferredDay))
+        } ?? availableDays
+    }
+
+    /// Lower is "better": contains `preferredDay`, then contains Sunday,
+    /// then contains Saturday, then lexicographically-smallest day list.
+    private static func rank(_ days: [Int], preferredDay: Int?) -> [Int] {
+        [
+            preferredDay.map { days.contains($0) ? 0 : 1 } ?? 0,
+            days.contains(7) ? 0 : 1,
+            days.contains(6) ? 0 : 1,
+        ] + days
+    }
+
+    /// Where the long run lands within `hardDays`: `requested` if available,
+    /// else Sunday, else Saturday, else the latest available hard day.
+    private static func preferredLongRunDay(among hardDays: [Int], requested: Int?) -> Int {
+        if let requested, hardDays.contains(requested) { return requested }
+        if hardDays.contains(7) { return 7 }
+        if hardDays.contains(6) { return 6 }
+        return hardDays.max() ?? 7
+    }
+
+    /// All `choose`-sized subsets of `array`, preserving ascending order.
+    private static func combinations(of array: [Int], choose: Int) -> [[Int]] {
+        guard choose > 0 else { return [[]] }
+        guard choose <= array.count else { return [] }
+        guard choose < array.count else { return [array] }
+
+        var result: [[Int]] = []
+        for i in 0..<array.count {
+            let rest = Array(array[(i + 1)...])
+            guard rest.count >= choose - 1 else { break }
+            for combo in combinations(of: rest, choose: choose - 1) {
+                result.append([array[i]] + combo)
+            }
+        }
+        return result
+    }
+
+    /// True if every pair of days is at least 2 days apart on the 7-day
+    /// cycle (so Sun=7 and Mon=1 count as adjacent).
+    private static func isFullySpaced(_ days: [Int]) -> Bool {
+        for i in 0..<days.count {
+            for j in (i + 1)..<days.count where circularDistance(days[i], days[j]) < 2 {
+                return false
+            }
+        }
+        return true
+    }
+
+    private static func circularDistance(_ a: Int, _ b: Int) -> Int {
+        let diff = abs(a - b)
+        return min(diff, 7 - diff)
     }
 }
