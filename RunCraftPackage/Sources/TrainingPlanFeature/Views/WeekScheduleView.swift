@@ -38,6 +38,15 @@ struct WeekScheduleView: View {
         allWeeks.filter { $0.weekNumber >= 1 }
     }
 
+    /// The `weekNumber == 0` gap-filler rolling week — present only while
+    /// "today" falls before the periodized plan's week 1 (race far enough
+    /// out that the 16-week buildup hasn't started yet). Shown in its own
+    /// "Foundation · Ongoing" section above the periodized phases so Full
+    /// Schedule has continuity with the Plan tab's "This Week" section.
+    private var gapWeek: TrainingWeek? {
+        allWeeks.first { $0.weekNumber == 0 }
+    }
+
     /// Walks `planWeeks` in order and runs them through the phase enum so
     /// the timeline can be rendered as four phase blocks instead of a flat
     /// 16-week list. Cheap — runs once per render.
@@ -56,6 +65,27 @@ struct WeekScheduleView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                if let gapWeek {
+                    FoundationDivider()
+                    WeekSection(
+                        week: gapWeek,
+                        sessions: allSessions.filter { $0.weekId == gapWeek.id }
+                                             .sorted { $0.dayOfWeek < $1.dayOfWeek },
+                        completedBySessionId: completedBySessionId,
+                        isCurrent: true,
+                        isExpanded: expandedWeekIds.contains(gapWeek.id),
+                        todayDayOfWeek: todayDayOfWeek,
+                        currentVDOT: currentVDOT,
+                        quickStartStatus: store.quickStartStatus,
+                        onToggle: { toggle(gapWeek.id) },
+                        onTap: { session, isToday in
+                            store.send(.sessionTapped(session, isToday: isToday))
+                        },
+                        onQuickStart: { session in
+                            store.send(.quickStartTapped(session, vdot: currentVDOT))
+                        }
+                    )
+                }
                 ForEach(phaseGroups, id: \.phase) { group in
                     PhaseDivider(
                         phase: group.phase,
@@ -98,7 +128,9 @@ struct WeekScheduleView: View {
 
     private func seedExpansionIfNeeded() {
         guard !hasSeededExpansion else { return }
-        if let current = planWeeks.first(where: isCurrentWeek) {
+        if let gapWeek {
+            expandedWeekIds.insert(gapWeek.id)
+        } else if let current = planWeeks.first(where: isCurrentWeek) {
             expandedWeekIds.insert(current.id)
         }
         hasSeededExpansion = true
@@ -149,6 +181,33 @@ private struct PhaseDivider: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(phase.displayName) phase, \(weekRange)")
+        .accessibilityAddTraits(.isHeader)
+    }
+}
+
+/// Header for the `weekNumber == 0` gap-filler week — visually matches
+/// `PhaseDivider` (same rail + caption styling) but isn't one of the four
+/// periodized `TrainingPhase`s, so it gets its own fixed "Foundation ·
+/// Ongoing" label rather than a phase name + week range.
+private struct FoundationDivider: View {
+    var body: some View {
+        HStack(spacing: 10) {
+            RoundedRectangle(cornerRadius: 1.5)
+                .fill(TrainingPhase.base.tint)
+                .frame(width: 3, height: 16)
+            Text("FOUNDATION")
+                .font(.caption.bold())
+                .foregroundStyle(TrainingPhase.base.tint)
+                .tracking(1.2)
+            Text("·")
+                .foregroundStyle(Color.brand.textSecondary)
+            Text("Ongoing")
+                .font(.caption)
+                .foregroundStyle(Color.brand.textSecondary)
+            Spacer()
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Foundation training, ongoing")
         .accessibilityAddTraits(.isHeader)
     }
 }
@@ -244,17 +303,26 @@ private struct WeekSection: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 8) {
-                        Text("Week \(week.weekNumber)")
-                            .font(.subheadline.bold())
-                            .foregroundStyle(isCurrent ? Color.brand.accent : Color.brand.textPrimary)
-                        if isCurrent {
-                            Text("THIS WEEK")
-                                .font(.caption2.bold())
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.brand.accent.opacity(0.2))
+                        if week.weekNumber == 0 {
+                            // The gap-filler week is always "now" — its
+                            // title already says so, so the "THIS WEEK"
+                            // badge below would just repeat it.
+                            Text("This Week")
+                                .font(.subheadline.bold())
                                 .foregroundStyle(Color.brand.accent)
-                                .clipShape(Capsule())
+                        } else {
+                            Text("Week \(week.weekNumber)")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(isCurrent ? Color.brand.accent : Color.brand.textPrimary)
+                            if isCurrent {
+                                Text("THIS WEEK")
+                                    .font(.caption2.bold())
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.brand.accent.opacity(0.2))
+                                    .foregroundStyle(Color.brand.accent)
+                                    .clipShape(Capsule())
+                            }
                         }
                     }
                     Text("\(completedCount) of \(sessionCount) done")
@@ -278,7 +346,7 @@ private struct WeekSection: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Week \(week.weekNumber), \(week.phase.displayName), \(completedCount) of \(sessionCount) completed, \(Int(week.targetWeeklyKm)) kilometres")
+        .accessibilityLabel("\(week.weekNumber == 0 ? "This week" : "Week \(week.weekNumber)"), \(week.phase.displayName), \(completedCount) of \(sessionCount) completed, \(Int(week.targetWeeklyKm)) kilometres")
         .accessibilityHint(isExpanded ? "Double tap to collapse" : "Double tap to expand")
         .accessibilityAddTraits(isExpanded ? [.isHeader, .isSelected] : .isHeader)
     }
