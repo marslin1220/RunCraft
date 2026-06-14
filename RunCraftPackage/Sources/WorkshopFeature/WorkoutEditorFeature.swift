@@ -5,7 +5,7 @@ import IdentifiedCollections
 import RunCraftModels
 
 @Reducer public struct WorkoutEditor {
-    @ObservableState public struct State {
+    @ObservableState public struct State: Equatable {
         /// nil = unsaved new template; non-nil = editing existing template from DB.
         public var editingTemplateId: UUID? = nil
         public var templateName: String = "New Workout"
@@ -316,6 +316,8 @@ import RunCraftModels
         }
     }
 }
+
+extension WorkoutEditor.Destination.State: Equatable {}
 
 // MARK: - EditStep
 
