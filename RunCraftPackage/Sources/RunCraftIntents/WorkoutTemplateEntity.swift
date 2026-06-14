@@ -1,6 +1,7 @@
 import AppIntents
 import Foundation
 import RunCraftModels
+import VDOTEngine
 
 /// Voice-/Spotlight-facing wrapper around a `WorkoutTemplate`. Covers both
 /// the built-in presets (Yasso 800s, Mona Fartlek, …) and user-saved
@@ -36,17 +37,22 @@ public struct WorkoutTemplateEntity: AppEntity {
     }
 
     public var displayRepresentation: DisplayRepresentation {
-        var subtitleParts: [String] = []
-        if isPreset { subtitleParts.append("Template") }
+        DisplayRepresentation(title: "\(name)", subtitle: "\(summary)")
+    }
+}
+
+extension WorkoutTemplateEntity {
+    /// "Template · ≈ X km · N steps" — canonical summary shown in Siri's
+    /// entity subtitle and the Start Workout snippet. Uses `PaceUnit.current`
+    /// since both render outside SwiftUI's environment.
+    var summary: String {
+        var parts: [String] = []
+        if isPreset { parts.append("Template") }
         if estimatedDistanceMetres > 0 {
-            let km = estimatedDistanceMetres / 1_000
-            subtitleParts.append("≈ \(km.formatted(.number.precision(.fractionLength(0...1)))) km")
+            parts.append("≈ \(PaceFormatting.distance(metres: estimatedDistanceMetres, unit: .current))")
         }
-        subtitleParts.append("\(stepCount) step\(stepCount == 1 ? "" : "s")")
-        return DisplayRepresentation(
-            title: "\(name)",
-            subtitle: "\(subtitleParts.joined(separator: " · "))"
-        )
+        parts.append("\(stepCount) step\(stepCount == 1 ? "" : "s")")
+        return parts.joined(separator: " · ")
     }
 }
 
@@ -54,34 +60,13 @@ public struct WorkoutTemplateEntity: AppEntity {
 
 extension WorkoutTemplateEntity {
     /// Lifts the persisted `WorkoutTemplate` into the AppIntents projection.
-    /// Walks the block tree once to count steps and accumulate distance.
     public init(template: WorkoutTemplate, isPreset: Bool) {
-        let blocks = template.blocks
-        let stepCount = blocks.reduce(0) { acc, block in
-            switch block {
-            case .step: acc + 1
-            case .repeatGroup(let g): acc + g.steps.count * g.iterations
-            }
-        }
-        let metres = blocks.reduce(0.0) { acc, block in
-            switch block {
-            case .step(let s):
-                if case .distance(let m) = s.goal { return acc + m }
-                return acc
-            case .repeatGroup(let g):
-                let per = g.steps.reduce(0.0) { sub, s in
-                    if case .distance(let m) = s.goal { return sub + m }
-                    return sub
-                }
-                return acc + per * Double(g.iterations)
-            }
-        }
         self.init(
             id: template.id,
             name: template.name,
             isPreset: isPreset,
-            stepCount: stepCount,
-            estimatedDistanceMetres: metres
+            stepCount: template.totalSteps,
+            estimatedDistanceMetres: template.estimatedDistanceMetres
         )
     }
 }

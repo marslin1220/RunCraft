@@ -122,39 +122,8 @@ private struct WorkoutCardRow: View {
     let onTap: () -> Void
     @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
 
-    private var totalSteps: Int {
-        template.blocks.reduce(0) { acc, block in
-            switch block {
-            case .step: acc + 1
-            case .repeatGroup(let g): acc + g.steps.count * g.iterations
-            }
-        }
-    }
-
-    /// Total estimated distance-goal metres in the template.
-    private var totalMetres: Double {
-        template.blocks.reduce(0.0) { acc, block in
-            switch block {
-            case .step(let s):
-                if case .distance(let m) = s.goal { return acc + m }
-                return acc
-            case .repeatGroup(let g):
-                let per = g.steps.reduce(0.0) { sub, s in
-                    if case .distance(let m) = s.goal { return sub + m }
-                    return sub
-                }
-                return acc + per * Double(g.iterations)
-            }
-        }
-    }
-
     private var subtitle: String {
-        var parts: [String] = []
-        if totalMetres > 0 {
-            parts.append("≈ \(PaceFormatting.distance(metres: totalMetres, unit: paceUnit))")
-        }
-        parts.append("\(totalSteps) step\(totalSteps == 1 ? "" : "s")")
-        return parts.joined(separator: " · ")
+        template.summary(unit: paceUnit)
     }
 
     var body: some View {

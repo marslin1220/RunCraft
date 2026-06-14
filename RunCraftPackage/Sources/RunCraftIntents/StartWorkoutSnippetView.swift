@@ -99,13 +99,6 @@ public struct StartWorkoutSnippetView: View {
     }
 
     private var subtitle: String {
-        var parts: [String] = []
-        if workout.isPreset { parts.append("Template") }
-        if workout.estimatedDistanceMetres > 0 {
-            let km = workout.estimatedDistanceMetres / 1_000
-            parts.append("≈ \(km.formatted(.number.precision(.fractionLength(0...1)))) km")
-        }
-        parts.append("\(workout.stepCount) step\(workout.stepCount == 1 ? "" : "s")")
-        return parts.joined(separator: " · ")
+        workout.summary
     }
 }
