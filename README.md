@@ -99,6 +99,8 @@ RunCraftPackage/                   Local SPM package — the bulk of the code
   how `TrainingPlanGenerator` places sessions once a runner restricts
   `availableDays` / `longRunDay`, and the 1-vs-2-day maintenance-mode
   threshold.
+- [`TODOS.md`](TODOS.md) — deliberately-deferred work and the reasoning
+  behind each deferral.
 
 ## License
 
