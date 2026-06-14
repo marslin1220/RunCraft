@@ -67,7 +67,7 @@ public struct LogCompletedRunIntent: AppIntent {
             try CompletedWorkout.upsert { workout }.execute(db)
         }
 
-        let unit = Self.readPaceUnit()
+        let unit = PaceUnit.current
         let spoken = Self.spokenSummary(km: km, seconds: seconds, unit: unit)
 
         return .result(dialog: IntentDialog(stringLiteral: spoken)) {
@@ -82,36 +82,23 @@ public struct LogCompletedRunIntent: AppIntent {
 
     // MARK: - Helpers
 
-    static func readPaceUnit() -> PaceUnit {
-        let raw = UserDefaults.standard.string(forKey: "paceUnit") ?? PaceUnit.perKilometre.rawValue
-        return PaceUnit(rawValue: raw) ?? .perKilometre
-    }
-
     /// "Logged a 5.0 kilometre run in 25 minutes. Average pace 5:00 per kilometre."
     /// Locale-respecting: switches to miles if the runner has chosen mi/hr in Settings.
     static func spokenSummary(km: Double, seconds: Double, unit: PaceUnit) -> String {
-        let distanceValue: Double
+        let distanceValue = PaceFormatting.distanceValue(metres: km * 1_000, unit: unit)
         let distanceLabel: String
-        let paceScale: Double
         let paceSuffix: String
         switch unit {
         case .perKilometre:
-            distanceValue = km
             distanceLabel = abs(distanceValue - 1) < 0.05 ? "kilometre" : "kilometres"
-            paceScale = 1.0
             paceSuffix = "per kilometre"
         case .perMile:
-            distanceValue = km / 1.609344
             distanceLabel = abs(distanceValue - 1) < 0.05 ? "mile" : "miles"
-            paceScale = 1.609344
             paceSuffix = "per mile"
         }
         let distanceText = distanceValue.formatted(.number.precision(.fractionLength(0...1)))
         let minutesText = Int((seconds / 60).rounded())
-        let pacePerUnit = (seconds / km) * paceScale
-        let paceMin = Int(pacePerUnit) / 60
-        let paceSec = Int(pacePerUnit) % 60
-        let paceText = "\(paceMin):\(String(format: "%02d", paceSec))"
+        let paceText = PaceFormatting.paceMinutesSeconds(secondsPerKm: seconds / km, unit: unit)
         return "Logged a \(distanceText) \(distanceLabel) run in \(minutesText) minutes. Average pace \(paceText) \(paceSuffix)."
     }
 }

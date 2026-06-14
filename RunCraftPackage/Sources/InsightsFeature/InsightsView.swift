@@ -372,17 +372,7 @@ private struct RecentRunRow: View {
     }()
 
     private var distanceText: String {
-        let value: Double
-        let suffix: String
-        switch paceUnit {
-        case .perKilometre:
-            value = run.actualDistanceKm
-            suffix = "km"
-        case .perMile:
-            value = run.actualDistanceKm / 1.609344
-            suffix = "mi"
-        }
-        return "\(value.formatted(.number.precision(.fractionLength(0...1)))) \(suffix)"
+        PaceFormatting.distance(metres: run.actualDistanceKm * 1_000, unit: paceUnit)
     }
 
     private var durationText: String {
@@ -392,14 +382,11 @@ private struct RecentRunRow: View {
         if hours > 0 {
             return "\(hours):\(String(format: "%02d", minutes))"
         }
-        let seconds = totalSeconds % 60
-        return "\(minutes):\(String(format: "%02d", seconds))"
+        return PaceFormatting.minutesSeconds(run.actualDurationSec)
     }
 
     private var paceText: String {
-        let scale = paceUnit == .perKilometre ? 1.0 : 1.609344
-        let secs = Int(run.avgPaceSecPerKm * scale)
-        return "\(secs / 60):\(String(format: "%02d", secs % 60))"
+        PaceFormatting.paceMinutesSeconds(secondsPerKm: run.avgPaceSecPerKm, unit: paceUnit)
     }
 
     private var achievementIcon: (symbol: String, color: Color)? {

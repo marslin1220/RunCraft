@@ -99,7 +99,7 @@ public enum StepAlert: Equatable, Sendable, Codable {
     }
 
     private static func formatPace(_ secPerKm: Int) -> String {
-        "\(secPerKm / 60):\(String(format: "%02d", secPerKm % 60))"
+        PaceFormatting.minutesSeconds(Double(secPerKm))
     }
 
     /// Build a pace range alert from a Jack Daniels zone for a given VDOT.

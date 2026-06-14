@@ -54,7 +54,7 @@ public struct AdjustVDOTIntent: AppIntent {
         }
 
         let zones = VDOTCalculator.paceZones(vdot: clamped)
-        let unit = Self.readPaceUnit()
+        let unit = PaceUnit.current
         let easy = zones.easy.formatted(unit: unit)
         let threshold = zones.threshold.formatted(unit: unit)
 
@@ -73,12 +73,5 @@ public struct AdjustVDOTIntent: AppIntent {
                 goalExisted: goalExisted
             )
         }
-    }
-
-    /// Same UserDefaults read as `WhatIsTodaysTrainingIntent`. Settings is
-    /// the single writer; intents are pure readers.
-    static func readPaceUnit() -> PaceUnit {
-        let raw = UserDefaults.standard.string(forKey: "paceUnit") ?? PaceUnit.perKilometre.rawValue
-        return PaceUnit(rawValue: raw) ?? .perKilometre
     }
 }

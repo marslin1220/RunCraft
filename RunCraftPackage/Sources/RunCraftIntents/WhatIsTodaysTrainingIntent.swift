@@ -25,7 +25,7 @@ public struct WhatIsTodaysTrainingIntent: AppIntent {
     public func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         let entity = try await TodaySessionQuery().loadToday()
 
-        let unit = Self.readPaceUnit()
+        let unit = PaceUnit.current
 
         guard let entity else {
             return .result(
@@ -43,14 +43,6 @@ public struct WhatIsTodaysTrainingIntent: AppIntent {
 
     // MARK: - Helpers
 
-    /// Reads the runner's pace unit preference. Lives in shared UserDefaults
-    /// — Settings is the writer; every other surface (PlanView, AdjustVDOT,
-    /// this intent) reads.
-    static func readPaceUnit() -> PaceUnit {
-        let raw = UserDefaults.standard.string(forKey: "paceUnit") ?? PaceUnit.perKilometre.rawValue
-        return PaceUnit(rawValue: raw) ?? .perKilometre
-    }
-
     /// Builds the sentence Siri reads aloud. Keep it conversational and
     /// avoid acronyms — "threshold pace" reads better than "T pace."
     static func spokenSummary(for entity: TodaySessionEntity, unit: PaceUnit) -> String {
@@ -64,14 +56,12 @@ public struct WhatIsTodaysTrainingIntent: AppIntent {
         var sentence = "Today's session is \(entity.sessionTitle.lowercased())"
 
         if let km = entity.targetDistanceKm {
-            let value: Double
+            let value = PaceFormatting.distanceValue(metres: km * 1_000, unit: unit)
             let label: String
             switch unit {
             case .perKilometre:
-                value = km
-                label = km == 1 ? "kilometre" : "kilometres"
+                label = value == 1 ? "kilometre" : "kilometres"
             case .perMile:
-                value = km / 1.609344
                 label = value == 1 ? "mile" : "miles"
             }
             sentence += ", \(value.formatted(.number.precision(.fractionLength(0...1)))) \(label)"

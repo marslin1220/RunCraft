@@ -151,17 +151,7 @@ private struct WorkoutCardRow: View {
     private var subtitle: String {
         var parts: [String] = []
         if totalMetres > 0 {
-            let scaled: Double
-            let suffix: String
-            switch paceUnit {
-            case .perKilometre:
-                scaled = totalMetres / 1_000
-                suffix = "km"
-            case .perMile:
-                scaled = totalMetres / 1_609.344
-                suffix = "mi"
-            }
-            parts.append("≈ \(scaled.formatted(.number.precision(.fractionLength(0...1)))) \(suffix)")
+            parts.append("≈ \(PaceFormatting.distance(metres: totalMetres, unit: paceUnit))")
         }
         parts.append("\(totalSteps) step\(totalSteps == 1 ? "" : "s")")
         return parts.joined(separator: " · ")

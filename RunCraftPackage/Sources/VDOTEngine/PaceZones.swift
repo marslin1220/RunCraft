@@ -27,14 +27,12 @@ public struct PaceZones: Equatable, Sendable {
 
         /// Returns a formatted string like "6:41 – 7:30 /km".
         public func formatted(unit: PaceUnit = .perKilometre) -> String {
-            let scale = unit == .perKilometre ? 1.0 : 1.60934
-            let lo = formatSeconds(lower * scale)
-            let hi = formatSeconds(upper * scale)
-            let suffix = unit == .perKilometre ? "/km" : "/mi"
+            let lo = PaceFormatting.paceMinutesSeconds(secondsPerKm: lower, unit: unit)
+            let hi = PaceFormatting.paceMinutesSeconds(secondsPerKm: upper, unit: unit)
             if abs(lower - upper) < 1 {
-                return "\(lo) \(suffix)"
+                return "\(lo) \(unit.displayName)"
             }
-            return "\(lo) – \(hi) \(suffix)"
+            return "\(lo) – \(hi) \(unit.displayName)"
         }
     }
 
@@ -58,9 +56,4 @@ public enum PaceUnit: String, Sendable, Equatable, CaseIterable, Codable {
         case .perMile:      "/mi"
         }
     }
-}
-
-private func formatSeconds(_ totalSeconds: Double) -> String {
-    let s = Int(totalSeconds.rounded())
-    return "\(s / 60):\(String(format: "%02d", s % 60))"
 }

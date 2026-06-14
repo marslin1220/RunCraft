@@ -100,18 +100,11 @@ public struct TodaySnippetView: View {
     }
 
     private func distanceText(km: Double) -> String {
-        let value: Double
-        switch paceUnit {
-        case .perKilometre: value = km
-        case .perMile:      value = km / 1.609344
-        }
-        return value.formatted(.number.precision(.fractionLength(0...1)))
+        PaceFormatting.distanceValue(metres: km * 1_000, unit: paceUnit)
+            .formatted(.number.precision(.fractionLength(0...1)))
     }
 
     private var distanceLabel: String {
-        switch paceUnit {
-        case .perKilometre: return "km"
-        case .perMile:      return "mi"
-        }
+        paceUnit.distanceSuffix
     }
 }

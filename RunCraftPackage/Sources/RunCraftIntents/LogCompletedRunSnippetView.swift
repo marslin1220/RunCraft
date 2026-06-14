@@ -55,7 +55,7 @@ public struct LogCompletedRunSnippetView: View {
         HStack(spacing: 20) {
             metric(value: distanceText, label: distanceLabel)
             metric(value: durationText, label: "duration")
-            metric(value: paceText,     label: "pace \(paceUnit == .perKilometre ? "/km" : "/mi")")
+            metric(value: paceText,     label: "pace \(paceUnit.displayName)")
         }
     }
 
@@ -79,16 +79,12 @@ public struct LogCompletedRunSnippetView: View {
     // MARK: - Computed text
 
     private var distanceText: String {
-        let value: Double
-        switch paceUnit {
-        case .perKilometre: value = distanceKm
-        case .perMile:      value = distanceKm / 1.609344
-        }
-        return value.formatted(.number.precision(.fractionLength(0...1)))
+        PaceFormatting.distanceValue(metres: distanceKm * 1_000, unit: paceUnit)
+            .formatted(.number.precision(.fractionLength(0...1)))
     }
 
     private var distanceLabel: String {
-        paceUnit == .perKilometre ? "km" : "mi"
+        paceUnit.distanceSuffix
     }
 
     private var durationText: String {
@@ -99,10 +95,6 @@ public struct LogCompletedRunSnippetView: View {
     }
 
     private var paceText: String {
-        let scale = paceUnit == .perKilometre ? 1.0 : 1.609344
-        let pacePerUnit = avgPaceSecPerKm * scale
-        let m = Int(pacePerUnit) / 60
-        let s = Int(pacePerUnit) % 60
-        return "\(m):\(String(format: "%02d", s))"
+        PaceFormatting.paceMinutesSeconds(secondsPerKm: avgPaceSecPerKm, unit: paceUnit)
     }
 }
