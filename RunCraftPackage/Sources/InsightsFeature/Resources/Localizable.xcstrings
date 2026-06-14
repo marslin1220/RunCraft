@@ -725,6 +725,64 @@
           }
         }
       }
+    },
+    "Set Up VDOT": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT を設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 설정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置 VDOT"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定 VDOT"
+          }
+        }
+      }
+    },
+    "Set up your VDOT to unlock pace zones, training paces, and race predictions. We can detect it from Apple Health, or you can enter a recent race time.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT を設定すると、ペースゾーン、トレーニングペース、レース予測が使えるようになります。Apple ヘルスケアから自動検出するか、直近のレースタイムを入力してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT을 설정하면 페이스 존, 훈련 페이스, 레이스 예측을 사용할 수 있습니다. Apple 건강에서 자동으로 감지하거나 최근 레이스 기록을 입력할 수 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置 VDOT 即可解锁配速区间、训练配速与比赛预测。我们可以从 Apple 健康自动检测，或者你可以输入近期的比赛成绩。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定 VDOT 即可解鎖配速區間、訓練配速與比賽預測。我們可以從 Apple 健康自動偵測，或者你可以輸入近期的比賽成績。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

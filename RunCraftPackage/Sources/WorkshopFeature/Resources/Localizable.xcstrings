@@ -1653,6 +1653,35 @@
           }
         }
       }
+    },
+    "Preview only — start this from the Plan tab on its scheduled day.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プレビューのみ — 予定日に「プラン」タブから開始してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "미리보기 전용 — 예정된 날에 \"계획\" 탭에서 시작하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅供预览 — 请在「计划」分页的预定日开始。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅供預覽 — 請在「計畫」分頁的預定日開始。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
