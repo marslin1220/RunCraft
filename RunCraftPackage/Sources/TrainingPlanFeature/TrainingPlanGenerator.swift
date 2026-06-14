@@ -106,7 +106,7 @@ public struct TrainingPlanGenerator {
         case .base:  buildMultiplier = 1.0 + Double(weekIndex % 4) * 0.08
         case .build: buildMultiplier = 1.32 + Double(weekIndex % 4) * 0.10
         case .peak:  buildMultiplier = 1.72 + Double(weekIndex % 4) * 0.05
-        case .taper: buildMultiplier = 1.92 - Double(weekIndex % 4) * 0.20
+        case .taper: buildMultiplier = 1.82 - Double(weekIndex % 4) * 0.20
         }
         return (base * max(buildMultiplier, 0.5)).rounded()
     }
