@@ -95,6 +95,10 @@ RunCraftPackage/                   Local SPM package — the bulk of the code
   layout rules, anti-patterns.
 - [`UBIQUITOUS_LANGUAGE.md`](UBIQUITOUS_LANGUAGE.md) — domain glossary
   (Order/Customer/Workout/PaceZone disambiguation).
+- [`TRAINING_PLAN_FLEXIBILITY.md`](TRAINING_PLAN_FLEXIBILITY.md) —
+  how `TrainingPlanGenerator` places sessions once a runner restricts
+  `availableDays` / `longRunDay`, and the 1-vs-2-day maintenance-mode
+  threshold.
 
 ## License
 
