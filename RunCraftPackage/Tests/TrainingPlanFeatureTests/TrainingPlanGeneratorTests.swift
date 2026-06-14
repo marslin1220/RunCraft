@@ -116,4 +116,37 @@ struct TrainingPlanGeneratorTests {
             #expect(s.targetDistanceKm == nil)
         }
     }
+
+    // MARK: - Rolling week (placeholder "Base Training" goal)
+
+    @Test("rollingWeek anchors to Monday of the current week, Base phase, week 1")
+    func rollingWeek_anchorsToCurrentMonday() {
+        let (week, sessions) = TrainingPlanGenerator.rollingWeek(raceGoalId: UUID(), vdot: 40)
+        #expect(week.weekNumber == 1)
+        #expect(week.phase == .base)
+        #expect(!sessions.isEmpty)
+
+        let calendar = Calendar.current
+        #expect(calendar.component(.weekday, from: week.startDate) == 2, "startDate should be a Monday")
+
+        let today = calendar.startOfDay(for: Date())
+        let nextWeekStart = calendar.date(byAdding: .day, value: 7, to: week.startDate)!
+        #expect(week.startDate <= today && today < nextWeekStart, "today should fall within the rolling week")
+    }
+
+    @Test("rollingWeek sessions reference the rolling week")
+    func rollingWeek_sessionsReferenceWeek() {
+        let (week, sessions) = TrainingPlanGenerator.rollingWeek(raceGoalId: UUID(), vdot: 40)
+        for session in sessions {
+            #expect(session.weekId == week.id)
+        }
+    }
+
+    @Test("rollingWeek(weekNumber: 0) produces a gap-filler week outside the 1-16 plan numbering")
+    func rollingWeek_gapFillerWeekNumber() {
+        let (week, sessions) = TrainingPlanGenerator.rollingWeek(raceGoalId: UUID(), vdot: 40, weekNumber: 0)
+        #expect(week.weekNumber == 0)
+        #expect(week.phase == .base)
+        #expect(!sessions.isEmpty)
+    }
 }

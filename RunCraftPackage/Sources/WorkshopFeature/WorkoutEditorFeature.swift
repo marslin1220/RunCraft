@@ -11,6 +11,13 @@ import RunCraftModels
         public var templateName: String = "New Workout"
         public var blocks: IdentifiedArrayOf<WorkoutBlock> = []
         public var source: Source = .yours
+        /// For `source == .planSession`: whether this is the session
+        /// scheduled for *today* in the *current* training week. HealthKit
+        /// sync-back matches a completed workout to today's session by
+        /// date, not by which session card was opened — starting a
+        /// different (past/future) session from here would get its
+        /// completion misattributed. Always `true` for `.yours`/`.template`.
+        public var isTodaySession: Bool = true
         public var saveStatus: SaveStatus = .idle
         public var syncStatus: SyncStatus = .idle
         /// Id of a block that was just appended optimistically and is being
@@ -53,12 +60,21 @@ import RunCraftModels
         public init(
             loading template: WorkoutTemplate,
             asCopy: Bool,
-            source: Source = .yours
+            source: Source = .yours,
+            isTodaySession: Bool = true
         ) {
             self.editingTemplateId = asCopy ? nil : template.id
             self.templateName = template.name
             self.blocks = IdentifiedArray(uniqueElements: template.blocks)
             self.source = source
+            self.isTodaySession = isTodaySession
+        }
+
+        /// Whether "Start Workout" should be offered. Plan-session copies
+        /// that aren't today's actual session are preview-only — see
+        /// `isTodaySession`.
+        public var canStartOnWatch: Bool {
+            source != .planSession || isTodaySession
         }
 
         /// Top-level steps in the workout (used by EditRepeatGroup to offer
@@ -221,7 +237,7 @@ import RunCraftModels
                 }
 
             case .startTapped:
-                guard !state.blocks.isEmpty else { return .none }
+                guard !state.blocks.isEmpty, state.canStartOnWatch else { return .none }
                 state.syncStatus = .sending
                 let template = WorkoutTemplate(
                     id: state.editingTemplateId ?? uuid(),

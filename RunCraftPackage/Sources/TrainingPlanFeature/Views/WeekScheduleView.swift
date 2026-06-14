@@ -20,20 +20,30 @@ struct WeekScheduleView: View {
     @State private var expandedWeekIds: Set<UUID> = []
     @State private var hasSeededExpansion = false
 
-    private var completedSessionIds: Set<UUID> {
-        Set(completedAll.compactMap(\.plannedSessionId))
+    /// `CompletedWorkout` rows grouped by the `PlannedSession` they were
+    /// matched to. A session can have more than one entry (same-day
+    /// double-workout) — see `SessionActuals`.
+    private var completedBySessionId: [UUID: [CompletedWorkout]] {
+        Dictionary(grouping: completedAll.filter { $0.plannedSessionId != nil }) { $0.plannedSessionId! }
     }
 
     private var todayDayOfWeek: Int {
         PlannedSession.dayOfWeek(for: Date())
     }
 
-    /// Walks `allWeeks` in order and runs them through the phase enum so
+    /// `allWeeks` filtered to the periodized weeks 1...16, excluding the
+    /// `weekNumber == 0` gap-filler rolling week (State C's pre-plan
+    /// "Base Training" week) so Full Schedule shows exactly the real plan.
+    private var planWeeks: [TrainingWeek] {
+        allWeeks.filter { $0.weekNumber >= 1 }
+    }
+
+    /// Walks `planWeeks` in order and runs them through the phase enum so
     /// the timeline can be rendered as four phase blocks instead of a flat
     /// 16-week list. Cheap — runs once per render.
     private var phaseGroups: [(phase: TrainingPhase, weeks: [TrainingWeek])] {
         var groups: [(TrainingPhase, [TrainingWeek])] = []
-        for week in allWeeks {
+        for week in planWeeks {
             if let last = groups.last, last.0 == week.phase {
                 groups[groups.count - 1].1.append(week)
             } else {
@@ -57,14 +67,16 @@ struct WeekScheduleView: View {
                                 week: week,
                                 sessions: allSessions.filter { $0.weekId == week.id }
                                                      .sorted { $0.dayOfWeek < $1.dayOfWeek },
-                                completedIds: completedSessionIds,
+                                completedBySessionId: completedBySessionId,
                                 isCurrent: isCurrentWeek(week),
                                 isExpanded: expandedWeekIds.contains(week.id),
                                 todayDayOfWeek: isCurrentWeek(week) ? todayDayOfWeek : nil,
                                 currentVDOT: currentVDOT,
                                 quickStartStatus: store.quickStartStatus,
                                 onToggle: { toggle(week.id) },
-                                onTap: { session in store.send(.sessionTapped(session)) },
+                                onTap: { session, isToday in
+                                    store.send(.sessionTapped(session, isToday: isToday))
+                                },
                                 onQuickStart: { session in
                                     store.send(.quickStartTapped(session, vdot: currentVDOT))
                                 }
@@ -86,7 +98,7 @@ struct WeekScheduleView: View {
 
     private func seedExpansionIfNeeded() {
         guard !hasSeededExpansion else { return }
-        if let current = allWeeks.first(where: isCurrentWeek) {
+        if let current = planWeeks.first(where: isCurrentWeek) {
             expandedWeekIds.insert(current.id)
         }
         hasSeededExpansion = true
@@ -173,7 +185,7 @@ private struct WeekSection: View {
 
     let week: TrainingWeek
     let sessions: [PlannedSession]
-    let completedIds: Set<UUID>
+    let completedBySessionId: [UUID: [CompletedWorkout]]
     let isCurrent: Bool
     let isExpanded: Bool
     /// Set when this section is the current week — used to mark today's
@@ -182,13 +194,18 @@ private struct WeekSection: View {
     let currentVDOT: Double
     let quickStartStatus: WeekSchedule.State.QuickStartStatus
     let onToggle: () -> Void
-    let onTap: (PlannedSession) -> Void
+    let onTap: (PlannedSession, Bool) -> Void
     let onQuickStart: (PlannedSession) -> Void
     @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
 
+    private var completedIds: Set<UUID> { Set(completedBySessionId.keys) }
     private var sessionCount: Int { sessions.filter { $0.sessionType != .rest }.count }
+    /// Rest days don't count toward "X of Y done" — but a rest day can
+    /// still have a `CompletedWorkout` matched to it (training happened on
+    /// a planned rest day, see `restRow`'s "Logged" line), so this must be
+    /// filtered the same way as `sessionCount` to avoid e.g. "5 of 4 done".
     private var completedCount: Int {
-        sessions.filter { completedIds.contains($0.id) }.count
+        sessions.filter { $0.sessionType != .rest && completedIds.contains($0.id) }.count
     }
 
     var body: some View {
@@ -198,10 +215,11 @@ private struct WeekSection: View {
             if isExpanded {
                 VStack(spacing: 8) {
                     ForEach(sessions) { session in
+                        let actuals = completedBySessionId[session.id].flatMap(SessionActuals.init)
                         if session.sessionType == .rest {
-                            restRow(session)
+                            restRow(session, actuals: actuals)
                         } else {
-                            sessionRow(session)
+                            sessionRow(session, actuals: actuals)
                         }
                     }
                 }
@@ -228,7 +246,7 @@ private struct WeekSection: View {
                     HStack(spacing: 8) {
                         Text("Week \(week.weekNumber)")
                             .font(.subheadline.bold())
-                            .foregroundStyle(isCurrent ? Color.brand.accent : .white)
+                            .foregroundStyle(isCurrent ? Color.brand.accent : Color.brand.textPrimary)
                         if isCurrent {
                             Text("THIS WEEK")
                                 .font(.caption2.bold())
@@ -250,7 +268,7 @@ private struct WeekSection: View {
                 // the volume curve down the page without reading subtitles.
                 Text("\(week.targetWeeklyKm, format: .number.precision(.fractionLength(0))) km")
                     .font(.title3.monospacedDigit().weight(.semibold))
-                    .foregroundStyle(isCurrent ? Color.brand.accent : .white)
+                    .foregroundStyle(isCurrent ? Color.brand.accent : Color.brand.textPrimary)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 14)
@@ -268,16 +286,16 @@ private struct WeekSection: View {
     // MARK: - Session row (active days)
 
     @ViewBuilder
-    private func sessionRow(_ session: PlannedSession) -> some View {
+    private func sessionRow(_ session: PlannedSession, actuals: SessionActuals?) -> some View {
         let isToday = todayDayOfWeek == session.dayOfWeek
-        let isCompleted = completedIds.contains(session.id)
+        let isCompleted = actuals != nil
         let isSending: Bool = {
             guard case let .sending(id) = quickStartStatus else { return false }
             return id == session.id
         }()
 
         Button {
-            onTap(session)
+            onTap(session, isToday)
         } label: {
             // Map the session type onto the dynamic brand zone palette so
             // tints adapt for light + dark instead of using the static
@@ -313,6 +331,12 @@ private struct WeekSection: View {
                             .foregroundStyle(Color.brand.textSecondary)
                             .lineLimit(1)
                     }
+                    if let actuals {
+                        Text("Actual: \(actuals.displayText(unit: paceUnit))")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(Color.brand.accent)
+                            .lineLimit(1)
+                    }
                 }
 
                 Spacer()
@@ -340,7 +364,7 @@ private struct WeekSection: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilityLabel(for: session, isToday: isToday, isCompleted: isCompleted))
+        .accessibilityLabel(accessibilityLabel(for: session, isToday: isToday, actuals: actuals))
     }
 
     @ViewBuilder
@@ -410,24 +434,39 @@ private struct WeekSection: View {
 
     // MARK: - Rest row (quieter)
 
+    /// Usually a quiet line so the eye skips past it — but if training
+    /// happened on a planned rest day (sync-back matched a `CompletedWorkout`
+    /// to this session), surface that instead of staying silent about it.
     @ViewBuilder
-    private func restRow(_ session: PlannedSession) -> some View {
+    private func restRow(_ session: PlannedSession, actuals: SessionActuals?) -> some View {
         HStack(spacing: 14) {
             Image(systemName: session.sessionType.symbolName)
                 .font(.subheadline)
                 .foregroundStyle(Color.brand.textSecondary)
                 .frame(width: 28, height: 28)
                 .accessibilityHidden(true)
-            Text("\(dayLabel(session.dayOfWeek)) · Rest")
-                .font(.subheadline)
-                .foregroundStyle(Color.brand.textSecondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(dayLabel(session.dayOfWeek)) · Rest")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.brand.textSecondary)
+                if let actuals {
+                    Text("Logged: \(actuals.displayText(unit: paceUnit))")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(Color.brand.accent)
+                }
+            }
             Spacer()
+            if actuals != nil {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.callout)
+                    .foregroundStyle(Color.brand.success)
+            }
         }
         .padding(.vertical, 4)
         .padding(.horizontal, 14)
-        .opacity(0.6)
+        .opacity(actuals == nil ? 0.6 : 1.0)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(dayLabel(session.dayOfWeek)), rest day")
+        .accessibilityLabel(restAccessibilityLabel(for: session, actuals: actuals))
     }
 
     // MARK: - Helpers
@@ -462,7 +501,7 @@ private struct WeekSection: View {
         return 0.85
     }
 
-    private func accessibilityLabel(for session: PlannedSession, isToday: Bool, isCompleted: Bool) -> String {
+    private func accessibilityLabel(for session: PlannedSession, isToday: Bool, actuals: SessionActuals?) -> String {
         var parts: [String] = [dayLabel(session.dayOfWeek), session.sessionType.displayName]
         if isToday { parts.append("today") }
         if let km = session.targetDistanceKm {
@@ -473,12 +512,47 @@ private struct WeekSection: View {
         if let zone = session.targetPaceZone {
             parts.append(zoneName(zone))
         }
-        if isCompleted { parts.append("completed") }
+        if let actuals {
+            parts.append("completed, actual \(actuals.displayText(unit: paceUnit))")
+        }
         return parts.joined(separator: ", ")
+    }
+
+    private func restAccessibilityLabel(for session: PlannedSession, actuals: SessionActuals?) -> String {
+        var label = "\(dayLabel(session.dayOfWeek)), rest day"
+        if let actuals {
+            label += ", but logged \(actuals.displayText(unit: paceUnit))"
+        }
+        return label
     }
 
     private func dayLabel(_ day: Int) -> String {
         weekdayLabel(day)
+    }
+}
+
+// MARK: - Session actuals
+
+/// "What actually happened" for a `PlannedSession`, derived from its matched
+/// `CompletedWorkout` row(s). A session can have more than one match (a
+/// same-day double-workout) — these are summed into one total rather than
+/// shown as competing numbers, so the runner sees their combined effort for
+/// the day alongside what was planned ("並陳顯示").
+struct SessionActuals: Equatable {
+    let distanceKm: Double
+    let paceSecPerKm: Double
+
+    init?(_ workouts: [CompletedWorkout]) {
+        guard !workouts.isEmpty else { return nil }
+        let totalDistanceKm = workouts.reduce(0) { $0 + $1.actualDistanceKm }
+        let totalDurationSec = workouts.reduce(0) { $0 + $1.actualDurationSec }
+        guard totalDistanceKm > 0 else { return nil }
+        self.distanceKm = totalDistanceKm
+        self.paceSecPerKm = totalDurationSec / totalDistanceKm
+    }
+
+    func displayText(unit: PaceUnit) -> String {
+        "\(PaceFormatting.distance(metres: distanceKm * 1_000, unit: unit)) · \(PaceFormatting.pace(secondsPerKm: paceSecPerKm, unit: unit))"
     }
 }
 

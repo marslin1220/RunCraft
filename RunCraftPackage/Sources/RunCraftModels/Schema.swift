@@ -1,9 +1,22 @@
 import Dependencies
+import Foundation
 import SQLiteData
+
+/// Shared between the main app and any future App Group member (e.g. the
+/// Today's-session Widget Extension) so they open the same SQLite file.
+private let appGroupIdentifier = "group.io.marstudio.RunCraft"
 
 extension DependencyValues {
     public mutating func bootstrapDatabase() throws {
-        let database = try SQLiteData.defaultDatabase()
+        let database = try SQLiteData.defaultDatabase(path: Self.databasePath)
+        try Self.migrate(database)
+        defaultDatabase = database
+    }
+
+    /// Applies every registered migration to `database`. Shared by
+    /// `bootstrapDatabase()` (App Group / Application Support file) and
+    /// tests that stand up an in-memory database against this schema.
+    public static func migrate(_ database: any DatabaseWriter) throws {
         var migrator = DatabaseMigrator()
         #if DEBUG
             migrator.eraseDatabaseOnSchemaChange = true
@@ -104,7 +117,27 @@ extension DependencyValues {
                 .execute(db)
         }
 
+        migrator.registerMigration("v3 – placeholder race goals") { db in
+            try #sql("""
+                ALTER TABLE "raceGoals" ADD COLUMN "isPlaceholder" INTEGER NOT NULL DEFAULT 0
+                """)
+                .execute(db)
+        }
+
         try migrator.migrate(database)
-        defaultDatabase = database
+    }
+
+    /// SQLite file location. Prefers the App Group's shared container so a
+    /// Widget Extension can open the same database; falls back to the
+    /// app's own Application Support directory if the App Groups
+    /// entitlement isn't configured yet.
+    private static var databasePath: String {
+        let directory = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)
+            ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        // SQLite won't create missing parent directories itself, and a
+        // freshly-added App Group container may not exist on disk yet.
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory.appendingPathComponent("RunCraft.db").path
     }
 }

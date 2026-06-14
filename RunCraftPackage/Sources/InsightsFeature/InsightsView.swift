@@ -16,6 +16,9 @@ public struct InsightsView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
+                    if store.currentVDOT == 0 {
+                        vdotSetupCard
+                    }
                     fitnessTrendCard
                     weeklyMileageCard
                     predictedRacesCard
@@ -31,6 +34,32 @@ public struct InsightsView: View {
     }
 
     // MARK: - Cards
+
+    /// Shown in place of real data when there's no VDOT yet — every other
+    /// card on this screen renders an empty state in that case, so this is
+    /// the one actionable thing the runner can do here.
+    @ViewBuilder
+    private var vdotSetupCard: some View {
+        sectionCard(title: "Set up your fitness baseline") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Set up your VDOT to unlock pace zones, training paces, and race predictions. We can detect it from Apple Health, or you can enter a recent race time.")
+                    .font(.footnote)
+                    .foregroundStyle(Color.brand.textSecondary)
+
+                Button {
+                    store.send(.setUpVDOTTapped)
+                } label: {
+                    Text("Set Up VDOT")
+                        .bold()
+                        .foregroundStyle(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.brand.accent)
+                        .clipShape(Capsule())
+                }
+            }
+        }
+    }
 
     /// VDOT / VO₂max / Δ in one card. Segmented picker at the top because
     /// the three series are *peers* — discoverable side-by-side beats a

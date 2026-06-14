@@ -21,6 +21,11 @@ public struct WorkoutCard<Content: View>: View {
     public let symbolName: String
     public let title: String
     public let subtitle: String?
+    /// Optional "what actually happened" line, rendered beneath `subtitle`
+    /// in the accent colour — lets a completed session show its planned
+    /// and actual distance/pace side by side instead of one overwriting
+    /// the other.
+    public let actualLine: String?
     public let trailing: Trailing
     public let isLoading: Bool
     public let action: () -> Void
@@ -32,6 +37,7 @@ public struct WorkoutCard<Content: View>: View {
         symbolName: String,
         title: String,
         subtitle: String? = nil,
+        actualLine: String? = nil,
         trailing: Trailing = .chevron,
         isLoading: Bool = false,
         action: @escaping () -> Void,
@@ -42,6 +48,7 @@ public struct WorkoutCard<Content: View>: View {
         self.symbolName = symbolName
         self.title = title
         self.subtitle = subtitle
+        self.actualLine = actualLine
         self.trailing = trailing
         self.isLoading = isLoading
         self.action = action
@@ -77,6 +84,12 @@ public struct WorkoutCard<Content: View>: View {
                         Text(subtitle)
                             .font(.subheadline.monospacedDigit())
                             .foregroundStyle(Color.brand.textSecondary)
+                            .lineLimit(1)
+                    }
+                    if let actualLine {
+                        Text(actualLine)
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(Color.brand.accent)
                             .lineLimit(1)
                     }
                     accessory

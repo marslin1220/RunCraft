@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import Foundation
-import HealthKitClient
 import RunCraftModels
 import VDOTEngine
 
@@ -18,39 +17,14 @@ import VDOTEngine
         /// to write a fresh VDOTSnapshot on save.
         public var originalVDOT: Double? = nil
 
-        // HealthKit auto-detection
-        public var detectedVDOT: Double? = nil
-        public var isDetectingVDOT: Bool = false
+        public var vdotInput: VDOTInput.State = .init()
 
-        // Manual race time input
-        public var manualDistance: RaceDistanceQuery = .fiveK
-        public var manualMinutes: Int = 0
-        public var manualSeconds: Int = 0
-
-        public var paceZones: PaceZones? {
-            guard let v = effectiveVDOT else { return nil }
-            return VDOTCalculator.paceZones(vdot: v)
-        }
+        public var paceZones: PaceZones? { vdotInput.paceZones }
 
         /// HealthKit-detected takes priority; falls back to calculated from manual race time.
-        public var effectiveVDOT: Double? {
-            if let v = detectedVDOT { return v }
-            let mins = manualMinutes
-            let secs = manualSeconds
-            let totalSeconds = Double(mins * 60 + secs)
-            guard totalSeconds > 0 else { return nil }
-            let v = VDOTCalculator.vdot(distanceMeters: manualDistance.metres, timeSeconds: totalSeconds)
-            return v >= 30 ? v : nil
-        }
+        public var effectiveVDOT: Double? { vdotInput.effectiveVDOT }
 
-        public var calculatedVDOT: Double? {
-            let mins = manualMinutes
-            let secs = manualSeconds
-            let totalSeconds = Double(mins * 60 + secs)
-            guard totalSeconds > 0 else { return nil }
-            let v = VDOTCalculator.vdot(distanceMeters: manualDistance.metres, timeSeconds: totalSeconds)
-            return v >= 30 ? v : nil
-        }
+        public var calculatedVDOT: Double? { vdotInput.calculatedVDOT }
 
         var canSave: Bool {
             !goalName.isEmpty && effectiveVDOT != nil
@@ -67,23 +41,28 @@ import VDOTEngine
             self.distanceKm = goal.distanceKm
             self.editingId = goal.id
             self.originalVDOT = goal.currentVDOT
-            // Seed the detected-VDOT pill so the form starts in a valid
-            // (saveable) state — user can clear it if they want to re-enter
-            // a new race time.
-            self.detectedVDOT = goal.currentVDOT
+            self.vdotInput = VDOTInput.State(detectedVDOT: goal.currentVDOT)
+        }
+
+        /// Pre-fill from a placeholder ("Base Training") goal when the
+        /// runner converts it into a real race goal. Carries the detected
+        /// VDOT over but leaves name/date/distance for the runner to enter —
+        /// the placeholder's own values (name="Base Training", distanceKm=0)
+        /// aren't meaningful race-goal defaults.
+        public init(convertingPlaceholder goal: RaceGoal) {
+            self.editingId = goal.id
+            self.originalVDOT = goal.currentVDOT
+            self.vdotInput = VDOTInput.State(detectedVDOT: goal.currentVDOT)
         }
     }
 
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
-        case detectVDOTTapped
-        case clearDetectedVDOTTapped
-        case vdotDetectionResponse(Result<Double, any Error>)
+        case vdotInput(VDOTInput.Action)
         case saveButtonTapped
         case cancelButtonTapped
     }
 
-    @Dependency(\.healthKitClient) var healthKitClient
     @Dependency(\.defaultDatabase) var database
     @Dependency(\.dismiss) var dismiss
     @Dependency(\.date.now) var now
@@ -92,40 +71,12 @@ import VDOTEngine
 
     public var body: some Reducer<State, Action> {
         BindingReducer()
+        Scope(state: \.vdotInput, action: \.vdotInput) {
+            VDOTInput()
+        }
         Reduce { state, action in
             switch action {
-            case .binding:
-                return .none
-
-            case .clearDetectedVDOTTapped:
-                state.detectedVDOT = nil
-                return .none
-
-            case .detectVDOTTapped:
-                state.isDetectingVDOT = true
-                return .run { [healthKitClient] send in
-                    await send(.vdotDetectionResponse(Result {
-                        try await healthKitClient.requestAuthorization()
-                        var bestVDOT: Double = 0
-                        for query in [RaceDistanceQuery.fiveK, .tenK, .halfMarathon] {
-                            if let time = try await healthKitClient.bestRaceTime(query) {
-                                let v = VDOTCalculator.vdot(distanceMeters: query.metres, timeSeconds: time)
-                                bestVDOT = max(bestVDOT, v)
-                            }
-                        }
-                        guard bestVDOT > 0 else { throw HealthKitError.noRaceDataFound }
-                        return bestVDOT
-                    }))
-                }
-
-            case let .vdotDetectionResponse(.success(vdot)):
-                state.isDetectingVDOT = false
-                state.detectedVDOT = vdot
-                return .none
-
-            case let .vdotDetectionResponse(.failure(error)):
-                state.isDetectingVDOT = false
-                _ = error
+            case .binding, .vdotInput:
                 return .none
 
             case .saveButtonTapped:
@@ -137,7 +88,8 @@ import VDOTEngine
                     targetDate: state.targetDate,
                     distanceKm: state.distanceKm,
                     currentVDOT: vdot,
-                    createdAt: now
+                    createdAt: now,
+                    isPlaceholder: false
                 )
                 let (weeks, sessions) = TrainingPlanGenerator.generate(goal: goal, vdot: vdot)
                 let isEditing = state.editingId != nil
@@ -172,17 +124,6 @@ import VDOTEngine
             case .cancelButtonTapped:
                 return .run { [dismiss] _ in await dismiss() }
             }
-        }
-    }
-}
-
-public enum HealthKitError: LocalizedError {
-    case noRaceDataFound
-
-    public var errorDescription: String? {
-        switch self {
-        case .noRaceDataFound:
-            "No running workouts found. Please enter your VDOT manually."
         }
     }
 }

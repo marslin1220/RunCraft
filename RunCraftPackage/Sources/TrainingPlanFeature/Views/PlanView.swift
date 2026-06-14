@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import DesignSystem
-import IssueReporting
 import RunCraftModels
 import SQLiteData
 import SwiftUI
@@ -20,7 +19,7 @@ public struct PlanView: View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
             ScrollView {
                 VStack(spacing: 20) {
-                    if let goal = activeGoal {
+                    if let goal = activeGoal, !goal.isPlaceholder {
                         Button {
                             store.send(.countdownTapped)
                         } label: {
@@ -29,51 +28,42 @@ public struct PlanView: View {
                         }
                         .buttonStyle(.plain)
 
-                        if let upgrade = store.vdotUpgrade {
-                            VDOTUpgradeBanner(upgrade: upgrade,
-                                onAccept: { store.send(.acceptVDOTUpgradeTapped) },
-                                onDismiss: { store.send(.dismissVDOTUpgrade) })
-                        }
-
-                        if case let .suggestDowngrade(reason) = store.recoveryAdvice {
-                            RecoveryAdviceBanner(reason: reason,
-                                onApply: { store.send(.applyDowngradeTapped) },
-                                onDismiss: { store.send(.dismissRecoveryAdvice) })
-                        }
+                        upgradeAndRecoveryBanners
 
                         // This Week comes BEFORE the pace zones — the runner's
                         // daily question is "what do I run today?" not "what
                         // are my paces?". Paces are reference; the schedule
                         // is the action. Apple Workout follows the same
                         // hierarchy.
-                        if let currentWeek = currentWeek {
-                            WeekSessionsSection(
-                                week: currentWeek,
-                                vdot: store.currentVDOT,
-                                quickStartSendingSessionId: store.quickStartSendingSessionId,
-                                onSessionTap: { store.send(.sessionTapped($0)) },
-                                onQuickStart: { store.send(.quickStartSession($0)) }
-                            )
-                        } else if let upcoming = firstUpcomingWeek {
-                            // No current week but the plan exists — runner is
-                            // in the "race is more than 16 weeks out" gap.
-                            // Show when the plan kicks in plus a greyed-out
-                            // preview of week 1 so the page doesn't look empty.
-                            PrePlanPreviewSection(
-                                week: upcoming,
-                                vdot: store.currentVDOT
-                            )
-                        }
+                        weekOrPreviewContent
 
                         if let zones = store.paceZones {
                             PaceZonesSummaryCard(zones: zones) { zone in
                                 store.send(.paceChipTapped(zone))
                             }
                         }
-                    } else {
-                        EmptyPlanPrompt {
-                            store.send(.createGoalButtonTapped)
+                    } else if let goal = activeGoal, goal.isPlaceholder {
+                        BaseTrainingBanner(vdot: store.currentVDOT)
+                            .padding(.top, 8)
+
+                        upgradeAndRecoveryBanners
+
+                        weekOrPreviewContent
+
+                        if let zones = store.paceZones {
+                            PaceZonesSummaryCard(zones: zones) { zone in
+                                store.send(.paceChipTapped(zone))
+                            }
                         }
+
+                        AddRaceGoalLink {
+                            store.send(.addRaceGoalButtonTapped)
+                        }
+                    } else {
+                        EmptyPlanPrompt(
+                            onAddRaceGoal: { store.send(.addRaceGoalButtonTapped) },
+                            onSetUpVDOT: { store.send(.setupVDOTButtonTapped) }
+                        )
                     }
                 }
                 .padding(.horizontal)
@@ -82,13 +72,15 @@ public struct PlanView: View {
             .navigationTitle("Plan")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                if store.hasGoal {
+                if let goal = activeGoal {
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
-                            Button {
-                                store.send(.recalculateVDOTRequested)
-                            } label: {
-                                Label("Edit goal / recalculate", systemImage: "pencil")
+                            if !goal.isPlaceholder {
+                                Button {
+                                    store.send(.recalculateVDOTRequested)
+                                } label: {
+                                    Label("Edit goal / recalculate", systemImage: "pencil")
+                                }
                             }
                             Button {
                                 store.send(.adjustVDOTRequested)
@@ -97,9 +89,12 @@ public struct PlanView: View {
                             }
                             Divider()
                             Button(role: .destructive) {
-                                store.send(.deletePlanRequested)
+                                store.send(.deletePlanRequested(isPlaceholder: goal.isPlaceholder))
                             } label: {
-                                Label("Delete plan", systemImage: "trash")
+                                Label(
+                                    goal.isPlaceholder ? "Remove VDOT setup" : "Delete plan",
+                                    systemImage: "trash"
+                                )
                             }
                         } label: {
                             Image(systemName: "ellipsis.circle")
@@ -111,6 +106,9 @@ public struct PlanView: View {
             .onAppear { store.send(.onAppear) }
             .sheet(item: $store.scope(state: \.destination?.setupRaceGoal, action: \.destination.setupRaceGoal)) { setupStore in
                 SetupRaceGoalView(store: setupStore)
+            }
+            .sheet(item: $store.scope(state: \.destination?.setupVDOT, action: \.destination.setupVDOT)) { setupStore in
+                SetupVDOTView(store: setupStore)
             }
             .sheet(item: $store.scope(state: \.destination?.adjustVDOT, action: \.destination.adjustVDOT)) { adjustStore in
                 AdjustVDOTView(store: adjustStore)
@@ -131,8 +129,60 @@ public struct PlanView: View {
         }
     }
 
+    /// VDOT-upgrade and recovery-advice banners — shown above the week's
+    /// sessions for both a real race goal (State C) and Base Training
+    /// (State B), since both have a current VDOT and a "today" to evaluate.
+    @ViewBuilder
+    private var upgradeAndRecoveryBanners: some View {
+        if let upgrade = store.vdotUpgrade {
+            VDOTUpgradeBanner(upgrade: upgrade,
+                onAccept: { store.send(.acceptVDOTUpgradeTapped) },
+                onDismiss: { store.send(.dismissVDOTUpgrade) })
+        }
+
+        if case let .suggestDowngrade(reason) = store.recoveryAdvice {
+            RecoveryAdviceBanner(reason: reason,
+                onApply: { store.send(.applyDowngradeTapped) },
+                onDismiss: { store.send(.dismissRecoveryAdvice) })
+        }
+    }
+
+    @ViewBuilder
+    private var weekOrPreviewContent: some View {
+        if let currentWeek = currentWeek {
+            // `weekNumber == 0` is the State C gap-filler: today falls
+            // before the periodized plan's week 1. Surface when the real
+            // plan kicks in above this week's Base Training sessions.
+            if currentWeek.weekNumber == 0, let planStart = planWeek1StartDate {
+                PlanGapBanner(planStartDate: planStart)
+            }
+            WeekSessionsSection(
+                week: currentWeek,
+                vdot: store.currentVDOT,
+                quickStartSendingSessionId: store.quickStartSendingSessionId,
+                onSessionTap: { store.send(.sessionTapped($0)) },
+                onQuickStart: { store.send(.quickStartSession($0)) }
+            )
+        } else if let upcoming = firstUpcomingWeek {
+            // No current week but the plan exists — runner is
+            // in the "race is more than 16 weeks out" gap.
+            // Show when the plan kicks in plus a greyed-out
+            // preview of week 1 so the page doesn't look empty.
+            PrePlanPreviewSection(
+                week: upcoming,
+                vdot: store.currentVDOT
+            )
+        }
+    }
+
     private var currentWeek: TrainingWeek? {
         TrainingWeek.current(in: allWeeks)
+    }
+
+    /// Start date of the periodized plan's week 1, used by `PlanGapBanner`
+    /// while the `weekNumber == 0` gap-filler week is current.
+    private var planWeek1StartDate: Date? {
+        allWeeks.first { $0.weekNumber == 1 }?.startDate
     }
 
     /// The next `TrainingWeek` to begin, used when `currentWeek` is nil
@@ -142,7 +192,7 @@ public struct PlanView: View {
         guard currentWeek == nil else { return nil }
         let today = Calendar.current.startOfDay(for: Date())
         return allWeeks
-            .filter { $0.startDate > today }
+            .filter { $0.weekNumber >= 1 && $0.startDate > today }
             .min(by: { $0.startDate < $1.startDate })
     }
 }
@@ -331,11 +381,17 @@ private struct WeekSessionsSection: View {
     let quickStartSendingSessionId: UUID?
     let onSessionTap: (PlannedSession) -> Void
     let onQuickStart: (PlannedSession) -> Void
-    @FetchAll(PlannedSession.none) var sessions: [PlannedSession]
+    @FetchAll var allSessions: [PlannedSession]
     @FetchAll var completedThisWeek: [CompletedWorkout]
 
-    private var completedSessionIds: Set<UUID> {
-        Set(completedThisWeek.compactMap(\.plannedSessionId))
+    private var sessions: [PlannedSession] {
+        allSessions.filter { $0.weekId == week.id }.sorted { $0.dayOfWeek < $1.dayOfWeek }
+    }
+
+    /// `CompletedWorkout` rows grouped by the `PlannedSession` they were
+    /// matched to — see `SessionActuals`.
+    private var completedBySessionId: [UUID: [CompletedWorkout]] {
+        Dictionary(grouping: completedThisWeek.filter { $0.plannedSessionId != nil }) { $0.plannedSessionId! }
     }
 
     private var todayDayOfWeek: Int {
@@ -345,7 +401,7 @@ private struct WeekSessionsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Week \(week.weekNumber) · \(week.phase.displayName)")
+                Text(week.weekNumber == 0 ? "This Week · Base Training" : "Week \(week.weekNumber) · \(week.phase.displayName)")
                     .font(.headline)
                     .foregroundStyle(Color.brand.textPrimary)
                 Spacer()
@@ -355,13 +411,14 @@ private struct WeekSessionsSection: View {
             }
 
             ForEach(sessions) { session in
+                let actuals = completedBySessionId[session.id].flatMap(SessionActuals.init)
                 if session.sessionType == .rest {
-                    RestSessionLine(session: session)
+                    RestSessionLine(session: session, actuals: actuals)
                 } else {
                     SessionCard(
                         session: session,
                         vdot: vdot,
-                        isCompleted: completedSessionIds.contains(session.id),
+                        actuals: actuals,
                         isToday: session.dayOfWeek == todayDayOfWeek,
                         isSending: quickStartSendingSessionId == session.id,
                         onTap: { onSessionTap(session) },
@@ -369,17 +426,6 @@ private struct WeekSessionsSection: View {
                     )
                 }
             }
-        }
-        .task(id: week.id) { await loadWeekData() }
-    }
-
-    private func loadWeekData() async {
-        _ = await withErrorReporting {
-            try await $sessions.load(
-                PlannedSession
-                    .where { $0.weekId.eq(week.id) }
-                    .order(by: \.dayOfWeek)
-            )
         }
     }
 }
@@ -394,7 +440,7 @@ private struct WeekSessionsSection: View {
 private struct PrePlanPreviewSection: View {
     let week: TrainingWeek
     let vdot: Double
-    @FetchAll(PlannedSession.none) var sessions: [PlannedSession]
+    @FetchAll var allSessions: [PlannedSession]
     @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
 
     private var daysUntilStart: Int {
@@ -411,7 +457,6 @@ private struct PrePlanPreviewSection: View {
             previewHeader
             previewList
         }
-        .task(id: week.id) { await loadSessions() }
     }
 
     /// Hero callout — the most important piece of info on this screen
@@ -462,7 +507,9 @@ private struct PrePlanPreviewSection: View {
     /// the runner a feel for the work, not a day-by-day shopping list.
     @ViewBuilder
     private var previewList: some View {
-        let runSessions = sessions.filter { $0.sessionType != .rest }
+        let runSessions = allSessions
+            .filter { $0.weekId == week.id && $0.sessionType != .rest }
+            .sorted { $0.dayOfWeek < $1.dayOfWeek }
         VStack(spacing: 8) {
             ForEach(runSessions) { session in
                 PreviewSessionRow(session: session, vdot: vdot, paceUnit: paceUnit)
@@ -472,13 +519,47 @@ private struct PrePlanPreviewSection: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Week 1 preview, \(runSessions.count) sessions")
     }
+}
 
-    private func loadSessions() async {
-        _ = await withErrorReporting {
-            try await $sessions.load(
-                PlannedSession
-                    .where { $0.weekId.eq(week.id) }
-                    .order(by: \.dayOfWeek)
+/// Shown above `WeekSessionsSection` for State C's `weekNumber == 0`
+/// gap-filler week — the runner's race is more than 16 weeks out (or the
+/// race date has passed), so today's "Base Training" session is shown
+/// alongside a heads-up about when the periodized plan starts.
+private struct PlanGapBanner: View {
+    let planStartDate: Date
+
+    private var daysUntilStart: Int {
+        Calendar.current.dateComponents(
+            [.day],
+            from: Calendar.current.startOfDay(for: Date()),
+            to: Calendar.current.startOfDay(for: planStartDate)
+        ).day ?? 0
+    }
+
+    var body: some View {
+        if daysUntilStart > 0 {
+            HStack(spacing: 12) {
+                Image(systemName: "calendar.badge.clock")
+                    .font(.title2)
+                    .foregroundStyle(Color.brand.caution)
+                    .frame(width: 36, height: 36)
+                    .background(Color.brand.caution.opacity(0.15), in: Circle())
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Your 16-week plan starts in \(daysUntilStart) day\(daysUntilStart == 1 ? "" : "s")")
+                        .font(.headline)
+                        .foregroundStyle(Color.brand.textPrimary)
+                    Text(planStartDate, format: .dateTime.weekday(.wide).month().day())
+                        .font(.subheadline)
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(Color.brand.caution.opacity(0.3), lineWidth: 1)
             )
         }
     }
@@ -538,12 +619,16 @@ private struct PreviewSessionRow: View {
 private struct SessionCard: View {
     let session: PlannedSession
     let vdot: Double
-    let isCompleted: Bool
+    /// "What actually happened," from the matched `CompletedWorkout`(s).
+    /// Drives the completed state — non-nil means this session is done.
+    let actuals: SessionActuals?
     let isToday: Bool
     let isSending: Bool
     let onTap: () -> Void
     let onQuickStart: () -> Void
     @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+
+    private var isCompleted: Bool { actuals != nil }
 
     var body: some View {
         WorkoutCard(
@@ -551,6 +636,7 @@ private struct SessionCard: View {
             symbolName: session.sessionType.symbolName,
             title: cardTitle,
             subtitle: cardSubtitle,
+            actualLine: actuals.map { "Actual: \($0.displayText(unit: paceUnit))" },
             trailing: trailingKind,
             isLoading: isSending,
             action: onTap,
@@ -597,7 +683,9 @@ private struct SessionCard: View {
         var parts: [String] = [dayLabel, session.sessionType.displayName]
         if isToday { parts.append("today") }
         if let sub = cardSubtitle { parts.append(sub) }
-        if isCompleted { parts.append("completed") }
+        if let actuals {
+            parts.append("completed, actual \(actuals.displayText(unit: paceUnit))")
+        }
         return parts.joined(separator: ", ")
     }
 
@@ -607,9 +695,13 @@ private struct SessionCard: View {
 }
 
 /// Rest days don't get a full card — they're a quiet line so the eye
-/// skips past them to the actual training.
+/// skips past them to the actual training. Unless training happened
+/// anyway (sync-back matched a `CompletedWorkout` to this rest day), in
+/// which case that's surfaced instead of staying silent about it.
 private struct RestSessionLine: View {
     let session: PlannedSession
+    let actuals: SessionActuals?
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
 
     var body: some View {
         HStack(spacing: 14) {
@@ -617,16 +709,36 @@ private struct RestSessionLine: View {
                 .font(.subheadline)
                 .foregroundStyle(Color.brand.textSecondary)
                 .frame(width: 32)
-            Text("\(dayLabel) · Rest")
-                .font(.subheadline)
-                .foregroundStyle(Color.brand.textSecondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(dayLabel) · Rest")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.brand.textSecondary)
+                if let actuals {
+                    Text("Logged: \(actuals.displayText(unit: paceUnit))")
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.accent)
+                }
+            }
             Spacer()
+            if actuals != nil {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.callout)
+                    .foregroundStyle(Color.brand.success)
+            }
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 16)
-        .opacity(0.7)
+        .opacity(actuals == nil ? 0.7 : 1.0)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(dayLabel), rest day")
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var accessibilityLabel: String {
+        var label = "\(dayLabel), rest day"
+        if let actuals {
+            label += ", but logged \(actuals.displayText(unit: paceUnit))"
+        }
+        return label
     }
 
     private var dayLabel: String {
@@ -650,8 +762,63 @@ enum SessionPalette {
     }
 }
 
+/// Non-interactive header for State B ("Base Training") — visually distinct
+/// from `RaceCountdownRing`: no ring, no countdown, no date, not a `Button`.
+private struct BaseTrainingBanner: View {
+    let vdot: Double
+
+    var body: some View {
+        HStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(Color.brand.accent.opacity(0.15))
+                    .frame(width: 56, height: 56)
+                Image(systemName: "figure.run")
+                    .font(.title2)
+                    .foregroundStyle(Color.brand.accent)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Base Training")
+                    .font(.headline)
+                    .foregroundStyle(Color.brand.textPrimary)
+                Text("VDOT \(vdot, format: .number.precision(.fractionLength(1))) · no race goal yet")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// Bottom-of-screen link for State B, inviting the runner to graduate
+/// Base Training into a full 16-week plan once they have a race in mind.
+private struct AddRaceGoalLink: View {
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack {
+                Label("Add a Race Goal", systemImage: "flag.checkered")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+            .foregroundStyle(Color.brand.accent)
+            .padding()
+            .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 private struct EmptyPlanPrompt: View {
-    let onCreateTapped: () -> Void
+    let onAddRaceGoal: () -> Void
+    let onSetUpVDOT: () -> Void
 
     var body: some View {
         VStack(spacing: 20) {
@@ -660,61 +827,37 @@ private struct EmptyPlanPrompt: View {
                 .foregroundStyle(Color.brand.accent)
                 .accessibilityHidden(true)
 
-            Text("No race goal yet")
+            Text("No training plan yet")
                 .font(.title2)
                 .bold()
                 .foregroundStyle(Color.brand.textPrimary)
 
-            Text("Create your first race goal and we'll build a personalised 16-week training plan.")
+            Text("Add a race goal for a personalised 16-week plan, or set up your VDOT for a rolling base training week.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.brand.textSecondary)
 
-            Button(action: onCreateTapped) {
-                Text("Create Race Goal")
-                    .bold()
-                    .foregroundStyle(.black)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(Color.brand.accent)
-                    .clipShape(Capsule())
-            }
+            VStack(spacing: 12) {
+                Button(action: onAddRaceGoal) {
+                    Text("Add Race Goal")
+                        .bold()
+                        .foregroundStyle(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.brand.accent)
+                        .clipShape(Capsule())
+                }
 
-            SampleWeekPreview()
-                .padding(.top, 12)
-        }
-        .padding(.top, 60)
-    }
-}
-
-/// Gives a runner with no race goal a concrete look at what RunCraft
-/// generates — the Base-phase week-1 template, rendered with the same
-/// dimmed `PreviewSessionRow` used for the "race far in the future" case.
-/// No VDOT yet, so paces are omitted; only structure (day, type, distance)
-/// is shown. Labelled "Example" so it doesn't read as the runner's own data.
-private struct SampleWeekPreview: View {
-    private let sessions = TrainingPlanGenerator.sampleWeek1Sessions()
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("EXAMPLE")
-                    .font(.caption2.weight(.bold))
-                    .tracking(1)
-                    .foregroundStyle(Color.brand.accent)
-                Text("Example week · \(TrainingPhase.base.displayName)")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.brand.textSecondary)
-            }
-            .padding(.horizontal, 4)
-
-            VStack(spacing: 8) {
-                ForEach(sessions.filter { $0.sessionType != .rest }) { session in
-                    PreviewSessionRow(session: session, vdot: 0, paceUnit: paceUnit)
+                Button(action: onSetUpVDOT) {
+                    Text("Set Up VDOT")
+                        .bold()
+                        .foregroundStyle(Color.brand.accent)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .overlay(Capsule().stroke(Color.brand.accent, lineWidth: 1.5))
                 }
             }
-            .opacity(0.55)
+            .padding(.horizontal, 24)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 60)
     }
 }

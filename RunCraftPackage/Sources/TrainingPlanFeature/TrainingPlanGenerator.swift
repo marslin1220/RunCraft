@@ -49,21 +49,33 @@ public struct TrainingPlanGenerator {
         return (weeks, sessions)
     }
 
-    /// A standalone "Base, week 1" set of sessions with no `TrainingWeek`
-    /// behind them — used by the empty-state preview to show what a
-    /// generated plan looks like before any race goal exists.
-    static func sampleWeek1Sessions() -> [PlannedSession] {
-        sessionTemplate(for: .base, weekNumber: 1).map { blueprint in
-            PlannedSession(
-                weekId: UUID(),
-                dayOfWeek: blueprint.dayOfWeek,
-                sessionType: blueprint.type,
-                targetDistanceKm: blueprint.distanceKm,
-                targetDurationMin: blueprint.durationMin,
-                targetPaceZone: blueprint.paceZone,
-                notes: blueprint.notes
-            )
-        }
+    /// A single "Base" `TrainingWeek` + sessions anchored to the current
+    /// calendar week — the rolling plan behind a placeholder `RaceGoal` (no
+    /// race goal set, VDOT-only "Base Training" state).
+    ///
+    /// Also reused for a real race goal whose 16-week plan doesn't cover
+    /// "today" (race more than 16 weeks out, or already past). In that case
+    /// pass `weekNumber: 0` — a sentinel that keeps this filler week out of
+    /// the periodized week-1...16 numbering so Full Schedule isn't confused
+    /// by a duplicate "Week 1".
+    public static func rollingWeek(
+        raceGoalId: UUID, vdot: Double, weekNumber: Int = 1
+    ) -> (week: TrainingWeek, sessions: [PlannedSession]) {
+        let zones = VDOTCalculator.paceZones(vdot: vdot)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let weekday = calendar.component(.weekday, from: today) // Sun=1...Sat=7
+        let daysSinceMonday = (weekday + 5) % 7
+        let weekStart = calendar.date(byAdding: .day, value: -daysSinceMonday, to: today) ?? today
+
+        let week = TrainingWeek(
+            raceGoalId: raceGoalId,
+            weekNumber: weekNumber,
+            phase: .base,
+            startDate: weekStart,
+            targetWeeklyKm: baseWeeklyKm(for: 0)
+        )
+        return (week, Self.sessions(for: week, zones: zones))
     }
 
     // MARK: - Phase

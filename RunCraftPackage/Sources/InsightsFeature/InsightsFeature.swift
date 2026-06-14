@@ -105,6 +105,15 @@ import VDOTEngine
             recentWorkouts: [CompletedWorkout],
             vo2MaxSamples: [VO2MaxSample]
         )
+        case setUpVDOTTapped
+        case delegate(Delegate)
+
+        public enum Delegate {
+            /// Parent (AppFeature) should switch to the Plan tab and open
+            /// "Set Up VDOT" — there's no race goal yet, so nothing here
+            /// (pace zones, predictions) can be computed.
+            case setUpVDOTTapped
+        }
     }
 
     @Dependency(\.defaultDatabase) var database
@@ -155,6 +164,12 @@ import VDOTEngine
                 state.snapshots = snapshots
                 state.recentWorkouts = workouts
                 state.vo2MaxSamples = vo2
+                return .none
+
+            case .setUpVDOTTapped:
+                return .send(.delegate(.setUpVDOTTapped))
+
+            case .delegate:
                 return .none
             }
         }

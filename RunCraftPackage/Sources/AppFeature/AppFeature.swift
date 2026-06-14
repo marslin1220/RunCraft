@@ -50,13 +50,17 @@ import WorkshopFeature
                 state.selectedTab = tab
                 return .none
 
-            case let .plan(.delegate(.openWorkoutInWorkshop(template, source))):
+            case let .plan(.delegate(.openWorkoutInWorkshop(template, source, isTodaySession))):
                 state.selectedTab = .workouts
                 let workoutsSource: WorkoutEditor.State.Source = switch source {
                 case .planSession: .planSession
                 case .template:    .template
                 }
-                return .send(.workouts(.openDetail(template, workoutsSource)))
+                return .send(.workouts(.openDetail(template, workoutsSource, isTodaySession: isTodaySession)))
+
+            case .insights(.delegate(.setUpVDOTTapped)):
+                state.selectedTab = .plan
+                return .send(.plan(.setupVDOTButtonTapped))
 
             case .plan, .workouts, .insights, .settings:
                 return .none

@@ -9,10 +9,8 @@ import WorkshopFeature
 
 @Reducer public struct TrainingPlan {
     @ObservableState public struct State {
-        public var hasGoal: Bool = false
         public var currentVDOT: Double = 0
         public var paceZones: PaceZones? = nil
-        public var isLoadingVDOT: Bool = false
         public var recoveryAdvice: RecoveryAdvice? = nil
         public var vdotUpgrade: VDOTUpgrade? = nil
         public var path = StackState<Path.State>()
@@ -66,6 +64,7 @@ import WorkshopFeature
 
     @Reducer public enum Destination {
         case setupRaceGoal(SetupRaceGoal)
+        case setupVDOT(SetupVDOT)
         case adjustVDOT(AdjustVDOT)
         case deleteConfirm(AlertState<DeleteAlertAction>)
     }
@@ -76,11 +75,14 @@ import WorkshopFeature
 
     public enum Action {
         case onAppear
-        case createGoalButtonTapped
-        case checkRaceGoalResponse(Result<Bool, any Error>)
-        case fetchVDOTTapped
-        case vdotFetchResponse(Result<Double, any Error>)
-        case deletePlanRequested
+        case activeGoalLoaded(Result<RaceGoal?, any Error>)
+        /// Re-anchors the placeholder ("Base Training") rolling week to the
+        /// current calendar week once the previous one has rolled past.
+        case refreshRollingWeekIfNeeded(RaceGoal)
+        case setupVDOTButtonTapped
+        case addRaceGoalButtonTapped
+        case addRaceGoalLoaded(RaceGoal?)
+        case deletePlanRequested(isPlaceholder: Bool)
         case recalculateVDOTRequested
         case adjustVDOTRequested
         case editGoalLoaded(RaceGoal?)
@@ -111,7 +113,9 @@ import WorkshopFeature
 
         public enum Delegate {
             /// Parent (AppFeature) should switch to Workshop tab and open this workout.
-            case openWorkoutInWorkshop(WorkoutTemplate, source: TemplateSource)
+            /// `isTodaySession` is forwarded to `WorkoutEditor.State` — see
+            /// `WorkoutEditor.State.isTodaySession`.
+            case openWorkoutInWorkshop(WorkoutTemplate, source: TemplateSource, isTodaySession: Bool)
         }
 
         public enum TemplateSource: Equatable {
@@ -133,45 +137,16 @@ import WorkshopFeature
             switch action {
             case .onAppear:
                 return .run { [database] send in
-                    await send(.checkRaceGoalResponse(Result {
-                        let count = try await database.read { db in
-                            try RaceGoal.all.fetchCount(db)
-                        }
-                        return count > 0
-                    }))
-                }
-
-            case .createGoalButtonTapped:
-                state.destination = .setupRaceGoal(SetupRaceGoal.State())
-                return .none
-
-            case let .checkRaceGoalResponse(.success(hasGoal)):
-                state.hasGoal = hasGoal
-                if hasGoal {
-                    return .send(.fetchVDOTTapped)
-                }
-                return .none
-
-            case .checkRaceGoalResponse(.failure):
-                state.hasGoal = false
-                return .none
-
-            case .fetchVDOTTapped:
-                state.isLoadingVDOT = true
-                return .run { [database] send in
-                    await send(.vdotFetchResponse(Result {
-                        let goal = try await database.read { db in
+                    await send(.activeGoalLoaded(Result {
+                        try await database.read { db in
                             try RaceGoal.order { $0.createdAt.desc() }.fetchOne(db)
                         }
-                        guard let goal else { throw PlanError.noGoalFound }
-                        return goal.currentVDOT
                     }))
                 }
 
-            case let .vdotFetchResponse(.success(vdot)):
-                state.isLoadingVDOT = false
-                state.currentVDOT = vdot
-                state.paceZones = VDOTCalculator.paceZones(vdot: vdot)
+            case let .activeGoalLoaded(.success(.some(goal))):
+                state.currentVDOT = goal.currentVDOT
+                state.paceZones = VDOTCalculator.paceZones(vdot: goal.currentVDOT)
                 // VDOT is loaded → kick the readiness, progress and
                 // sync-back checks now that we know there's an active plan
                 // with a today's session to evaluate and a baseline VDOT
@@ -179,25 +154,132 @@ import WorkshopFeature
                 return .merge(
                     .send(.fetchRecoveryAdvice),
                     .send(.syncBackWorkouts),
-                    .send(.checkVDOTUpgrade)
+                    .send(.checkVDOTUpgrade),
+                    .send(.refreshRollingWeekIfNeeded(goal))
                 )
 
-            case .vdotFetchResponse(.failure):
-                state.isLoadingVDOT = false
+            case .activeGoalLoaded(.success(.none)):
+                state.currentVDOT = 0
+                state.paceZones = nil
                 return .none
 
-            case .deletePlanRequested:
+            case .activeGoalLoaded(.failure):
+                state.currentVDOT = 0
+                state.paceZones = nil
+                return .none
+
+            case let .refreshRollingWeekIfNeeded(goal):
+                return .run { [database] _ in
+                    try await database.write { db in
+                        let weeks = try TrainingWeek
+                            .where { $0.raceGoalId.eq(goal.id) }
+                            .fetchAll(db)
+
+                        func hasSessions(forWeekId weekId: UUID) throws -> Bool {
+                            try PlannedSession.where { $0.weekId.eq(weekId) }.fetchCount(db) > 0
+                        }
+
+                        if goal.isPlaceholder {
+                            // State B: the placeholder goal's only week is
+                            // this rolling "Base Training" week. Regenerate
+                            // it whenever it's rolled past the current week,
+                            // or if it's missing its planned sessions.
+                            if let current = TrainingWeek.current(in: weeks),
+                               try hasSessions(forWeekId: current.id) {
+                                return
+                            }
+                            try TrainingWeek
+                                .where { $0.raceGoalId.eq(goal.id) }
+                                .delete()
+                                .execute(db)
+                            let (week, sessions) = TrainingPlanGenerator.rollingWeek(
+                                raceGoalId: goal.id, vdot: goal.currentVDOT
+                            )
+                            try TrainingWeek.upsert { week }.execute(db)
+                            for session in sessions {
+                                try PlannedSession.upsert { session }.execute(db)
+                            }
+                            return
+                        }
+
+                        // State C: weeks 1...16 are the periodized plan and
+                        // are never touched here. `weekNumber == 0` is a
+                        // gap-filler rolling week shown only while "today"
+                        // falls before the plan's week 1 — keep it in sync
+                        // without disturbing the real plan.
+                        let planWeeks = weeks.filter { $0.weekNumber >= 1 }
+                        let gapWeek = weeks.first { $0.weekNumber == 0 }
+
+                        if TrainingWeek.current(in: planWeeks) != nil {
+                            if gapWeek != nil {
+                                try TrainingWeek
+                                    .where { $0.raceGoalId.eq(goal.id) }
+                                    .where { $0.weekNumber.eq(0) }
+                                    .delete()
+                                    .execute(db)
+                            }
+                            return
+                        }
+
+                        if let gapWeek,
+                           TrainingWeek.current(in: [gapWeek]) != nil,
+                           try hasSessions(forWeekId: gapWeek.id) {
+                            return
+                        }
+
+                        if gapWeek != nil {
+                            try TrainingWeek
+                                .where { $0.raceGoalId.eq(goal.id) }
+                                .where { $0.weekNumber.eq(0) }
+                                .delete()
+                                .execute(db)
+                        }
+                        let (week, sessions) = TrainingPlanGenerator.rollingWeek(
+                            raceGoalId: goal.id, vdot: goal.currentVDOT, weekNumber: 0
+                        )
+                        try TrainingWeek.upsert { week }.execute(db)
+                        for session in sessions {
+                            try PlannedSession.upsert { session }.execute(db)
+                        }
+                    }
+                }
+
+            case .setupVDOTButtonTapped:
+                state.destination = .setupVDOT(SetupVDOT.State())
+                return .none
+
+            case .addRaceGoalButtonTapped:
+                return .run { [database] send in
+                    let goal = try? await database.read { db in
+                        try RaceGoal.order { $0.createdAt.desc() }.fetchOne(db)
+                    }
+                    await send(.addRaceGoalLoaded(goal))
+                }
+
+            case let .addRaceGoalLoaded(goal):
+                if let goal, goal.isPlaceholder {
+                    state.destination = .setupRaceGoal(SetupRaceGoal.State(convertingPlaceholder: goal))
+                } else {
+                    state.destination = .setupRaceGoal(SetupRaceGoal.State())
+                }
+                return .none
+
+            case let .deletePlanRequested(isPlaceholder):
                 state.destination = .deleteConfirm(AlertState {
-                    TextState("Delete plan?")
+                    TextState(isPlaceholder ? "Remove VDOT setup?" : "Delete plan?")
                 } actions: {
                     ButtonState(role: .destructive, action: .confirmDelete) {
-                        TextState("Delete")
+                        TextState(isPlaceholder ? "Remove" : "Delete")
                     }
                     ButtonState(role: .cancel) {
                         TextState("Cancel")
                     }
                 } message: {
-                    TextState("This removes your race goal and all generated weekly sessions. Completed workouts are kept.")
+                    TextState(
+                        isPlaceholder
+                            ? "This removes your base training week. Completed workouts are kept."
+                            : "This removes your race goal and all generated weekly sessions. Completed workouts are kept."
+                    )
                 })
                 return .none
 
@@ -231,7 +313,7 @@ import WorkshopFeature
                 }
 
             case .planDeleted:
-                state.hasGoal = false
+                state.currentVDOT = 0
                 state.paceZones = nil
                 return .none
 
@@ -448,11 +530,12 @@ import WorkshopFeature
 
             case let .paceChipTapped(zone):
                 let template = makePaceFocusTemplate(zone: zone, vdot: state.currentVDOT)
-                return .send(.delegate(.openWorkoutInWorkshop(template, source: .template)))
+                return .send(.delegate(.openWorkoutInWorkshop(template, source: .template, isTodaySession: true)))
 
             case let .sessionTapped(session):
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
-                return .send(.delegate(.openWorkoutInWorkshop(template, source: .planSession)))
+                let isToday = session.dayOfWeek == PlannedSession.dayOfWeek(for: now)
+                return .send(.delegate(.openWorkoutInWorkshop(template, source: .planSession, isTodaySession: isToday)))
 
             case let .quickStartSession(session):
                 state.quickStartSendingSessionId = session.id
@@ -487,14 +570,15 @@ import WorkshopFeature
             case .quickStartAlert:
                 return .none
 
-            case let .path(.element(_, .weekSchedule(.delegate(.openSession(session))))):
+            case let .path(.element(_, .weekSchedule(.delegate(.openSession(session, isToday))))):
                 // Push the editor onto Plan's own stack — Back from there
                 // returns to Full Schedule, not the Workshop tab.
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
                 state.path.append(.editor(WorkoutEditor.State(
                     loading: template,
                     asCopy: true,
-                    source: .planSession
+                    source: .planSession,
+                    isTodaySession: isToday
                 )))
                 return .none
 
@@ -555,7 +639,10 @@ import WorkshopFeature
         }
     }
     public enum Action {
-        case sessionTapped(PlannedSession)
+        /// `isToday`: this session is the current week's session for today
+        /// — forwarded to `WorkoutEditor.State.isTodaySession` so "Start
+        /// Workout" is only offered for today's actual session.
+        case sessionTapped(PlannedSession, isToday: Bool)
         /// Skips the editor and pushes the workout straight to the Watch.
         /// Surfaces an alert on failure; otherwise just sets `sent`.
         case quickStartTapped(PlannedSession, vdot: Double)
@@ -564,7 +651,7 @@ import WorkshopFeature
         case delegate(Delegate)
         public enum Alert: Equatable {}
         public enum Delegate {
-            case openSession(PlannedSession)
+            case openSession(PlannedSession, isToday: Bool)
         }
     }
 
@@ -574,8 +661,8 @@ import WorkshopFeature
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case let .sessionTapped(s):
-                return .send(.delegate(.openSession(s)))
+            case let .sessionTapped(s, isToday):
+                return .send(.delegate(.openSession(s, isToday: isToday)))
 
             case let .quickStartTapped(session, vdot):
                 state.quickStartStatus = .sending(sessionId: session.id)
@@ -608,8 +695,4 @@ import WorkshopFeature
         }
         .ifLet(\.$alert, action: \.alert)
     }
-}
-
-public enum PlanError: Error {
-    case noGoalFound
 }

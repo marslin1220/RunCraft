@@ -29,19 +29,25 @@ public struct WorkoutEditorView: View {
         // in the list, and the system handles inset on the home gesture
         // bar (HIG `fixed-element-offset`).
         .safeAreaInset(edge: .bottom) {
-            sendToWatchButton
-                .padding(.horizontal)
-                .padding(.bottom, 8)
-                .background(
-                    LinearGradient(
-                        colors: [Color.brand.background.opacity(0), Color.brand.background],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 60)
-                    .offset(y: 20)
-                    .allowsHitTesting(false)
+            Group {
+                if store.canStartOnWatch {
+                    sendToWatchButton
+                } else {
+                    previewOnlyNotice
+                }
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+            .background(
+                LinearGradient(
+                    colors: [Color.brand.background.opacity(0), Color.brand.background],
+                    startPoint: .top,
+                    endPoint: .bottom
                 )
+                .frame(height: 60)
+                .offset(y: 20)
+                .allowsHitTesting(false)
+            )
         }
         .navigationTitle(store.templateName.isEmpty ? "Edit Workout" : store.templateName)
         .navigationBarTitleDisplayMode(.inline)
@@ -158,6 +164,20 @@ public struct WorkoutEditorView: View {
         .buttonStyle(.plain)
         .disabled(store.syncStatus == .sending || store.blocks.isEmpty)
         .opacity(store.blocks.isEmpty ? 0.4 : 1)
+    }
+
+    /// Shown instead of "Start Workout" for a plan session that isn't
+    /// today's — completing it now would get logged against today's
+    /// actual session via HealthKit sync-back, not this one.
+    private var previewOnlyNotice: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "eye")
+            Text("Preview only — start this from the Plan tab on its scheduled day.")
+        }
+        .font(.footnote)
+        .foregroundStyle(Color.brand.textSecondary)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
     }
 
     @ViewBuilder private var sendIcon: some View {

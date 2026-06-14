@@ -42,7 +42,7 @@ import RunCraftModels
         case newWorkoutTapped
         case workoutTapped(WorkoutTemplate, WorkoutEditor.State.Source)
         case browseTemplatesTapped
-        case openDetail(WorkoutTemplate, WorkoutEditor.State.Source)
+        case openDetail(WorkoutTemplate, WorkoutEditor.State.Source, isTodaySession: Bool)
         case path(StackActionOf<Path>)
     }
 
@@ -78,7 +78,7 @@ import RunCraftModels
                 state.selectedSegment = .templates
                 return .none
 
-            case let .openDetail(template, source):
+            case let .openDetail(template, source, isTodaySession):
                 // Called by AppFeature when Plan tab requests cross-tab navigation.
                 let asCopy = source != .yours
                 state.path.removeAll()
@@ -86,7 +86,8 @@ import RunCraftModels
                     WorkoutEditor.State(
                         loading: template,
                         asCopy: asCopy,
-                        source: source
+                        source: source,
+                        isTodaySession: isTodaySession
                     )
                 ))
                 return .none
