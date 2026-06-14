@@ -28,6 +28,15 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "輕鬆跑" } }
       }
     },
+    "Fartlek" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ファルトレク" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "파틀렉" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "法特莱克跑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "法特雷克跑" } }
+      }
+    },
     "Half Marathon" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -53,6 +62,15 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "롱런" } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "长距离跑" } },
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "長距離跑" } }
+      }
+    },
+    "Mixed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ミックスラン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "믹스런" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "混合跑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "混合跑" } }
       }
     },
     "Peak" : {

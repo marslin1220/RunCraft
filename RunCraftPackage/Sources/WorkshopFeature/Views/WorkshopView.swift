@@ -95,20 +95,57 @@ private struct YoursSegment: View {
 private struct TemplatesSegment: View {
     let store: StoreOf<Workshop>
 
+    /// Presets grouped by training-stimulus category, in `SessionType`
+    /// declaration order — only categories with at least one preset appear.
+    private var groups: [(category: SessionType, presets: [WorkoutTemplate])] {
+        let grouped = Dictionary(grouping: WorkoutPresets.all, by: WorkoutPresets.category(for:))
+        return SessionType.allCases.compactMap { category in
+            grouped[category].map { (category: category, presets: $0) }
+        }
+    }
+
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 10) {
-                ForEach(WorkoutPresets.all) { preset in
-                    WorkoutCardRow(
-                        template: preset,
-                        isPreset: true,
-                        onTap: { store.send(.workoutTapped(preset, .template)) }
-                    )
+            LazyVStack(alignment: .leading, spacing: 10) {
+                ForEach(groups, id: \.category) { group in
+                    CategoryDivider(category: group.category)
+                    ForEach(group.presets) { preset in
+                        WorkoutCardRow(
+                            template: preset,
+                            isPreset: true,
+                            onTap: { store.send(.workoutTapped(preset, .template)) }
+                        )
+                    }
                 }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
         }
+    }
+}
+
+// MARK: - Category divider
+
+/// Section header grouping presets by `SessionType` — a coloured rail +
+/// caption naming the training stimulus (e.g. "INTERVALS", "FARTLEK").
+private struct CategoryDivider: View {
+    let category: SessionType
+
+    var body: some View {
+        HStack(spacing: 10) {
+            RoundedRectangle(cornerRadius: 1.5)
+                .fill(Color(hex: category.colorHex))
+                .frame(width: 3, height: 16)
+            Text(category.displayName.uppercased())
+                .font(.caption.bold())
+                .foregroundStyle(Color(hex: category.colorHex))
+                .tracking(1.2)
+            Spacer()
+        }
+        .padding(.top, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(category.displayName)
+        .accessibilityAddTraits(.isHeader)
     }
 }
 

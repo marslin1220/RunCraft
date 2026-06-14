@@ -8,6 +8,14 @@ public enum SessionType: String, Sendable, Equatable, CaseIterable, Codable, Que
     case long
     case repetition
     case rest
+    /// Speed-play session — varied surges and floats (e.g. Mona Fartlek).
+    /// Never produced by `TrainingPlanGenerator`; used to categorise
+    /// Workshop presets.
+    case fartlek
+    /// Combination session spanning more than one pace zone (e.g.
+    /// Progression Run). Default category for Workshop presets that
+    /// don't fit a single zone.
+    case mixed
 
     public var displayName: String {
         switch self {
@@ -17,6 +25,8 @@ public enum SessionType: String, Sendable, Equatable, CaseIterable, Codable, Que
         case .long:       String(localized: "Long Run",   bundle: .module)
         case .repetition: String(localized: "Repetitions", bundle: .module)
         case .rest:       String(localized: "Rest",       bundle: .module)
+        case .fartlek:    String(localized: "Fartlek",    bundle: .module)
+        case .mixed:      String(localized: "Mixed",      bundle: .module)
         }
     }
 
@@ -29,6 +39,8 @@ public enum SessionType: String, Sendable, Equatable, CaseIterable, Codable, Que
         case .long:       "#2196F3"  // blue
         case .repetition: "#FF5722"  // deep orange
         case .rest:       "#9E9E9E"  // grey
+        case .fartlek:    "#9C27B0"  // purple
+        case .mixed:      "#607D8B"  // blue grey
         }
     }
 
@@ -43,6 +55,8 @@ public enum SessionType: String, Sendable, Equatable, CaseIterable, Codable, Que
         case .long:       "figure.run.circle"
         case .repetition: "arrow.up.right"
         case .rest:       "moon.zzz"
+        case .fartlek:    "shuffle"
+        case .mixed:      "square.stack.3d.up"
         }
     }
 }

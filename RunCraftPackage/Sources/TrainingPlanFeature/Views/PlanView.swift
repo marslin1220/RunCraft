@@ -758,6 +758,8 @@ enum SessionPalette {
         case .long:       .long
         case .repetition: .repetition
         case .rest:       .rest
+        case .fartlek:    .fartlek
+        case .mixed:      .mixed
         }
     }
 }

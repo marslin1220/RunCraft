@@ -52,6 +52,11 @@ public enum PlanSessionAdapter {
 
         case .repetition:
             return repetition(vdot: vdot)
+
+        case .fartlek, .mixed:
+            // Never produced by TrainingPlanGenerator — these categorise
+            // Workshop presets only. Fall back to a generic easy run.
+            return easyOrLong(distanceKm: session.targetDistanceKm, durationMin: session.targetDurationMin, vdot: vdot)
         }
     }
 

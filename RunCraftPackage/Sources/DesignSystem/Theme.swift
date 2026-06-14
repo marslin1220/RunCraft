@@ -130,6 +130,19 @@ public extension Color {
                 light: Color(red: 0.72, green: 0.11, blue: 0.11), // #B71C1C deeper red
                 dark:  Color(red: 1.00, green: 0.24, blue: 0.00)  // fire red
             )
+            /// Speed-play sessions (`SessionType.fartlek`) — purple, distinct
+            /// from the warm interval/repetition reds.
+            public static let fartlek = Color.dynamicBrand(
+                light: Color(red: 0.49, green: 0.20, blue: 0.64), // #7B33A3 deep purple
+                dark:  Color(red: 0.78, green: 0.61, blue: 0.93)  // soft lilac
+            )
+            /// Combination sessions spanning multiple pace zones
+            /// (`SessionType.mixed`) — neutral slate, deliberately
+            /// understated since it isn't a single zone.
+            public static let mixed = Color.dynamicBrand(
+                light: Color(red: 0.30, green: 0.40, blue: 0.45), // #4D6673 slate
+                dark:  Color(white: 0.65)
+            )
         }
     }
 
@@ -191,6 +204,8 @@ public extension WorkoutCardPalette {
     static let repetition = WorkoutCardPalette(tint: Color(red: 1.00, green: 0.34, blue: 0.13))   // orange
     static let long       = WorkoutCardPalette(tint: Color(red: 0.40, green: 0.49, blue: 0.92))   // indigo
     static let rest       = WorkoutCardPalette(tint: Color(white: 0.50), alpha: 0.10)              // grey
+    static let fartlek    = WorkoutCardPalette(tint: Color(red: 0.61, green: 0.35, blue: 0.71))   // purple
+    static let mixed      = WorkoutCardPalette(tint: Color(red: 0.46, green: 0.53, blue: 0.60))   // slate
     /// Brand palette — Electric Cyan. Used for user-created workouts so they
     /// stand out against the muted preset palette.
     static let brand      = WorkoutCardPalette(tint: Color(red: 0.00, green: 0.831, blue: 1.00))   // #00D4FF

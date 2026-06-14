@@ -22,6 +22,28 @@ public enum WorkoutPresets {
         easyRecoveryRun,
     ]
 
+    /// Maps each built-in preset onto the `SessionType` that best describes
+    /// its training stimulus — drives the section grouping in the Workshop
+    /// Templates tab. Presets whose work steps span more than one pace zone
+    /// (no single dominant stimulus) fall back to `.mixed`.
+    public static let categories: [WorkoutTemplate.ID: SessionType] = [
+        yasso800s.id:                .interval,
+        tempoRun.id:                 .tempo,
+        thresholdCruiseIntervals.id: .tempo,
+        ladderWorkout.id:            .interval,
+        monaFartlek.id:              .fartlek,
+        hillRepeats.id:              .interval,
+        progressionRun.id:           .mixed,
+        speedPyramid.id:             .interval,
+        michiganWorkout.id:          .mixed,
+        easyRecoveryRun.id:          .easy,
+    ]
+
+    /// Falls back to `.mixed` for any preset not listed in `categories`.
+    public static func category(for template: WorkoutTemplate) -> SessionType {
+        categories[template.id] ?? .mixed
+    }
+
     // MARK: - Yasso 800s
 
     /// 10×800m at I pace with 400m recoveries. Bart Yasso's signature workout —

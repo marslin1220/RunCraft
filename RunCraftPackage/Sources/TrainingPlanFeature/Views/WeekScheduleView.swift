@@ -238,6 +238,8 @@ private struct WeekSection: View {
         case .long:       Color.brand.zone.marathon
         case .repetition: Color.brand.zone.repetition
         case .rest:       Color.brand.textSecondary
+        case .fartlek:    Color.brand.zone.fartlek
+        case .mixed:      Color.brand.zone.mixed
         }
     }
 
