@@ -499,7 +499,7 @@ private struct PreviewSessionRow: View {
     private var subtitle: String {
         var pieces: [String] = []
         if let km = session.targetDistanceKm {
-            pieces.append("\(km.formatted(.number.precision(.fractionLength(0...1)))) km")
+            pieces.append(PaceFormatting.distance(metres: km * 1_000, unit: paceUnit))
         } else if let min = session.targetDurationMin {
             pieces.append("\(min) min")
         }
@@ -822,8 +822,44 @@ private struct EmptyPlanPrompt: View {
                     .background(Color.brand.accent)
                     .clipShape(Capsule())
             }
+
+            SampleWeekPreview()
+                .padding(.top, 12)
         }
         .padding(.top, 60)
+    }
+}
+
+/// Gives a runner with no race goal a concrete look at what RunCraft
+/// generates — the Base-phase week-1 template, rendered with the same
+/// dimmed `PreviewSessionRow` used for the "race far in the future" case.
+/// No VDOT yet, so paces are omitted; only structure (day, type, distance)
+/// is shown. Labelled "Example" so it doesn't read as the runner's own data.
+private struct SampleWeekPreview: View {
+    private let sessions = TrainingPlanGenerator.sampleWeek1Sessions()
+    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("EXAMPLE")
+                    .font(.caption2.weight(.bold))
+                    .tracking(1)
+                    .foregroundStyle(Color.brand.accent)
+                Text("Example week · \(TrainingPhase.base.displayName)")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+            .padding(.horizontal, 4)
+
+            VStack(spacing: 8) {
+                ForEach(sessions.filter { $0.sessionType != .rest }) { session in
+                    PreviewSessionRow(session: session, vdot: 0, paceUnit: paceUnit)
+                }
+            }
+            .opacity(0.55)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

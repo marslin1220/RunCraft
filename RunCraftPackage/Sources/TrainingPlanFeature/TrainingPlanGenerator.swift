@@ -49,6 +49,23 @@ public struct TrainingPlanGenerator {
         return (weeks, sessions)
     }
 
+    /// A standalone "Base, week 1" set of sessions with no `TrainingWeek`
+    /// behind them — used by the empty-state preview to show what a
+    /// generated plan looks like before any race goal exists.
+    static func sampleWeek1Sessions() -> [PlannedSession] {
+        sessionTemplate(for: .base, weekNumber: 1).map { blueprint in
+            PlannedSession(
+                weekId: UUID(),
+                dayOfWeek: blueprint.dayOfWeek,
+                sessionType: blueprint.type,
+                targetDistanceKm: blueprint.distanceKm,
+                targetDurationMin: blueprint.durationMin,
+                targetPaceZone: blueprint.paceZone,
+                notes: blueprint.notes
+            )
+        }
+    }
+
     // MARK: - Phase
 
     private static func phase(for weekIndex: Int) -> TrainingPhase {
