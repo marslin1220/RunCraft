@@ -66,6 +66,20 @@ extension WorkoutKitClient: DependencyKey {
                 return Self.map(state)
             },
             openInWorkoutApp: { template in
+                // WorkoutScheduler.schedule(_:at:) can't report failure, so a
+                // denied/restricted authorization would otherwise look
+                // identical to success — nothing shows up on the Watch but
+                // the caller sees it as "sent". Check first and surface an
+                // actionable error instead.
+                switch Self.map(await WorkoutScheduler.shared.requestAuthorization()) {
+                case .authorized:
+                    break
+                case .restricted:
+                    throw WorkoutKitError.watchNotPaired
+                case .denied, .notDetermined:
+                    throw WorkoutKitError.notAuthorized
+                }
+
                 let plan = try WorkoutPlanBuilder.makePlan(from: template)
                 let now = Date().addingTimeInterval(60)   // 1 min from now
                 let comps = Calendar.current.dateComponents(

@@ -248,7 +248,6 @@ import RunCraftModels
                 )
                 return .run { [workoutKitClient] send in
                     await send(.syncResponse(Result {
-                        _ = try await workoutKitClient.requestAuthorization()
                         try await workoutKitClient.openInWorkoutApp(template)
                     }))
                 }

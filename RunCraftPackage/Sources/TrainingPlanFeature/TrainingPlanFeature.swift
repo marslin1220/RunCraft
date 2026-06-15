@@ -605,7 +605,6 @@ import WorkshopFeature
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
                 return .run { [workoutKitClient] send in
                     await send(.quickStartResponse(sessionId: id, Result {
-                        _ = try await workoutKitClient.requestAuthorization()
                         try await workoutKitClient.openInWorkoutApp(template)
                     }))
                 }
@@ -731,7 +730,6 @@ import WorkshopFeature
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: vdot)
                 return .run { [workoutKitClient] send in
                     await send(.quickStartResponse(Result {
-                        _ = try await workoutKitClient.requestAuthorization()
                         try await workoutKitClient.openInWorkoutApp(template)
                     }))
                 }
