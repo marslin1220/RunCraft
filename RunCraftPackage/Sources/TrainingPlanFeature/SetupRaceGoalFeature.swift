@@ -18,6 +18,7 @@ import VDOTEngine
         public var originalVDOT: Double? = nil
 
         public var vdotInput: VDOTInput.State = .init()
+        public var trainingDaysInput: TrainingDaysInput.State = .init()
 
         public var paceZones: PaceZones? { vdotInput.paceZones }
 
@@ -42,6 +43,7 @@ import VDOTEngine
             self.editingId = goal.id
             self.originalVDOT = goal.currentVDOT
             self.vdotInput = VDOTInput.State(detectedVDOT: goal.currentVDOT)
+            self.trainingDaysInput = TrainingDaysInput.State(availableDays: goal.availableDays, longRunDay: goal.longRunDay)
         }
 
         /// Pre-fill from a placeholder ("Base Training") goal when the
@@ -53,12 +55,14 @@ import VDOTEngine
             self.editingId = goal.id
             self.originalVDOT = goal.currentVDOT
             self.vdotInput = VDOTInput.State(detectedVDOT: goal.currentVDOT)
+            self.trainingDaysInput = TrainingDaysInput.State(availableDays: goal.availableDays, longRunDay: goal.longRunDay)
         }
     }
 
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
         case vdotInput(VDOTInput.Action)
+        case trainingDaysInput(TrainingDaysInput.Action)
         case saveButtonTapped
         case cancelButtonTapped
     }
@@ -74,24 +78,35 @@ import VDOTEngine
         Scope(state: \.vdotInput, action: \.vdotInput) {
             VDOTInput()
         }
+        Scope(state: \.trainingDaysInput, action: \.trainingDaysInput) {
+            TrainingDaysInput()
+        }
         Reduce { state, action in
             switch action {
-            case .binding, .vdotInput:
+            case .binding, .vdotInput, .trainingDaysInput:
                 return .none
 
             case .saveButtonTapped:
                 guard let vdot = state.effectiveVDOT else { return .none }
                 let goalId = state.editingId ?? UUID()
-                let goal = RaceGoal(
-                    id: goalId,
-                    name: state.goalName,
-                    targetDate: state.targetDate,
-                    distanceKm: state.distanceKm,
-                    currentVDOT: vdot,
-                    createdAt: now,
-                    isPlaceholder: false
+                let goal: RaceGoal = {
+                    var g = RaceGoal(
+                        id: goalId,
+                        name: state.goalName,
+                        targetDate: state.targetDate,
+                        distanceKm: state.distanceKm,
+                        currentVDOT: vdot,
+                        createdAt: now,
+                        isPlaceholder: false
+                    )
+                    g.availableDays = state.trainingDaysInput.availableDays
+                    g.longRunDay = state.trainingDaysInput.longRunDay
+                    return g
+                }()
+                let (weeks, sessions) = TrainingPlanGenerator.generate(
+                    goal: goal, vdot: vdot,
+                    availableDays: goal.availableDays, longRunDay: goal.longRunDay
                 )
-                let (weeks, sessions) = TrainingPlanGenerator.generate(goal: goal, vdot: vdot)
                 let isEditing = state.editingId != nil
                 // Only snapshot when VDOT changed: avoids piling identical
                 // points on the trend line on every cosmetic edit.

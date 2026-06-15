@@ -50,6 +50,14 @@ public struct SetupRaceGoalView: View {
                 if let zones = store.vdotInput.paceZones {
                     PaceZonesPreviewSection(zones: zones)
                 }
+
+                Section {
+                    TrainingDaysGrid(store: store.scope(state: \.trainingDaysInput, action: \.trainingDaysInput))
+                } header: {
+                    Text("Training Days")
+                } footer: {
+                    Text("Pick the days you can train. We'll place your long run, hard sessions, and rest days around them.")
+                }
             }
             .navigationTitle(store.editingId == nil ? "New Race Goal" : "Edit Race Goal")
             .navigationBarTitleDisplayMode(.inline)

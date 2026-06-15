@@ -193,7 +193,8 @@ import WorkshopFeature
                                 .delete()
                                 .execute(db)
                             let (week, sessions) = TrainingPlanGenerator.rollingWeek(
-                                raceGoalId: goal.id, vdot: goal.currentVDOT
+                                raceGoalId: goal.id, vdot: goal.currentVDOT,
+                                availableDays: goal.availableDays, longRunDay: goal.longRunDay
                             )
                             try TrainingWeek.upsert { week }.execute(db)
                             for session in sessions {
@@ -235,7 +236,8 @@ import WorkshopFeature
                                 .execute(db)
                         }
                         let (week, sessions) = TrainingPlanGenerator.rollingWeek(
-                            raceGoalId: goal.id, vdot: goal.currentVDOT, weekNumber: 0
+                            raceGoalId: goal.id, vdot: goal.currentVDOT, weekNumber: 0,
+                            availableDays: goal.availableDays, longRunDay: goal.longRunDay
                         )
                         try TrainingWeek.upsert { week }.execute(db)
                         for session in sessions {
