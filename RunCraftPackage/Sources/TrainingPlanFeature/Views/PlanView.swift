@@ -754,24 +754,6 @@ private struct RestSessionLine: View {
     }
 }
 
-/// Maps each SessionType onto a `WorkoutCardPalette` — keeps the palette
-/// lookup centralised so the Plan tab, Full Schedule, and any future
-/// session-row consumer stay visually consistent.
-enum SessionPalette {
-    static func palette(for type: SessionType) -> WorkoutCardPalette {
-        switch type {
-        case .easy:       .easy
-        case .tempo:      .threshold
-        case .interval:   .interval
-        case .long:       .long
-        case .repetition: .repetition
-        case .rest:       .rest
-        case .fartlek:    .fartlek
-        case .mixed:      .mixed
-        }
-    }
-}
-
 /// Non-interactive header for State B ("Base Training") — visually distinct
 /// from `RaceCountdownRing`: no ring, no countdown, no date, not a `Button`.
 private struct BaseTrainingBanner: View {

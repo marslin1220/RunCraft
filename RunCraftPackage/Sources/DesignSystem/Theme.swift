@@ -207,9 +207,8 @@ public extension WorkoutCardPalette {
     static let fartlek    = WorkoutCardPalette(tint: Color(red: 0.61, green: 0.35, blue: 0.71))   // purple
     static let mixed      = WorkoutCardPalette(tint: Color(red: 0.46, green: 0.53, blue: 0.60))   // slate
     /// Brand palette — Electric Cyan. Used for user-created workouts so they
-    /// stand out against the muted preset palette.
+    /// stand out against the category-coloured preset palettes.
     static let brand      = WorkoutCardPalette(tint: Color(red: 0.00, green: 0.831, blue: 1.00))   // #00D4FF
     /// Legacy alias for the brand palette — new code should use `.brand`.
     static let lime       = brand
-    static let lilac      = WorkoutCardPalette(tint: Color(red: 0.65, green: 0.51, blue: 0.92))   // for Templates
 }

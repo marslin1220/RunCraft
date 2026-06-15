@@ -153,8 +153,6 @@ private struct CategoryDivider: View {
 
 private struct WorkoutCardRow: View {
     let template: WorkoutTemplate
-    /// Built-in template uses a different palette + leading icon so the
-    /// runner can spot "sample preset" vs "my workout" at a glance.
     let isPreset: Bool
     let onTap: () -> Void
     @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
@@ -163,10 +161,17 @@ private struct WorkoutCardRow: View {
         template.summary(unit: paceUnit)
     }
 
+    /// Presets are coloured by their `SessionType` category — matching the
+    /// `CategoryDivider` they're grouped under. "Yours" rows keep the brand
+    /// palette, since custom templates have no category.
+    private var category: SessionType? {
+        isPreset ? WorkoutPresets.category(for: template) : nil
+    }
+
     var body: some View {
         WorkoutCard(
-            palette: isPreset ? .lilac : .lime,
-            symbolName: isPreset ? "sparkles" : "figure.run",
+            palette: category.map(SessionPalette.palette(for:)) ?? .lime,
+            symbolName: category?.symbolName ?? "figure.run",
             title: template.name,
             subtitle: subtitle,
             trailing: .chevron,
