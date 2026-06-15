@@ -60,9 +60,10 @@ struct TrainingPlanRegenerationTests {
 
         var updatedGoal = goal
         updatedGoal.availableDays = [1, 2, 3, 4, 5]
+        let goalWithNewDays = updatedGoal
         try await database.write { db in
-            try RaceGoal.upsert { updatedGoal }.execute(db)
-            try TrainingPlanRegeneration.regenerateFutureWeeks(goal: updatedGoal, vdot: Self.vdot, now: now, db: db)
+            try RaceGoal.upsert { goalWithNewDays }.execute(db)
+            try TrainingPlanRegeneration.regenerateFutureWeeks(goal: goalWithNewDays, vdot: Self.vdot, now: now, db: db)
         }
 
         let sessionsAfter = try await database.read { db in
@@ -91,9 +92,10 @@ struct TrainingPlanRegenerationTests {
 
         var updatedGoal = goal
         updatedGoal.availableDays = [1, 2, 3, 4, 5] // weekdays only
+        let goalWithNewDays = updatedGoal
         try await database.write { db in
-            try RaceGoal.upsert { updatedGoal }.execute(db)
-            try TrainingPlanRegeneration.regenerateFutureWeeks(goal: updatedGoal, vdot: Self.vdot, now: now, db: db)
+            try RaceGoal.upsert { goalWithNewDays }.execute(db)
+            try TrainingPlanRegeneration.regenerateFutureWeeks(goal: goalWithNewDays, vdot: Self.vdot, now: now, db: db)
         }
 
         let weeksAfter = try await database.read { db in
@@ -124,7 +126,7 @@ struct TrainingPlanRegenerationTests {
         try DependencyValues.migrate(database)
         let now = Date()
 
-        var goal = RaceGoal(name: "Base Training", targetDate: now, distanceKm: 0, currentVDOT: Self.vdot, isPlaceholder: true)
+        let goal = RaceGoal(name: "Base Training", targetDate: now, distanceKm: 0, currentVDOT: Self.vdot, isPlaceholder: true)
         let (week, sessions) = TrainingPlanGenerator.rollingWeek(raceGoalId: goal.id, vdot: Self.vdot)
         try await database.write { db in
             try RaceGoal.upsert { goal }.execute(db)
@@ -132,9 +134,11 @@ struct TrainingPlanRegenerationTests {
             for session in sessions { try PlannedSession.upsert { session }.execute(db) }
         }
 
-        goal.availableDays = [1, 2, 3, 4, 5]
+        var updatedGoal = goal
+        updatedGoal.availableDays = [1, 2, 3, 4, 5]
+        let goalWithNewDays = updatedGoal
         try await database.write { db in
-            try TrainingPlanRegeneration.regenerateFutureWeeks(goal: goal, vdot: Self.vdot, now: now, db: db)
+            try TrainingPlanRegeneration.regenerateFutureWeeks(goal: goalWithNewDays, vdot: Self.vdot, now: now, db: db)
         }
 
         let weeksAfter = try await database.read { db in
@@ -163,9 +167,10 @@ struct TrainingPlanRegenerationTests {
 
         var updatedGoal = goal
         updatedGoal.availableDays = [1, 2, 3, 4, 5]
+        let goalWithNewDays = updatedGoal
         try await database.write { db in
-            try RaceGoal.upsert { updatedGoal }.execute(db)
-            try TrainingPlanRegeneration.regenerateFutureWeeks(goal: updatedGoal, vdot: Self.vdot, now: now, db: db)
+            try RaceGoal.upsert { goalWithNewDays }.execute(db)
+            try TrainingPlanRegeneration.regenerateFutureWeeks(goal: goalWithNewDays, vdot: Self.vdot, now: now, db: db)
         }
 
         let weeksAfter = try await database.read { db in

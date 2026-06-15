@@ -44,13 +44,14 @@ struct RaceGoalAvailableDaysTests {
         var goal = RaceGoal(name: "Test", targetDate: Date(), distanceKm: 10)
         goal.availableDays = [1, 3, 5]
         goal.longRunDay = 5
+        let savedGoal = goal
 
         try await database.write { db in
-            try RaceGoal.insert { goal }.execute(db)
+            try RaceGoal.insert { savedGoal }.execute(db)
         }
 
         let fetched = try await database.read { db in
-            try RaceGoal.where { $0.id.eq(goal.id) }.fetchOne(db)
+            try RaceGoal.where { $0.id.eq(savedGoal.id) }.fetchOne(db)
         }
         let saved = try #require(fetched)
         #expect(saved.availableDays == Set([1, 3, 5]))

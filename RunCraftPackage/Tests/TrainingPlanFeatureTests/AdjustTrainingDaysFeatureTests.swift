@@ -9,10 +9,10 @@ import TrainingPlanFeature
 @Suite("AdjustTrainingDays — save / cancel")
 struct AdjustTrainingDaysFeatureTests {
 
-    private static let vdot = 40.0
+    private nonisolated static let vdot = 40.0
 
     /// A race goal 8 weeks (56 days) out, seeded with its full 16-week plan.
-    private static func seedGoal(now: Date, availableDays: Set<Int>, db: Database) throws -> RaceGoal {
+    private nonisolated static func seedGoal(now: Date, availableDays: Set<Int>, db: Database) throws -> RaceGoal {
         var goal = RaceGoal(
             name: "Test Race",
             targetDate: Calendar.current.date(byAdding: .day, value: 56, to: now)!,
