@@ -153,6 +153,10 @@ public struct PlanView: View {
                 onApply: { store.send(.applyDowngradeTapped) },
                 onDismiss: { store.send(.dismissRecoveryAdvice) })
         }
+
+        if store.healthPermissionLost {
+            HealthPermissionBanner(onDismiss: { store.send(.dismissHealthPermissionBanner) })
+        }
     }
 
     @ViewBuilder

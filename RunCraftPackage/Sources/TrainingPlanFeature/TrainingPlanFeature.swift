@@ -13,6 +13,11 @@ import WorkshopFeature
         public var paceZones: PaceZones? = nil
         public var recoveryAdvice: RecoveryAdvice? = nil
         public var vdotUpgrade: VDOTUpgrade? = nil
+        /// Set when HealthKit reads have succeeded before (a synced
+        /// `CompletedWorkout` exists) but read authorization now reports
+        /// `.needsRequest` — i.e. the runner revoked Health permission in
+        /// iOS Settings after granting it.
+        public var healthPermissionLost: Bool = false
         public var path = StackState<Path.State>()
         @Presents public var destination: Destination.State? = nil
         /// Id of the session currently being pushed to the Watch via the
@@ -29,6 +34,9 @@ import WorkshopFeature
         /// Same idea for the VDOT-upgrade banner.
         @Shared(.appStorage("vdotUpgrade_lastDismissAt"))
         public var vdotUpgradeLastDismissAt = Date.distantPast
+        /// Same idea for the Health-permission-lost banner.
+        @Shared(.appStorage("healthPermissionBanner_lastDismissAt"))
+        public var healthPermissionBannerLastDismissAt = Date.distantPast
 
         public init() {}
     }
@@ -37,6 +45,19 @@ import WorkshopFeature
     /// Six hours matches a typical training rhythm: dismissed in the morning,
     /// the banner can return that evening or next day if signals still apply.
     private static let bannerDebounce: TimeInterval = 6 * 3600
+
+    /// Whether `.needsRequest` should be surfaced as "permission lost".
+    ///
+    /// iOS never reports HealthKit read-authorization status directly — both
+    /// "never granted" and "revoked via Settings" make
+    /// `getRequestStatusForAuthorization` return `.shouldRequest`
+    /// (`.needsRequest`). We only treat that as alarming if HealthKit reads
+    /// have succeeded before (a `CompletedWorkout` with a non-nil
+    /// `hkWorkoutId` exists) — otherwise permission was simply never
+    /// granted, which is normal and not worth alarming the runner about.
+    static func healthPermissionLost(hasSyncedBefore: Bool, status: HealthAuthorizationRequestStatus) -> Bool {
+        hasSyncedBefore && status == .needsRequest
+    }
 
     /// VDOT-improvement signal surfaced from HealthKit when a fresh race
     /// from the runner's history implies a higher VDOT than the plan was
@@ -100,6 +121,9 @@ import WorkshopFeature
         case vdotUpgradeDetected(VDOTUpgrade?)
         case acceptVDOTUpgradeTapped
         case dismissVDOTUpgrade
+        case checkHealthAuthorization
+        case healthAuthorizationChecked(lost: Bool)
+        case dismissHealthPermissionBanner
         case syncBackWorkouts
         case syncBackCompleted
         /// Sent from the Plan tab's today-card "play" button. Bypasses
@@ -157,6 +181,7 @@ import WorkshopFeature
                     .send(.fetchRecoveryAdvice),
                     .send(.syncBackWorkouts),
                     .send(.checkVDOTUpgrade),
+                    .send(.checkHealthAuthorization),
                     .send(.refreshRollingWeekIfNeeded(goal))
                 )
 
@@ -487,6 +512,35 @@ import WorkshopFeature
             case .dismissVDOTUpgrade:
                 state.vdotUpgrade = nil
                 state.$vdotUpgradeLastDismissAt.withLock { $0 = now }
+                return .none
+
+            case .checkHealthAuthorization:
+                // Debounce: same 6 h window as the other banners.
+                if now.timeIntervalSince(state.healthPermissionBannerLastDismissAt) < Self.bannerDebounce {
+                    return .none
+                }
+                return .run { [database, healthKitClient] send in
+                    let hasSyncedBefore = (try? await database.read { db in
+                        try CompletedWorkout.all.fetchAll(db).contains { $0.hkWorkoutId != nil }
+                    }) ?? false
+                    // Skip the HealthKit round-trip entirely if reads have
+                    // never succeeded — `.needsRequest` in that case just
+                    // means permission was never granted, not lost.
+                    guard hasSyncedBefore else {
+                        await send(.healthAuthorizationChecked(lost: false))
+                        return
+                    }
+                    let status = await healthKitClient.authorizationRequestStatus()
+                    await send(.healthAuthorizationChecked(lost: Self.healthPermissionLost(hasSyncedBefore: hasSyncedBefore, status: status)))
+                }
+
+            case let .healthAuthorizationChecked(lost):
+                state.healthPermissionLost = lost
+                return .none
+
+            case .dismissHealthPermissionBanner:
+                state.healthPermissionLost = false
+                state.$healthPermissionBannerLastDismissAt.withLock { $0 = now }
                 return .none
 
             case .syncBackWorkouts:

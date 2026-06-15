@@ -1,5 +1,70 @@
 import DesignSystem
 import SwiftUI
+import UIKit
+
+struct HealthPermissionBanner: View {
+    let onDismiss: () -> Void
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "exclamationmark.shield.fill")
+                    .font(.title2)
+                    .foregroundStyle(Color.brand.danger)
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Health permission lost")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(Color.brand.textPrimary)
+                    Text("RunCraft can no longer read your Health data. HRV, race times and completed-workout sync will stop updating until you re-grant access.")
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+
+                Spacer(minLength: 6)
+
+                Button {
+                    onDismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.caption.bold())
+                        .foregroundStyle(Color.brand.textSecondary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Dismiss health permission alert")
+            }
+
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    openURL(url)
+                }
+            } label: {
+                Text("Open Settings")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .frame(minHeight: 44)
+                    .background(Color.brand.danger)
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Opens Settings → Health → Data Access & Devices → RunCraft")
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.brand.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color.brand.danger.opacity(0.4), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
 
 struct VDOTUpgradeBanner: View {
     let upgrade: TrainingPlan.VDOTUpgrade

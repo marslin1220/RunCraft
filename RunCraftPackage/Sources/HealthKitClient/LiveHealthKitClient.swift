@@ -2,18 +2,21 @@ import Foundation
 import HealthKit
 
 enum LiveHealthKitClient {
+    /// Read types requested by `requestAuthorization` — also the set checked
+    /// by `getRequestStatusForAuthorization` to detect a revoked grant.
+    private static let readTypes: Set<HKObjectType> = [
+        HKObjectType.workoutType(),
+        HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!,
+        HKObjectType.quantityType(forIdentifier: .vo2Max)!,
+        HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+    ]
+
     static func make() -> HealthKitClient {
         HealthKitClient(
             requestAuthorization: {
                 guard HKHealthStore.isHealthDataAvailable() else { return }
                 let store = HKHealthStore()
-                let types: Set<HKObjectType> = [
-                    HKObjectType.workoutType(),
-                    HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!,
-                    HKObjectType.quantityType(forIdentifier: .vo2Max)!,
-                    HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
-                ]
-                try await store.requestAuthorization(toShare: [], read: types)
+                try await store.requestAuthorization(toShare: [], read: readTypes)
             },
             bestRaceTime: { distance in
                 try await bestRaceTime(for: distance)
@@ -29,8 +32,29 @@ enum LiveHealthKitClient {
             },
             recentVO2MaxSamples: { daysBack in
                 try await recentVO2MaxSamples(daysBack: daysBack)
+            },
+            authorizationRequestStatus: {
+                await authorizationRequestStatus()
             }
         )
+    }
+
+    // MARK: - Authorization status
+
+    private static func authorizationRequestStatus() async -> HealthAuthorizationRequestStatus {
+        guard HKHealthStore.isHealthDataAvailable() else { return .unknown }
+        let store = HKHealthStore()
+
+        return await withCheckedContinuation { continuation in
+            store.getRequestStatusForAuthorization(toShare: [], read: readTypes) { status, _ in
+                switch status {
+                case .unnecessary:    continuation.resume(returning: .authorized)
+                case .shouldRequest:  continuation.resume(returning: .needsRequest)
+                case .unknown:        continuation.resume(returning: .unknown)
+                @unknown default:    continuation.resume(returning: .unknown)
+                }
+            }
+        }
     }
 
     // MARK: - VO2max

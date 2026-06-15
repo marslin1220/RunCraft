@@ -16,6 +16,10 @@ public struct HealthKitClient: Sendable {
     /// oldest first. Each sample carries the date the Watch decided it had
     /// enough signal — these are sporadic, not daily.
     public var recentVO2MaxSamples: @Sendable (_ daysBack: Int) async throws -> [VO2MaxSample]
+    /// Whether the app would need to (re-)request HealthKit read permission
+    /// if it asked right now. `.needsRequest` after permission was already
+    /// granted once means the runner revoked it via Settings.
+    public var authorizationRequestStatus: @Sendable () async -> HealthAuthorizationRequestStatus
 
     public init(
         requestAuthorization: @Sendable @escaping () async throws -> Void,
@@ -23,7 +27,8 @@ public struct HealthKitClient: Sendable {
         latestHRV: @Sendable @escaping () async throws -> Double?,
         recentSleepHours: @Sendable @escaping (_ nights: Int) async throws -> Double,
         recentWorkouts: @Sendable @escaping (_ since: Date) async throws -> [HKWorkoutSummary],
-        recentVO2MaxSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [VO2MaxSample]
+        recentVO2MaxSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [VO2MaxSample],
+        authorizationRequestStatus: @Sendable @escaping () async -> HealthAuthorizationRequestStatus
     ) {
         self.requestAuthorization = requestAuthorization
         self.bestRaceTime = bestRaceTime
@@ -31,7 +36,18 @@ public struct HealthKitClient: Sendable {
         self.recentSleepHours = recentSleepHours
         self.recentWorkouts = recentWorkouts
         self.recentVO2MaxSamples = recentVO2MaxSamples
+        self.authorizationRequestStatus = authorizationRequestStatus
     }
+}
+
+/// Mirrors `HKAuthorizationRequestStatus` without leaking HealthKit types
+/// into callers. `.needsRequest` covers both "never asked" and "revoked via
+/// Settings" — callers distinguish the two using other evidence (e.g.
+/// whether any HealthKit-derived data has been seen before).
+public enum HealthAuthorizationRequestStatus: Sendable, Equatable {
+    case authorized
+    case needsRequest
+    case unknown
 }
 
 /// Apple-Watch-derived VO2max reading. Same unit (mL/(kg·min)) as Daniels'
@@ -111,7 +127,8 @@ extension HealthKitClient: DependencyKey {
             latestHRV: { 42.0 },
             recentSleepHours: { _ in 7.5 },
             recentWorkouts: { _ in [] },
-            recentVO2MaxSamples: { _ in [] }
+            recentVO2MaxSamples: { _ in [] },
+            authorizationRequestStatus: { .authorized }
         )
     }
 
