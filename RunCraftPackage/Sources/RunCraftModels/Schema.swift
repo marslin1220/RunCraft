@@ -124,6 +124,18 @@ extension DependencyValues {
                 .execute(db)
         }
 
+        migrator.registerMigration("v4 – flexible training days") { db in
+            try #sql("""
+                ALTER TABLE "raceGoals" ADD COLUMN "availableDaysData" TEXT NOT NULL DEFAULT '[1,2,3,4,5,6,7]'
+                """)
+                .execute(db)
+
+            try #sql("""
+                ALTER TABLE "raceGoals" ADD COLUMN "longRunDay" INTEGER
+                """)
+                .execute(db)
+        }
+
         try migrator.migrate(database)
     }
 

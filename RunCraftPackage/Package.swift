@@ -151,7 +151,11 @@ let package = Package(
 
         .testTarget(
             name: "RunCraftModelsTests",
-            dependencies: ["RunCraftModels"]
+            dependencies: [
+                "RunCraftModels",
+                .product(name: "SQLiteData", package: "sqlite-data"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
+            ]
         ),
 
         .testTarget(
