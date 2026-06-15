@@ -308,7 +308,7 @@ public struct InsightsView: View {
     /// Pace-unit preference written by Settings. Reading at view scope
     /// (not from store) so the row updates instantly when the runner
     /// flips km/mi.
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     // MARK: - Helpers
 

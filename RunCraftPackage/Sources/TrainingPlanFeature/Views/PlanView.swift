@@ -305,7 +305,7 @@ private struct RaceCountdownRing: View {
 private struct PaceZonesSummaryCard: View {
     let zones: PaceZones
     let onTap: (PaceZoneName) -> Void
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -453,7 +453,7 @@ private struct PrePlanPreviewSection: View {
     let week: TrainingWeek
     let vdot: Double
     @FetchAll var allSessions: [PlannedSession]
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     private var daysUntilStart: Int {
         Calendar.current.dateComponents(
@@ -638,7 +638,7 @@ private struct SessionCard: View {
     let isSending: Bool
     let onTap: () -> Void
     let onQuickStart: () -> Void
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     private var isCompleted: Bool { actuals != nil }
 
@@ -713,7 +713,7 @@ private struct SessionCard: View {
 private struct RestSessionLine: View {
     let session: PlannedSession
     let actuals: SessionActuals?
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     var body: some View {
         HStack(spacing: 14) {

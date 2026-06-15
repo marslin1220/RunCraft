@@ -121,7 +121,7 @@ public struct VDOTInputSections: View {
 /// derived from an already-resolved VDOT.
 public struct PaceZonesPreviewSection: View {
     let zones: PaceZones
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     public init(zones: PaceZones) {
         self.zones = zones

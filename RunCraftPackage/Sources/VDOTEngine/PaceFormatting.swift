@@ -54,7 +54,7 @@ extension PaceUnit {
     /// summaries — that need the same source of truth without a view
     /// hierarchy.
     public static var current: PaceUnit {
-        let raw = UserDefaults.standard.string(forKey: "paceUnit") ?? PaceUnit.perKilometre.rawValue
+        let raw = UserDefaults.runCraftGroup.string(forKey: "paceUnit") ?? PaceUnit.perKilometre.rawValue
         return PaceUnit(rawValue: raw) ?? .perKilometre
     }
 

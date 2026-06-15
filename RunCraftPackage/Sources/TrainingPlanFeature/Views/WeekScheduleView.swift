@@ -257,7 +257,7 @@ private struct WeekSection: View {
     let onToggle: () -> Void
     let onTap: (PlannedSession, Bool) -> Void
     let onQuickStart: (PlannedSession) -> Void
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     private var completedIds: Set<UUID> { Set(completedBySessionId.keys) }
     private var sessionCount: Int { sessions.filter { $0.sessionType != .rest }.count }

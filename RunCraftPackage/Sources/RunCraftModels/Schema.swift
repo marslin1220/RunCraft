@@ -1,10 +1,7 @@
 import Dependencies
 import Foundation
 import SQLiteData
-
-/// Shared between the main app and any future App Group member (e.g. the
-/// Today's-session Widget Extension) so they open the same SQLite file.
-private let appGroupIdentifier = "group.io.marstudio.RunCraft"
+import VDOTEngine
 
 extension DependencyValues {
     public mutating func bootstrapDatabase() throws {
@@ -145,7 +142,7 @@ extension DependencyValues {
     /// entitlement isn't configured yet.
     private static var databasePath: String {
         let directory = FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)
+            .containerURL(forSecurityApplicationGroupIdentifier: runCraftAppGroupIdentifier)
             ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         // SQLite won't create missing parent directories itself, and a
         // freshly-added App Group container may not exist on disk yet.

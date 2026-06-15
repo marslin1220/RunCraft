@@ -6,12 +6,13 @@ import VDOTEngine
 
 public struct SettingsView: View {
     @Bindable public var store: StoreOf<Settings>
-    /// Pace unit lives in UserDefaults; Settings is the writer, every other
-    /// view reads via @Shared(.appStorage("paceUnit")). Using @AppStorage
-    /// here (instead of routing through the Settings state) sidesteps the
-    /// BindingReducer + @Shared edge cases that were causing toggles to
-    /// silently drop.
-    @AppStorage("paceUnit") private var paceUnitRaw: String = PaceUnit.perKilometre.rawValue
+    /// Pace unit lives in the App Group's shared UserDefaults (`.runCraftGroup`)
+    /// so the Today's-session widget can read it too; Settings is the writer,
+    /// every other view reads via @Shared(.appStorage("paceUnit", store:)).
+    /// Using @AppStorage here (instead of routing through the Settings state)
+    /// sidesteps the BindingReducer + @Shared edge cases that were causing
+    /// toggles to silently drop.
+    @AppStorage("paceUnit", store: .runCraftGroup) private var paceUnitRaw: String = PaceUnit.perKilometre.rawValue
 
     /// Daily training reminder. Persisted as three keys so the toggle and
     /// the time picker stay independent of each other — same @AppStorage

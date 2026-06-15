@@ -172,7 +172,7 @@ private struct WorkoutCardRow: View {
     let template: WorkoutTemplate
     let isPreset: Bool
     let onTap: () -> Void
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     private var subtitle: String {
         template.summary(unit: paceUnit)

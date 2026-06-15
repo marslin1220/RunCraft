@@ -5,7 +5,7 @@ import VDOTEngine
 
 public struct AdjustVDOTView: View {
     @Bindable public var store: StoreOf<AdjustVDOT>
-    @Shared(.appStorage("paceUnit")) private var paceUnit: PaceUnit = .perKilometre
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     public init(store: StoreOf<AdjustVDOT>) {
         self.store = store
