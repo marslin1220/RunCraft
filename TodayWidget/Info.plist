@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.widgetkit-extension</string>
+	</dict>
+	<key>NSHealthShareUsageDescription</key>
+	<string>RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days for your training plan.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>RunCraft saves completed workouts so they sync with the Fitness app and inform your training progress.</string>
+</dict>
+</plist>
