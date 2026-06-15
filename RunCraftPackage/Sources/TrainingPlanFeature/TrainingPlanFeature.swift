@@ -66,6 +66,7 @@ import WorkshopFeature
         case setupRaceGoal(SetupRaceGoal)
         case setupVDOT(SetupVDOT)
         case adjustVDOT(AdjustVDOT)
+        case adjustTrainingDays(AdjustTrainingDays)
         case deleteConfirm(AlertState<DeleteAlertAction>)
     }
 
@@ -85,6 +86,7 @@ import WorkshopFeature
         case deletePlanRequested(isPlaceholder: Bool)
         case recalculateVDOTRequested
         case adjustVDOTRequested
+        case adjustTrainingDaysRequested(RaceGoal)
         case editGoalLoaded(RaceGoal?)
         case planDeleted
         case countdownTapped
@@ -303,6 +305,10 @@ import WorkshopFeature
 
             case .adjustVDOTRequested:
                 state.destination = .adjustVDOT(AdjustVDOT.State(currentVDOT: state.currentVDOT))
+                return .none
+
+            case let .adjustTrainingDaysRequested(goal):
+                state.destination = .adjustTrainingDays(AdjustTrainingDays.State(goal: goal))
                 return .none
 
             case .destination(.presented(.deleteConfirm(.confirmDelete))):

@@ -87,6 +87,11 @@ public struct PlanView: View {
                             } label: {
                                 Label("Adjust VDOT manually", systemImage: "slider.horizontal.3")
                             }
+                            Button {
+                                store.send(.adjustTrainingDaysRequested(goal))
+                            } label: {
+                                Label("Adjust training days", systemImage: "calendar.badge.checkmark")
+                            }
                             Divider()
                             Button(role: .destructive) {
                                 store.send(.deletePlanRequested(isPlaceholder: goal.isPlaceholder))
@@ -112,6 +117,9 @@ public struct PlanView: View {
             }
             .sheet(item: $store.scope(state: \.destination?.adjustVDOT, action: \.destination.adjustVDOT)) { adjustStore in
                 AdjustVDOTView(store: adjustStore)
+            }
+            .sheet(item: $store.scope(state: \.destination?.adjustTrainingDays, action: \.destination.adjustTrainingDays)) { adjustStore in
+                AdjustTrainingDaysView(store: adjustStore)
             }
             .alert($store.scope(state: \.destination?.deleteConfirm, action: \.destination.deleteConfirm))
             .alert($store.scope(state: \.quickStartAlert, action: \.quickStartAlert))
