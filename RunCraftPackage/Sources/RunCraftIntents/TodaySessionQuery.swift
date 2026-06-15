@@ -38,43 +38,23 @@ public struct TodaySessionQuery: EntityQuery {
     /// it with the latest VDOT-derived pace range. Returns nil if the
     /// runner hasn't set up a race goal yet, or if today's day-of-week
     /// has no scheduled session.
-    func loadToday() async throws -> TodaySessionEntity? {
+    public func loadToday() async throws -> TodaySessionEntity? {
         let database = currentDatabase()
-        let dayOfWeek = PlannedSession.dayOfWeek(for: Date())
 
-        struct Snapshot {
-            let session: PlannedSession
-            let vdot: Double
-        }
+        let today = try await database.read { db in try TodaysSession.current(in: db) }
+        guard let today else { return nil }
 
-        let snapshot: Snapshot? = try await database.read { db in
-            let weeks = try TrainingWeek.all.fetchAll(db)
-            guard let week = TrainingWeek.current(in: weeks) else { return nil as Snapshot? }
-
-            let session = try PlannedSession
-                .where { $0.weekId.eq(week.id) }
-                .where { $0.dayOfWeek.eq(dayOfWeek) }
-                .fetchOne(db)
-            guard let session else { return nil as Snapshot? }
-
-            let goal = try RaceGoal.order { $0.createdAt.desc() }.fetchOne(db)
-            let vdot = goal?.currentVDOT ?? 40
-            return Snapshot(session: session, vdot: vdot)
-        }
-
-        guard let snapshot else { return nil }
-
-        let range: PaceZones.PaceRange? = snapshot.session.targetPaceZone.map { zone in
-            VDOTCalculator.paceRange(for: zone, vdot: snapshot.vdot)
+        let range: PaceZones.PaceRange? = today.session.targetPaceZone.map { zone in
+            VDOTCalculator.paceRange(for: zone, vdot: today.vdot)
         }
 
         return TodaySessionEntity(
             id: "today",
-            sessionType: snapshot.session.sessionType,
-            sessionTitle: snapshot.session.sessionType.displayName,
-            targetDistanceKm: snapshot.session.targetDistanceKm,
-            targetDurationMin: snapshot.session.targetDurationMin,
-            paceZone: snapshot.session.targetPaceZone,
+            sessionType: today.session.sessionType,
+            sessionTitle: today.session.sessionType.displayName,
+            targetDistanceKm: today.session.targetDistanceKm,
+            targetDurationMin: today.session.targetDurationMin,
+            paceZone: today.session.targetPaceZone,
             paceLowerSecPerKm: range?.lower,
             paceUpperSecPerKm: range?.upper
         )

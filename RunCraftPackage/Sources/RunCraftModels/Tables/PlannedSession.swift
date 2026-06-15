@@ -2,7 +2,7 @@ import Foundation
 import SQLiteData
 import VDOTEngine
 
-@Table public struct PlannedSession: Identifiable, Sendable {
+@Table public struct PlannedSession: Identifiable, Sendable, Equatable {
     public let id: UUID
     public var weekId: TrainingWeek.ID
     /// 1 = Monday … 7 = Sunday
