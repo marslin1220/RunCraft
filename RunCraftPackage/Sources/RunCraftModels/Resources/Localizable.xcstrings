@@ -1,6 +1,24 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "A scheduled day off from running. This is when your body absorbs the training and adapts — skipping it works against you." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "予定された休養日です。この間に体はトレーニングの効果を吸収して適応します――これを省略すると逆効果になります。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "계획된 휴식일입니다. 이때 몸이 훈련 효과를 흡수하고 적응합니다 — 이를 건너뛰면 오히려 역효과를 낼 수 있습니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "排定的休跑日。身体在此时吸收训练成果并完成适应——跳过它只会适得其反。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "排定的休跑日。身體在此時吸收訓練成果並完成適應——跳過它只會適得其反。" } }
+      }
+    },
+    "A session that blends paces or stimuli in one run — for example easy, marathon, and threshold efforts back to back." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "1回のランの中で複数のペースや刺激を組み合わせたセッションです――例えばイージー、マラソン、閾値ペースの走りを連続して行います。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "한 번의 러닝 안에서 여러 페이스나 자극을 결합한 세션입니다 — 예를 들어 이지, 마라톤, 임계값 강도의 러닝을 연속으로 진행합니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在一次跑步中混合多种配速或训练刺激的课表——例如依次进行轻松、马拉松与乳酸阈值强度的跑步。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "在一次跑步中混合多種配速或訓練刺激的課表——例如依次進行輕鬆、馬拉松與乳酸閾值強度的跑步。" } }
+      }
+    },
     "Base" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -17,6 +35,15 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "빌드 단계" } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "进阶期" } },
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "進階期" } }
+      }
+    },
+    "Comfortable, conversational-effort running that builds your aerobic base and helps you recover between harder sessions." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "会話できる程度の楽な強度で走り、エアロビックベースを築きながら、ハードなセッションの間の回復を促します。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "대화할 수 있을 정도로 편안한 강도로 달리며, 유산소 기초를 다지고 강도 높은 세션 사이의 회복을 돕습니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "以轻松、可交谈的强度跑步，能建立有氧基础，并帮助你在高强度训练之间恢复。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "以輕鬆、可交談的強度跑步，能建立有氧基礎，並幫助你在高強度訓練之間恢復。" } }
       }
     },
     "Easy Run" : {
@@ -44,6 +71,15 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "하프 마라톤" } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "半程马拉松" } },
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "半程馬拉松" } }
+      }
+    },
+    "Hard repeats at Interval pace with jog recoveries in between. Raises your VO₂max and running economy." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "インターバルペースでのハードな反復走に、ジョグでの回復を挟みます。VO₂maxとランニングエコノミーを向上させます。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "인터벌 페이스로 강도 높은 반복 훈련을 하며 사이에 조깅으로 회복합니다. VO₂max와 러닝 이코노미를 향상시킵니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "以间歇配速进行高强度反复跑，期间穿插慢跑恢复。能提升你的最大摄氧量（VO₂max）与跑步经济性。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "以間歇配速進行高強度反覆跑，期間穿插慢跑恢復。能提升你的最大攝氧量（VO₂max）與跑步經濟性。" } }
       }
     },
     "Intervals" : {
@@ -100,6 +136,33 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "休息日" } }
       }
     },
+    "Short, fast repeats at Repetition pace with full recovery. Sharpens speed and running form without heavy aerobic load." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レペティションペースでの短く速い反復走を、十分な回復を取りながら行います。大きな有酸素的負荷をかけずに、スピードとランニングフォームを磨きます。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "레피티션 페이스로 짧고 빠른 반복 훈련을 충분한 회복과 함께 진행합니다. 큰 유산소 부담 없이 스피드와 러닝 폼을 연마합니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "以反复冲刺配速进行短而快的反复跑，并搭配充分恢复。能提升速度与跑步技巧，且不会带来沉重的有氧负荷。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "以反覆衝刺配速進行短而快的反覆跑，並搭配充分恢復。能提升速度與跑步技巧，且不會帶來沉重的有氧負荷。" } }
+      }
+    },
+    "Sustained effort at Threshold pace — comfortably hard. Trains your body to clear lactate efficiently so you can hold a strong pace longer." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "閾値ペースでの持続走――「快適にきつい」強度。乳酸を効率よく除去できる体に鍛え、より長く力強いペースを維持できるようにします。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "임계값 페이스로 지속적으로 달리는 훈련 — '편안하게 힘든' 강도입니다. 젖산을 효율적으로 제거하도록 몸을 단련시켜 더 강한 페이스를 더 오래 유지할 수 있게 합니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "以乳酸阈值配速持续跑——感觉「舒适地吃力」。训练身体更有效地清除乳酸，让你能以强劲配速跑得更久。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "以乳酸閾值配速持續跑——感覺「舒適地吃力」。訓練身體更有效率地清除乳酸，讓你能以強勁配速跑得更久。" } }
+      }
+    },
+    "Swedish for \"speed play\" — unstructured bursts of faster running mixed into an easy run. Adds variety and teaches you to change gears." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "スウェーデン語で「スピードプレイ」を意味します――イージーランの中に、決まった構成のない速いペースの区間を織り交ぜます。トレーニングに変化を加え、ペースを切り替える感覚を養います。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "스웨덴어로 '스피드 플레이'를 뜻합니다 — 이지런 중간에 정해진 형식 없이 빠른 구간을 섞어 넣습니다. 훈련에 변화를 더하고 페이스를 전환하는 감각을 길러줍니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "源自瑞典语「速度游戏」——在轻松跑中穿插不固定的加速段。增添训练的多样性，并训练你切换节奏的能力。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "源自瑞典語「速度遊戲」——在輕鬆跑中穿插不固定的加速段。增添訓練的多樣性，並訓練你切換節奏的能力。" } }
+      }
+    },
     "Taper" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -116,6 +179,15 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "템포런" } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "节奏跑" } },
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "節奏跑" } }
+      }
+    },
+    "Your week's longest run, at an easy-to-moderate effort. Builds endurance and the resilience to keep going late in a race." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "その週で最も長い距離を走る、イージーからモデレートの強度のランです。持久力と、レース後半まで走り続ける粘り強さを築きます。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "그 주에서 가장 긴 거리를 달리는 러닝으로, 이지에서 중간 강도로 진행합니다. 지속력과 경기 후반까지 버틸 수 있는 회복력을 길러줍니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本周最长的一次跑步，强度为轻松到中等。能建立耐力，以及在比赛后段持续前进的韧性。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "本週最長的一次跑步，強度為輕鬆到中等。能建立耐力，以及在比賽後段持續前進的韌性。" } }
       }
     }
   },

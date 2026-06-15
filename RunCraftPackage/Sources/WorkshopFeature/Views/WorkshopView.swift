@@ -127,25 +127,42 @@ private struct TemplatesSegment: View {
 // MARK: - Category divider
 
 /// Section header grouping presets by `SessionType` — a coloured rail +
-/// caption naming the training stimulus (e.g. "INTERVALS", "FARTLEK").
+/// caption naming the training stimulus (e.g. "INTERVALS", "FARTLEK"), with
+/// an info button explaining that stimulus's training purpose.
 private struct CategoryDivider: View {
     let category: SessionType
+    @State private var showInfo = false
 
     var body: some View {
         HStack(spacing: 10) {
-            RoundedRectangle(cornerRadius: 1.5)
-                .fill(Color(hex: category.colorHex))
-                .frame(width: 3, height: 16)
-            Text(category.displayName.uppercased())
-                .font(.caption.bold())
-                .foregroundStyle(Color(hex: category.colorHex))
-                .tracking(1.2)
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 1.5)
+                    .fill(Color(hex: category.colorHex))
+                    .frame(width: 3, height: 16)
+                Text(category.displayName.uppercased())
+                    .font(.caption.bold())
+                    .foregroundStyle(Color(hex: category.colorHex))
+                    .tracking(1.2)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(category.displayName)
+            .accessibilityAddTraits(.isHeader)
+
+            Button {
+                showInfo = true
+            } label: {
+                Image(systemName: "info.circle")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .popover(isPresented: $showInfo, arrowEdge: .top) {
+                SessionTypeInfoPopover(category: category)
+            }
+
             Spacer()
         }
         .padding(.top, 4)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(category.displayName)
-        .accessibilityAddTraits(.isHeader)
     }
 }
 
