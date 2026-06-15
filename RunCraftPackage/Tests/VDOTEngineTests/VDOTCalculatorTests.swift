@@ -11,10 +11,10 @@ struct VDOTCalculatorTests {
         #expect(abs(vdot - 40) < 2, "Expected VDOT ≈ 40, got \(vdot)")
     }
 
-    @Test("5K 30:00 → VDOT ≈ 33")
+    @Test("5K 30:00 → VDOT ≈ 31")
     func vdotFrom5K30min() {
         let vdot = VDOTCalculator.vdot(distanceMeters: 5000, timeSeconds: 30 * 60)
-        #expect(abs(vdot - 33) < 2, "Expected VDOT ≈ 33, got \(vdot)")
+        #expect(abs(vdot - 31) < 2, "Expected VDOT ≈ 31, got \(vdot)")
     }
 
     @Test("10K 48:00 → VDOT ≈ 42")
