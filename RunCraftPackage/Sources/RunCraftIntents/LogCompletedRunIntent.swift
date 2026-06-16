@@ -49,7 +49,7 @@ public struct LogCompletedRunIntent: AppIntent {
     }
 
     public func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
-        let database: any DatabaseWriter = Dependency(key: \DependencyValues.defaultDatabase).wrappedValue
+        let database: any DatabaseWriter = Dependencies.Dependency(\.defaultDatabase).wrappedValue
 
         let km = max(0.1, distanceKm)
         let seconds = Double(max(1, durationMin)) * 60

@@ -11,6 +11,9 @@
 		A20A670A2FDFD1130017A9BA /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20A67092FDFD1130017A9BA /* SwiftUI.framework */; };
 		A20A671B2FDFD1150017A9BA /* TodayWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20A67052FDFD1130017A9BA /* TodayWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A20A67222FDFD1290017A9BA /* RunCraftIntents in Frameworks */ = {isa = PBXBuildFile; productRef = A20A67212FDFD1290017A9BA /* RunCraftIntents */; };
+		A20CBA8E2FE054EE0060F9C3 /* RunCraftWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A20CBA842FE054EC0060F9C3 /* RunCraftWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A20CBA942FE055D10060F9C3 /* AppleWatchSync in Frameworks */ = {isa = PBXBuildFile; productRef = A20CBA932FE055D10060F9C3 /* AppleWatchSync */; };
+		A20CBA962FE055DD0060F9C3 /* RunCraftModels in Frameworks */ = {isa = PBXBuildFile; productRef = A20CBA952FE055DD0060F9C3 /* RunCraftModels */; };
 		A2C910222FB830CB00D0D23E /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = A2C910212FB830CB00D0D23E /* AppFeature */; };
 /* End PBXBuildFile section */
 
@@ -21,6 +24,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = A20A67042FDFD1130017A9BA;
 			remoteInfo = TodayWidgetExtension;
+		};
+		A20CBA8C2FE054EE0060F9C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A2C90FFD2FB830CB00D0D23E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A20CBA832FE054EC0060F9C3;
+			remoteInfo = "RunCraftWatch Watch App";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -36,6 +46,17 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A20A67432FE053F80017A9BA /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				A20CBA8E2FE054EE0060F9C3 /* RunCraftWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +64,7 @@
 		A20A67072FDFD1130017A9BA /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		A20A67092FDFD1130017A9BA /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		A20A67232FDFD1360017A9BA /* TodayWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayWidgetExtension.entitlements; sourceTree = "<group>"; };
+		A20CBA842FE054EC0060F9C3 /* RunCraftWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "RunCraftWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2C910052FB830CB00D0D23E /* RunCraft.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunCraft.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -72,6 +94,11 @@
 			path = TodayWidget;
 			sourceTree = "<group>";
 		};
+		A20CBA852FE054EC0060F9C3 /* RunCraftWatch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "RunCraftWatch Watch App";
+			sourceTree = "<group>";
+		};
 		A2C910072FB830CB00D0D23E /* RunCraft */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -90,6 +117,15 @@
 				A20A670A2FDFD1130017A9BA /* SwiftUI.framework in Frameworks */,
 				A20A67222FDFD1290017A9BA /* RunCraftIntents in Frameworks */,
 				A20A67082FDFD1130017A9BA /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A20CBA812FE054EC0060F9C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A20CBA942FE055D10060F9C3 /* AppleWatchSync in Frameworks */,
+				A20CBA962FE055DD0060F9C3 /* RunCraftModels in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +155,7 @@
 				A20A67232FDFD1360017A9BA /* TodayWidgetExtension.entitlements */,
 				A2C910072FB830CB00D0D23E /* RunCraft */,
 				A20A670B2FDFD1130017A9BA /* TodayWidget */,
+				A20CBA852FE054EC0060F9C3 /* RunCraftWatch Watch App */,
 				A20A67062FDFD1130017A9BA /* Frameworks */,
 				A2C910062FB830CB00D0D23E /* Products */,
 			);
@@ -129,6 +166,7 @@
 			children = (
 				A2C910052FB830CB00D0D23E /* RunCraft.app */,
 				A20A67052FDFD1130017A9BA /* TodayWidgetExtension.appex */,
+				A20CBA842FE054EC0060F9C3 /* RunCraftWatch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -159,6 +197,30 @@
 			productReference = A20A67052FDFD1130017A9BA /* TodayWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		A20CBA832FE054EC0060F9C3 /* RunCraftWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A20CBA912FE054EE0060F9C3 /* Build configuration list for PBXNativeTarget "RunCraftWatch Watch App" */;
+			buildPhases = (
+				A20CBA802FE054EC0060F9C3 /* Sources */,
+				A20CBA812FE054EC0060F9C3 /* Frameworks */,
+				A20CBA822FE054EC0060F9C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A20CBA852FE054EC0060F9C3 /* RunCraftWatch Watch App */,
+			);
+			name = "RunCraftWatch Watch App";
+			packageProductDependencies = (
+				A20CBA932FE055D10060F9C3 /* AppleWatchSync */,
+				A20CBA952FE055DD0060F9C3 /* RunCraftModels */,
+			);
+			productName = "RunCraftWatch Watch App";
+			productReference = A20CBA842FE054EC0060F9C3 /* RunCraftWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 		A2C910042FB830CB00D0D23E /* RunCraft */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A2C910102FB830CD00D0D23E /* Build configuration list for PBXNativeTarget "RunCraft" */;
@@ -167,11 +229,13 @@
 				A2C910022FB830CB00D0D23E /* Frameworks */,
 				A2C910032FB830CB00D0D23E /* Resources */,
 				A20A67202FDFD1150017A9BA /* Embed Foundation Extensions */,
+				A20A67432FE053F80017A9BA /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				A20A671A2FDFD1150017A9BA /* PBXTargetDependency */,
+				A20CBA8D2FE054EE0060F9C3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A2C910072FB830CB00D0D23E /* RunCraft */,
@@ -195,6 +259,9 @@
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					A20A67042FDFD1130017A9BA = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					A20CBA832FE054EC0060F9C3 = {
 						CreatedOnToolsVersion = 26.5;
 					};
 					A2C910042FB830CB00D0D23E = {
@@ -225,12 +292,20 @@
 			targets = (
 				A2C910042FB830CB00D0D23E /* RunCraft */,
 				A20A67042FDFD1130017A9BA /* TodayWidgetExtension */,
+				A20CBA832FE054EC0060F9C3 /* RunCraftWatch Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A20A67032FDFD1130017A9BA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A20CBA822FE054EC0060F9C3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -254,6 +329,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A20CBA802FE054EC0060F9C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A2C910012FB830CB00D0D23E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -268,6 +350,11 @@
 			isa = PBXTargetDependency;
 			target = A20A67042FDFD1130017A9BA /* TodayWidgetExtension */;
 			targetProxy = A20A67192FDFD1150017A9BA /* PBXContainerItemProxy */;
+		};
+		A20CBA8D2FE054EE0060F9C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A20CBA832FE054EC0060F9C3 /* RunCraftWatch Watch App */;
+			targetProxy = A20CBA8C2FE054EE0060F9C3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -340,6 +427,79 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A20CBA8F2FE054EE0060F9C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "RunCraftWatch Watch App/RunCraftWatch Watch App.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9PRFX23G7R;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RunCraftWatch;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days for your training plan.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "RunCraft saves completed workouts so they sync with the Fitness app and inform your training progress.";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.marstudio.RunCraft.RunCraft;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.marstudio.RunCraft.RunCraft.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		A20CBA902FE054EE0060F9C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "RunCraftWatch Watch App/RunCraftWatch Watch App.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9PRFX23G7R;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RunCraftWatch;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days for your training plan.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "RunCraft saves completed workouts so they sync with the Fitness app and inform your training progress.";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.marstudio.RunCraft.RunCraft;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.marstudio.RunCraft.RunCraft.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
 			};
 			name = Release;
 		};
@@ -571,6 +731,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		A20CBA912FE054EE0060F9C3 /* Build configuration list for PBXNativeTarget "RunCraftWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A20CBA8F2FE054EE0060F9C3 /* Debug */,
+				A20CBA902FE054EE0060F9C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A2C910002FB830CB00D0D23E /* Build configuration list for PBXProject "RunCraft" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -602,6 +771,14 @@
 		A20A67212FDFD1290017A9BA /* RunCraftIntents */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RunCraftIntents;
+		};
+		A20CBA932FE055D10060F9C3 /* AppleWatchSync */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppleWatchSync;
+		};
+		A20CBA952FE055DD0060F9C3 /* RunCraftModels */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RunCraftModels;
 		};
 		A2C910212FB830CB00D0D23E /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;

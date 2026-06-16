@@ -85,15 +85,15 @@ public struct StartWorkoutSnippetView: View {
     private var statusHeadline: String {
         switch status {
         case .sent:        "Sent to Apple Watch"
-        case .unavailable: "Watch unavailable"
+        case .unavailable: "Apple Watch not reachable"
         case .failed:      "Couldn't send"
         }
     }
 
     private var footerText: String {
         switch status {
-        case .sent:        "Open Workouts on your Apple Watch within a minute."
-        case .unavailable: "WorkoutKit isn't available on this device."
+        case .sent:        "Opening Workouts on your Apple Watch…"
+        case .unavailable: "Open RunCraft on your Apple Watch, then try again."
         case .failed:      "Open RunCraft and try Start Workout from the editor."
         }
     }

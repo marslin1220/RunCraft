@@ -10,7 +10,7 @@ import SQLiteData
 /// action on the Today's-session widget, and mirrors
 /// `TrainingPlanFeature.quickStartSession`'s
 /// `PlanSessionAdapter.makeTemplate(from:vdot:)` →
-/// `workoutKitClient.openInWorkoutApp(template)` flow.
+/// `watchConnectivityClient.sendWorkout(WatchWorkoutPayload(...))` flow.
 public struct StartTodaysSessionIntent: AppIntent {
 
     public static let title: LocalizedStringResource = "Start today's session"
@@ -28,17 +28,32 @@ public struct StartTodaysSessionIntent: AppIntent {
     public init() {}
 
     public func perform() async throws -> some IntentResult & ProvidesDialog {
-        let database: any DatabaseWriter = Dependency(key: \DependencyValues.defaultDatabase).wrappedValue
+        let database: any DatabaseWriter = Dependencies.Dependency(\.defaultDatabase).wrappedValue
         let today = try await database.read { db in try TodaysSession.current(in: db) }
 
         guard let today, today.session.sessionType != .rest else {
-            return .result(dialog: "There's no training session scheduled for today.")
+            return .result(dialog: IntentDialog(stringLiteral: String(
+                localized: "There's no training session scheduled for today.",
+                bundle: .module
+            )))
         }
 
-        let workoutKitClient: WorkoutKitClient = Dependency(key: \DependencyValues.workoutKitClient).wrappedValue
+        let watchConnectivityClient: WatchConnectivityClient = Dependencies.Dependency(\.watchConnectivityClient).wrappedValue
+        let hkWatchTriggerClient: HKWatchTriggerClient = Dependencies.Dependency(\.hkWatchTriggerClient).wrappedValue
         let template = PlanSessionAdapter.makeTemplate(from: today.session, vdot: today.vdot)
-        try await workoutKitClient.openInWorkoutApp(template)
+        do {
+            try await watchConnectivityClient.sendWorkout(
+                WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+            )
+            try await hkWatchTriggerClient.startWatchSession()
+        } catch {
+            return .result(dialog: IntentDialog(stringLiteral: error.localizedDescription))
+        }
 
-        return .result(dialog: "Sending \(today.session.sessionType.displayName) to your Apple Watch.")
+        let sessionName = today.session.sessionType.displayName
+        return .result(dialog: IntentDialog(stringLiteral: String(
+            localized: "Starting \(sessionName) on your Apple Watch.",
+            bundle: .module
+        )))
     }
 }

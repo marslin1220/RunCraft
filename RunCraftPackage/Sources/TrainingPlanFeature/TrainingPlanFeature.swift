@@ -23,6 +23,7 @@ import WorkshopFeature
         /// Id of the session currently being pushed to the Watch via the
         /// today-row play button. Drives the ProgressView in the card so
         /// the runner sees their tap registered.
+        public var watchAvailable: Bool = true
         public var quickStartSendingSessionId: UUID? = nil
         @Presents public var quickStartAlert: AlertState<Action.QuickStartAlert>? = nil
 
@@ -126,6 +127,7 @@ import WorkshopFeature
         case dismissHealthPermissionBanner
         case syncBackWorkouts
         case syncBackCompleted
+        case watchScheduleSync
         /// Sent from the Plan tab's today-card "play" button. Bypasses
         /// the editor and pushes the workout straight to Apple Watch.
         case quickStartSession(PlannedSession)
@@ -154,7 +156,8 @@ import WorkshopFeature
     @Dependency(\.defaultDatabase) var database
     @Dependency(\.date.now) var now
     @Dependency(\.workoutTemplateRepository) var repository
-    @Dependency(\.workoutKitClient) var workoutKitClient
+    @Dependency(\.watchConnectivityClient) var watchConnectivityClient
+    @Dependency(\.hkWatchTriggerClient) var hkWatchTriggerClient
 
     public init() {}
 
@@ -162,6 +165,7 @@ import WorkshopFeature
         Reduce { state, action in
             switch action {
             case .onAppear:
+                state.watchAvailable = watchConnectivityClient.isWatchPaired()
                 return .run { [database] send in
                     await send(.activeGoalLoaded(Result {
                         try await database.read { db in
@@ -182,7 +186,8 @@ import WorkshopFeature
                     .send(.syncBackWorkouts),
                     .send(.checkVDOTUpgrade),
                     .send(.checkHealthAuthorization),
-                    .send(.refreshRollingWeekIfNeeded(goal))
+                    .send(.refreshRollingWeekIfNeeded(goal)),
+                    .send(.watchScheduleSync)
                 )
 
             case .activeGoalLoaded(.success(.none)):
@@ -351,7 +356,7 @@ import WorkshopFeature
                 return .none
 
             case .countdownTapped:
-                state.path.append(.weekSchedule(WeekSchedule.State()))
+                state.path.append(.weekSchedule(WeekSchedule.State(watchAvailable: state.watchAvailable)))
                 return .none
 
             case .fetchRecoveryAdvice:
@@ -398,23 +403,26 @@ import WorkshopFeature
 
             case .applyDowngradeTapped:
                 state.recoveryAdvice = nil
-                return .run { [database] _ in
-                    try await database.write { db in
-                        let weeks = try TrainingWeek.all.fetchAll(db)
-                        guard let currentWeek = TrainingWeek.current(in: weeks) else { return }
-                        let dayOfWeek = PlannedSession.dayOfWeek(for: Date())
-                        try PlannedSession
-                            .where { $0.weekId.eq(currentWeek.id) }
-                            .where { $0.dayOfWeek.eq(dayOfWeek) }
-                            .update {
-                                $0.sessionType = #bind(.easy)
-                                $0.targetPaceZone = #bind(.easy)
-                                $0.targetDistanceKm = #bind(5)
-                                $0.notes = #bind("Auto-downgraded for recovery")
-                            }
-                            .execute(db)
-                    }
-                }
+                return .merge(
+                    .run { [database] _ in
+                        try await database.write { db in
+                            let weeks = try TrainingWeek.all.fetchAll(db)
+                            guard let currentWeek = TrainingWeek.current(in: weeks) else { return }
+                            let dayOfWeek = PlannedSession.dayOfWeek(for: Date())
+                            try PlannedSession
+                                .where { $0.weekId.eq(currentWeek.id) }
+                                .where { $0.dayOfWeek.eq(dayOfWeek) }
+                                .update {
+                                    $0.sessionType = #bind(.easy)
+                                    $0.targetPaceZone = #bind(.easy)
+                                    $0.targetDistanceKm = #bind(5)
+                                    $0.notes = #bind("Auto-downgraded for recovery")
+                                }
+                                .execute(db)
+                        }
+                    },
+                    .send(.watchScheduleSync)
+                )
 
             case .dismissRecoveryAdvice:
                 state.recoveryAdvice = nil
@@ -499,15 +507,18 @@ import WorkshopFeature
                 state.vdotUpgrade = nil
                 state.currentVDOT = newVDOT
                 state.paceZones = VDOTCalculator.paceZones(vdot: newVDOT)
-                return .run { [database] _ in
-                    try await database.write { db in
-                        try RaceGoal.update {
-                            $0.currentVDOT = newVDOT
-                        }.execute(db)
-                        let snapshot = VDOTSnapshot(vdot: newVDOT, source: source)
-                        try VDOTSnapshot.upsert { snapshot }.execute(db)
-                    }
-                }
+                return .merge(
+                    .run { [database] _ in
+                        try await database.write { db in
+                            try RaceGoal.update {
+                                $0.currentVDOT = newVDOT
+                            }.execute(db)
+                            let snapshot = VDOTSnapshot(vdot: newVDOT, source: source)
+                            try VDOTSnapshot.upsert { snapshot }.execute(db)
+                        }
+                    },
+                    .send(.watchScheduleSync)
+                )
 
             case .dismissVDOTUpgrade:
                 state.vdotUpgrade = nil
@@ -590,6 +601,51 @@ import WorkshopFeature
                 // the historic best race-time check.
                 return .send(.checkVDOTUpgrade)
 
+            case .watchScheduleSync:
+                guard state.currentVDOT > 0 else { return .none }
+                let vdot = state.currentVDOT
+                return .run { [database, watchConnectivityClient] _ in
+                    let schedPayload: WatchSchedulePayload? = try? await database.read { db in
+                        let allWeeks = try TrainingWeek.all.fetchAll(db)
+                        guard let currentWeek = TrainingWeek.current(in: allWeeks) else { return nil }
+                        let sessions = try PlannedSession
+                            .where { $0.weekId.eq(currentWeek.id) }
+                            .fetchAll(db)
+                        let dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                        let today = PlannedSession.dayOfWeek(for: Date())
+                        let watchSessions = sessions
+                            .filter { $0.sessionType != .rest }
+                            .sorted { $0.dayOfWeek < $1.dayOfWeek }
+                            .map { s in
+                                let template = PlanSessionAdapter.makeTemplate(from: s, vdot: vdot)
+                                return WatchSchedulePayload.Session(
+                                    id: s.id,
+                                    dayName: dayNames[max(0, min(s.dayOfWeek - 1, 6))],
+                                    title: s.sessionType.displayName,
+                                    isToday: s.dayOfWeek == today,
+                                    payload: WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+                                )
+                            }
+                        let paceZones = VDOTCalculator.paceZones(vdot: vdot)
+                        let unit = PaceUnit.current
+                        let paceTemplates = PaceZoneName.allCases.map { zone -> WatchWorkoutPayload in
+                            let step = WorkoutStep(
+                                kind: .work,
+                                goal: .time(seconds: 30 * 60),
+                                alert: .paceZone(zone, vdot: vdot)
+                            )
+                            return WatchWorkoutPayload(
+                                name: "\(zone.displayName) · 30 min",
+                                subtitle: paceZones[zone].formatted(unit: unit),
+                                blocks: [.step(step)]
+                            )
+                        }
+                        return WatchSchedulePayload(sessions: watchSessions, paceTemplates: paceTemplates)
+                    }
+                    guard let schedPayload else { return }
+                    try? await watchConnectivityClient.sendSchedule(schedPayload)
+                }
+
             case let .paceChipTapped(zone):
                 let template = makePaceFocusTemplate(zone: zone, vdot: state.currentVDOT)
                 return .send(.delegate(.openWorkoutInWorkshop(template, source: .template, isTodaySession: true)))
@@ -597,15 +653,24 @@ import WorkshopFeature
             case let .sessionTapped(session):
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
                 let isToday = session.dayOfWeek == PlannedSession.dayOfWeek(for: now)
-                return .send(.delegate(.openWorkoutInWorkshop(template, source: .planSession, isTodaySession: isToday)))
+                state.path.append(.editor(WorkoutEditor.State(
+                    loading: template,
+                    asCopy: true,
+                    source: .planSession,
+                    isTodaySession: isToday
+                )))
+                return .none
 
             case let .quickStartSession(session):
                 state.quickStartSendingSessionId = session.id
                 let id = session.id
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
-                return .run { [workoutKitClient] send in
+                return .run { [watchConnectivityClient, hkWatchTriggerClient] send in
                     await send(.quickStartResponse(sessionId: id, Result {
-                        try await workoutKitClient.openInWorkoutApp(template)
+                        try await watchConnectivityClient.sendWorkout(
+                            WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+                        )
+                        try await hkWatchTriggerClient.startWatchSession()
                     }))
                 }
 
@@ -688,10 +753,13 @@ import WorkshopFeature
 
 @Reducer public struct WeekSchedule {
     @ObservableState public struct State: Equatable {
+        public var watchAvailable: Bool
         public var quickStartStatus: QuickStartStatus = .idle
         @Presents public var alert: AlertState<Action.Alert>?
 
-        public init() {}
+        public init(watchAvailable: Bool = true) {
+            self.watchAvailable = watchAvailable
+        }
 
         public enum QuickStartStatus: Equatable {
             case idle
@@ -708,6 +776,10 @@ import WorkshopFeature
         /// Surfaces an alert on failure; otherwise just sets `sent`.
         case quickStartTapped(PlannedSession, vdot: Double)
         case quickStartResponse(Result<Void, any Error>)
+        /// Clears the brief "Sent" confirmation back to idle — debounces
+        /// the button so an accidental second tap doesn't immediately
+        /// re-schedule the workout.
+        case quickStartStatusReset
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
         public enum Alert: Equatable {}
@@ -716,7 +788,14 @@ import WorkshopFeature
         }
     }
 
-    @Dependency(\.workoutKitClient) var workoutKitClient
+    @Dependency(\.watchConnectivityClient) var watchConnectivityClient
+    @Dependency(\.hkWatchTriggerClient) var hkWatchTriggerClient
+    @Dependency(\.continuousClock) var clock
+
+    /// How long the "Sent" confirmation stays up before the button reverts
+    /// to "Start" — long enough to read, short enough that a genuine
+    /// re-send isn't blocked for long.
+    static let sentConfirmationDuration: Duration = .seconds(3)
 
     public init() {}
     public var body: some Reducer<State, Action> {
@@ -726,16 +805,29 @@ import WorkshopFeature
                 return .send(.delegate(.openSession(s, isToday: isToday)))
 
             case let .quickStartTapped(session, vdot):
+                guard state.watchAvailable else { return .none }
                 state.quickStartStatus = .sending(sessionId: session.id)
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: vdot)
-                return .run { [workoutKitClient] send in
+                return .run { [watchConnectivityClient, hkWatchTriggerClient] send in
                     await send(.quickStartResponse(Result {
-                        try await workoutKitClient.openInWorkoutApp(template)
+                        try await watchConnectivityClient.sendWorkout(
+                            WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+                        )
+                        try await hkWatchTriggerClient.startWatchSession()
                     }))
                 }
 
             case .quickStartResponse(.success):
                 state.quickStartStatus = .sent
+                return .run { [clock] send in
+                    try await clock.sleep(for: Self.sentConfirmationDuration)
+                    await send(.quickStartStatusReset)
+                }
+
+            case .quickStartStatusReset:
+                if state.quickStartStatus == .sent {
+                    state.quickStartStatus = .idle
+                }
                 return .none
 
             case let .quickStartResponse(.failure(error)):

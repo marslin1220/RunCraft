@@ -18,6 +18,7 @@ import RunCraftModels
         /// different (past/future) session from here would get its
         /// completion misattributed. Always `true` for `.yours`/`.template`.
         public var isTodaySession: Bool = true
+        public var watchAvailable: Bool = true
         public var saveStatus: SaveStatus = .idle
         public var syncStatus: SyncStatus = .idle
         /// Id of a block that was just appended optimistically and is being
@@ -70,11 +71,10 @@ import RunCraftModels
             self.isTodaySession = isTodaySession
         }
 
-        /// Whether "Start Workout" should be offered. Plan-session copies
-        /// that aren't today's actual session are preview-only — see
-        /// `isTodaySession`.
+        /// Whether "Start Workout" should be offered. Requires a paired Watch
+        /// and either a non-plan-session source or today's actual session.
         public var canStartOnWatch: Bool {
-            source != .planSession || isTodaySession
+            watchAvailable && (source != .planSession || isTodaySession)
         }
 
         /// Top-level steps in the workout (used by EditRepeatGroup to offer
@@ -123,9 +123,16 @@ import RunCraftModels
         case newTemplateTapped
         case deleteTemplate(WorkoutTemplate.ID)
 
+        // Lifecycle
+        case onTask
+
         // Apple Watch handoff
         case startTapped
         case syncResponse(Result<Void, any Error>)
+        /// Clears the brief "Sent" confirmation back to idle — debounces
+        /// the button so an accidental second tap doesn't immediately
+        /// re-schedule the workout.
+        case syncStatusReset
 
         // Duplicate — emits delegate; Workshop reducer does the DB insert
         case duplicateTapped
@@ -144,8 +151,15 @@ import RunCraftModels
 
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
+    @Dependency(\.continuousClock) var clock
     @Dependency(\.workoutTemplateRepository) var repository
-    @Dependency(\.workoutKitClient) var workoutKitClient
+    @Dependency(\.watchConnectivityClient) var watchConnectivityClient
+    @Dependency(\.hkWatchTriggerClient) var hkWatchTriggerClient
+
+    /// How long the "Sent" confirmation stays up before the button reverts
+    /// to "Start Workout" — long enough to read, short enough that a
+    /// genuine re-send isn't blocked for long.
+    static let sentConfirmationDuration: Duration = .seconds(3)
 
     public init() {}
 
@@ -153,6 +167,10 @@ import RunCraftModels
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case .onTask:
+                state.watchAvailable = watchConnectivityClient.isWatchPaired()
+                return .none
+
             case .binding:
                 return .none
 
@@ -246,14 +264,26 @@ import RunCraftModels
                     createdAt: now,
                     updatedAt: now
                 )
-                return .run { [workoutKitClient] send in
+                return .run { [watchConnectivityClient, hkWatchTriggerClient] send in
                     await send(.syncResponse(Result {
-                        try await workoutKitClient.openInWorkoutApp(template)
+                        try await watchConnectivityClient.sendWorkout(
+                            WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+                        )
+                        try await hkWatchTriggerClient.startWatchSession()
                     }))
                 }
 
             case .syncResponse(.success):
                 state.syncStatus = .sent
+                return .run { [clock] send in
+                    try await clock.sleep(for: Self.sentConfirmationDuration)
+                    await send(.syncStatusReset)
+                }
+
+            case .syncStatusReset:
+                if state.syncStatus == .sent {
+                    state.syncStatus = .idle
+                }
                 return .none
 
             case let .syncResponse(.failure(error)):

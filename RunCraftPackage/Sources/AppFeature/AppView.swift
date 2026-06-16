@@ -11,6 +11,7 @@ public struct AppView: View {
     /// Plain `@AppStorage` (same pattern as the pace-unit picker in
     /// Settings) so the flag persists without going through TCA state.
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+    @Environment(\.scenePhase) private var scenePhase
 
     public init(store: StoreOf<AppFeature>) {
         self.store = store
@@ -43,6 +44,11 @@ public struct AppView: View {
                 .tag(AppFeature.Tab.settings)
         }
         .tint(Color.brand.accent)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                store.send(.plan(.watchScheduleSync))
+            }
+        }
         .fullScreenCover(isPresented: Binding(
             get: { !hasCompletedOnboarding },
             set: { _ in /* dismissal handled via onComplete */ }

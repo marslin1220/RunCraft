@@ -1,40 +1,31 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Apple Watch workout sync is not authorised. Tap to allow in Settings." : {
+    "Could not send workout to Apple Watch: %@" : {
       "extractionState" : "manual",
       "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch のワークアウト同期が許可されていません。「設定」でタップして許可してください。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 운동 동기화가 승인되지 않았습니다. \"설정\"에서 탭하여 허용하세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 训练同步未授权。请在「设置」中允许。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "Apple Watch 訓練同步尚未授權。請至「設定」中允許。" } }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウトを Apple Watch に送信できませんでした：%@" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동을 Apple Watch로 전송할 수 없습니다: %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法将训练发送到 Apple Watch：%@" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "無法將訓練傳送至 Apple Watch：%@" } }
       }
     },
-    "Could not convert workout: %@" : {
+    "No paired Apple Watch with RunCraft installed was found." : {
       "extractionState" : "manual",
       "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウトを変換できませんでした：%@" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동을 변환할 수 없습니다: %@" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法转换训练：%@" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "無法轉換訓練：%@" } }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft がインストールされたペアリング済みの Apple Watch が見つかりませんでした。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft가 설치된 페어링된 Apple Watch를 찾을 수 없습니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未找到已安装 RunCraft 的配对 Apple Watch。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "找不到已安裝 RunCraft 的配對 Apple Watch。" } }
       }
     },
-    "No paired Apple Watch found. Pair a Watch in the Watch app." : {
+    "WatchConnectivity requires iOS." : {
       "extractionState" : "manual",
       "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ペアリング済みの Apple Watch が見つかりません。Watch アプリでペアリングしてください。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "페어링된 Apple Watch가 없습니다. Watch 앱에서 페어링하세요." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "找不到配对的 Apple Watch。请在 Watch app 中配对手表。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "找不到配對的 Apple Watch。請在 Watch app 中配對手錶。" } }
-      }
-    },
-    "WorkoutKit requires iOS 17 or later." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "WorkoutKit は iOS 17 以降が必要です。" } },
-        "ko" : { "stringUnit" : { "state" : "translated", "value" : "WorkoutKit은 iOS 17 이상이 필요합니다." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "WorkoutKit 需要 iOS 17 或更新版本。" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "WorkoutKit 需要 iOS 17 或更新版本。" } }
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "WatchConnectivity には iOS が必要です。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "WatchConnectivity는 iOS가 필요합니다." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "WatchConnectivity 需要 iOS。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "WatchConnectivity 需要 iOS。" } }
       }
     }
   },

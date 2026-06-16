@@ -10,8 +10,9 @@ import WorkshopFeature
 /// "Start Yasso 800 in RunCraft" — voice-driven workout dispatch.
 ///
 /// Resolves the chosen template (either a built-in preset or a user-saved
-/// row), builds a WorkoutKit `WorkoutPlan`, and schedules it on the paired
-/// Apple Watch. The runner gets a banner on their Watch within ~1 minute.
+/// row) and sends it to the paired Apple Watch over WatchConnectivity. The
+/// RunCraftWatch app converts it to a WorkoutKit `WorkoutPlan` and hands it
+/// straight to the native Workout app.
 public struct StartWorkoutIntent: AppIntent {
 
     public static let title: LocalizedStringResource = "Start a workout"
@@ -41,26 +42,29 @@ public struct StartWorkoutIntent: AppIntent {
     public func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         let template = try resolveTemplate(for: workout)
 
-        let workoutKitClient: WorkoutKitClient = Dependency(key: \DependencyValues.workoutKitClient).wrappedValue
-        guard workoutKitClient.isAvailable() else {
-            return .result(
-                dialog: "WorkoutKit isn't available on this device. Open RunCraft to start the workout manually."
-            ) {
-                StartWorkoutSnippetView(workout: workout, status: .unavailable)
-            }
-        }
+        let watchConnectivityClient: WatchConnectivityClient = Dependencies.Dependency(\.watchConnectivityClient).wrappedValue
+        let hkWatchTriggerClient: HKWatchTriggerClient = Dependencies.Dependency(\.hkWatchTriggerClient).wrappedValue
 
         do {
-            try await workoutKitClient.openInWorkoutApp(template)
+            try await watchConnectivityClient.sendWorkout(
+                WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+            )
+            try await hkWatchTriggerClient.startWatchSession()
         } catch {
+            let name = workout.name
+            let errorMsg = error.localizedDescription
             return .result(
-                dialog: "I couldn't send \(workout.name) to your Watch. \(error.localizedDescription)"
+                dialog: IntentDialog(stringLiteral: String(
+                    localized: "I couldn't send \(name) to your Watch. \(errorMsg)",
+                    bundle: .module
+                ))
             ) {
                 StartWorkoutSnippetView(workout: workout, status: .failed)
             }
         }
 
-        let spoken = "Sending \(workout.name) to your Apple Watch. Open Workouts on the Watch when you're ready."
+        let name = workout.name
+        let spoken = String(localized: "Starting \(name) on your Apple Watch.", bundle: .module)
         return .result(dialog: IntentDialog(stringLiteral: spoken)) {
             StartWorkoutSnippetView(workout: workout, status: .sent)
         }
@@ -74,7 +78,7 @@ public struct StartWorkoutIntent: AppIntent {
         if let preset = WorkoutPresets.all.first(where: { $0.id == entity.id }) {
             return preset
         }
-        let database: any DatabaseWriter = Dependency(key: \DependencyValues.defaultDatabase).wrappedValue
+        let database: any DatabaseWriter = Dependencies.Dependency(\.defaultDatabase).wrappedValue
         let row: WorkoutTemplate? = try database.read { db in
             try WorkoutTemplate.find(entity.id).fetchOne(db)
         }
@@ -93,7 +97,7 @@ public enum StartWorkoutIntentError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .templateNotFound(let name):
-            return "I couldn't find a workout named \(name) any more — it may have been deleted."
+            return String(localized: "I couldn't find a workout named \(name) any more — it may have been deleted.", bundle: .module)
         }
     }
 }

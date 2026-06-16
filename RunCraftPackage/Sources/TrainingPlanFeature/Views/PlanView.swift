@@ -171,6 +171,7 @@ public struct PlanView: View {
             WeekSessionsSection(
                 week: currentWeek,
                 vdot: store.currentVDOT,
+                watchAvailable: store.watchAvailable,
                 quickStartSendingSessionId: store.quickStartSendingSessionId,
                 onSessionTap: { store.send(.sessionTapped($0)) },
                 onQuickStart: { store.send(.quickStartSession($0)) }
@@ -390,6 +391,7 @@ private extension PaceZoneName {
 private struct WeekSessionsSection: View {
     let week: TrainingWeek
     let vdot: Double
+    let watchAvailable: Bool
     let quickStartSendingSessionId: UUID?
     let onSessionTap: (PlannedSession) -> Void
     let onQuickStart: (PlannedSession) -> Void
@@ -432,6 +434,7 @@ private struct WeekSessionsSection: View {
                         vdot: vdot,
                         actuals: actuals,
                         isToday: session.dayOfWeek == todayDayOfWeek,
+                        watchAvailable: watchAvailable,
                         isSending: quickStartSendingSessionId == session.id,
                         onTap: { onSessionTap(session) },
                         onQuickStart: { onQuickStart(session) }
@@ -635,6 +638,7 @@ private struct SessionCard: View {
     /// Drives the completed state — non-nil means this session is done.
     let actuals: SessionActuals?
     let isToday: Bool
+    let watchAvailable: Bool
     let isSending: Bool
     let onTap: () -> Void
     let onQuickStart: () -> Void
@@ -687,7 +691,7 @@ private struct SessionCard: View {
 
     private var trailingKind: WorkoutCard<EmptyView>.Trailing {
         if isCompleted { return .check }
-        if isToday { return .play }
+        if isToday && watchAvailable { return .play }
         return .chevron
     }
 

@@ -16,8 +16,8 @@ public enum WorkoutPlanBuilder {
     /// - Everything in between becomes `IntervalBlock`s:
     ///     • a `.step` becomes a one-iteration block with a single step
     ///     • a `.repeatGroup` becomes a multi-iteration block with the inner steps
-    public static func makePlan(from template: WorkoutTemplate) throws -> WorkoutPlan {
-        var remaining = template.blocks
+    public static func makePlan(name: String, blocks: [WorkoutBlock]) throws -> WorkoutPlan {
+        var remaining = blocks
         var warmup: WorkoutKit.WorkoutStep? = nil
         var cooldown: WorkoutKit.WorkoutStep? = nil
 
@@ -30,7 +30,7 @@ public enum WorkoutPlanBuilder {
             remaining.removeLast()
         }
 
-        let blocks: [IntervalBlock] = remaining.map { block in
+        let intervalBlocks: [IntervalBlock] = remaining.map { block in
             switch block {
             case let .step(step):
                 return IntervalBlock(
@@ -48,12 +48,19 @@ public enum WorkoutPlanBuilder {
         let custom = CustomWorkout(
             activity: .running,
             location: .outdoor,
-            displayName: template.name,
+            displayName: name,
             warmup: warmup,
-            blocks: blocks,
+            blocks: intervalBlocks,
             cooldown: cooldown
         )
         return WorkoutPlan(.custom(custom))
+    }
+
+    /// Convenience wrapper for the iOS template path — extracts `name` and
+    /// `blocks` from a `WorkoutTemplate` and delegates to
+    /// ``makePlan(name:blocks:)``.
+    public static func makePlan(from template: WorkoutTemplate) throws -> WorkoutPlan {
+        try makePlan(name: template.name, blocks: template.blocks)
     }
 
     // MARK: - Step conversion

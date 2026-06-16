@@ -76,6 +76,7 @@ struct WeekScheduleView: View {
                         isExpanded: expandedWeekIds.contains(gapWeek.id),
                         todayDayOfWeek: todayDayOfWeek,
                         currentVDOT: currentVDOT,
+                        watchAvailable: store.watchAvailable,
                         quickStartStatus: store.quickStartStatus,
                         onToggle: { toggle(gapWeek.id) },
                         onTap: { session, isToday in
@@ -102,6 +103,7 @@ struct WeekScheduleView: View {
                                 isExpanded: expandedWeekIds.contains(week.id),
                                 todayDayOfWeek: isCurrentWeek(week) ? todayDayOfWeek : nil,
                                 currentVDOT: currentVDOT,
+                                watchAvailable: store.watchAvailable,
                                 quickStartStatus: store.quickStartStatus,
                                 onToggle: { toggle(week.id) },
                                 onTap: { session, isToday in
@@ -253,6 +255,7 @@ private struct WeekSection: View {
     /// row with a lime border and a Start button. nil for past/future weeks.
     let todayDayOfWeek: Int?
     let currentVDOT: Double
+    let watchAvailable: Bool
     let quickStartStatus: WeekSchedule.State.QuickStartStatus
     let onToggle: () -> Void
     let onTap: (PlannedSession, Bool) -> Void
@@ -363,6 +366,9 @@ private struct WeekSection: View {
             guard case let .sending(id) = quickStartStatus else { return false }
             return id == session.id
         }()
+        // `.sent` carries no session id, but only one row can be "today"
+        // at a time, so it unambiguously refers to this row.
+        let isSent = quickStartStatus == .sent
 
         Button {
             onTap(session, isToday)
@@ -415,7 +421,8 @@ private struct WeekSection: View {
                     session: session,
                     isToday: isToday,
                     isCompleted: isCompleted,
-                    isSending: isSending
+                    isSending: isSending,
+                    isSent: isSent
                 )
             }
             .padding(.vertical, 12)
@@ -442,7 +449,8 @@ private struct WeekSection: View {
         session: PlannedSession,
         isToday: Bool,
         isCompleted: Bool,
-        isSending: Bool
+        isSending: Bool,
+        isSent: Bool
     ) -> some View {
         if isCompleted {
             VStack(alignment: .trailing, spacing: 4) {
@@ -451,7 +459,7 @@ private struct WeekSection: View {
                     .font(.callout)
                     .foregroundStyle(Color.brand.success)
             }
-        } else if isToday {
+        } else if isToday && watchAvailable {
             // Today's row gets a dedicated Start button — bypasses the
             // editor and pushes the workout straight to the Watch.
             Button {
@@ -462,11 +470,14 @@ private struct WeekSection: View {
                         ProgressView()
                             .controlSize(.mini)
                             .tint(.black)
+                    } else if isSent {
+                        Image(systemName: "checkmark")
+                            .font(.caption.bold())
                     } else {
                         Image(systemName: "play.fill")
                             .font(.caption.bold())
                     }
-                    Text(isSending ? "Sending" : "Start")
+                    Text(isSending ? "Sending" : (isSent ? "Sent" : "Start"))
                         .font(.caption.bold())
                 }
                 .foregroundStyle(.black)
@@ -477,7 +488,7 @@ private struct WeekSection: View {
                 .clipShape(Capsule())
             }
             .buttonStyle(.plain)
-            .disabled(isSending)
+            .disabled(isSending || isSent)
             .accessibilityLabel("Start \(session.sessionType.displayName) on Apple Watch")
         } else {
             VStack(alignment: .trailing, spacing: 4) {

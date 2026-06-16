@@ -465,31 +465,31 @@
         }
       }
     },
-    "Open Workouts on your Apple Watch within a minute.": {
+    "Opening Workouts on your Apple Watch…": {
       "extractionState": "manual",
       "localizations": {
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 分以内に Apple Watch の「ワークアウト」を開いてください。"
+            "value": "Apple Watch で「ワークアウト」を開いています…"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "1분 이내에 Apple Watch의 \"운동\"을 여세요."
+            "value": "Apple Watch에서 \"운동\"을 여는 중…"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请在一分钟内打开 Apple Watch 上的「体能训练」。"
+            "value": "正在打开 Apple Watch 上的「体能训练」…"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "請在一分鐘內打開 Apple Watch 上的「體能訓練」。"
+            "value": "正在打開 Apple Watch 上的「體能訓練」…"
           }
         }
       }
@@ -958,31 +958,31 @@
         }
       }
     },
-    "Watch unavailable": {
+    "Apple Watch not reachable": {
       "extractionState": "manual",
       "localizations": {
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Watch を利用できません"
+            "value": "Apple Watch に接続できません"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Watch 사용 불가"
+            "value": "Apple Watch에 연결할 수 없음"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Watch 无法使用"
+            "value": "无法连接 Apple Watch"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Watch 無法使用"
+            "value": "無法連線至 Apple Watch"
           }
         }
       }
@@ -1074,31 +1074,147 @@
         }
       }
     },
-    "WorkoutKit isn't available on this device.": {
+    "Open RunCraft on your Apple Watch, then try again.": {
       "extractionState": "manual",
       "localizations": {
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "このデバイスでは WorkoutKit を利用できません。"
+            "value": "Apple Watch で RunCraft を開いてから、もう一度お試しください。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "이 기기에서는 WorkoutKit을 사용할 수 없습니다."
+            "value": "Apple Watch에서 RunCraft를 연 다음 다시 시도하세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "这台设备无法使用 WorkoutKit。"
+            "value": "请在 Apple Watch 上打开 RunCraft，然后重试。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "這台裝置無法使用 WorkoutKit。"
+            "value": "請在 Apple Watch 上開啟 RunCraft，然後再試一次。"
+          }
+        }
+      }
+    },
+    "Starting %@ on your Apple Watch.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch で %@ を開始しています…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch에서 %@ 시작 중…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在 Apple Watch 上启动 %@…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在 Apple Watch 上啟動 %@…"
+          }
+        }
+      }
+    },
+    "There's no training session scheduled for today.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日は訓練セッションが予定されていません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘 예정된 훈련 세션이 없습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天没有安排训练。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天沒有安排訓練。"
+          }
+        }
+      }
+    },
+    "I couldn't send %@ to your Watch. %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ を Apple Watch に送信できませんでした。%@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@을(를) Apple Watch에 보낼 수 없습니다. %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法将 %@ 传送到 Apple Watch。%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法將 %@ 傳送到 Apple Watch。%@"
+          }
+        }
+      }
+    },
+    "I couldn't find a workout named %@ any more — it may have been deleted.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ というワークアウトは見つかりません。削除された可能性があります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 운동을 더 이상 찾을 수 없습니다. 삭제된 것 같습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找不到名为 %@ 的训练，它可能已被删除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找不到名為 %@ 的訓練，它可能已被刪除。"
           }
         }
       }

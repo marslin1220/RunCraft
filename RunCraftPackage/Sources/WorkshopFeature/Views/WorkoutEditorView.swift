@@ -49,6 +49,7 @@ public struct WorkoutEditorView: View {
                 .allowsHitTesting(false)
             )
         }
+        .task { store.send(.onTask) }
         .navigationTitle(store.templateName.isEmpty ? "Edit Workout" : store.templateName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -162,7 +163,7 @@ public struct WorkoutEditorView: View {
             .shadow(color: .black.opacity(0.4), radius: 6, y: 2)
         }
         .buttonStyle(.plain)
-        .disabled(store.syncStatus == .sending || store.blocks.isEmpty)
+        .disabled(store.syncStatus == .sending || store.syncStatus == .sent || store.blocks.isEmpty)
         .opacity(store.blocks.isEmpty ? 0.4 : 1)
     }
 
@@ -191,7 +192,7 @@ public struct WorkoutEditorView: View {
     private var sendLabel: Text {
         switch store.syncStatus {
         case .sending: Text("Starting…")
-        case .sent:    Text("Started · Check Apple Watch")
+        case .sent:    Text("Starting on your Apple Watch…")
         default:       Text("Start Workout")
         }
     }

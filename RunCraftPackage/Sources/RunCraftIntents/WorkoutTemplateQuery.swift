@@ -48,11 +48,8 @@ public struct WorkoutTemplateQuery: EntityQuery, EntityStringQuery {
         return presets + userTemplates
     }
 
-    /// Same `@Dependency` macro workaround as `TodaySessionQuery` —
-    /// inline access via `Dependency(key:)` to dodge the macro × Sendable
-    /// compiler panic.
     private func loadUserTemplates() async throws -> [WorkoutTemplate] {
-        let database: any DatabaseWriter = Dependency(key: \DependencyValues.defaultDatabase).wrappedValue
+        let database: any DatabaseWriter = Dependencies.Dependency(\.defaultDatabase).wrappedValue
         return try await database.read { db in
             try WorkoutTemplate.order { $0.updatedAt.desc() }.fetchAll(db)
         }

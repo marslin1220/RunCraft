@@ -26,20 +26,12 @@ public struct TodaySessionQuery: EntityQuery {
         return []
     }
 
-    /// Pulls the shared DatabaseWriter that the host app bootstrapped at
-    /// launch (see `bootstrapApp()`). Avoiding `@Dependency` as a stored
-    /// property because the property wrapper isn't `Sendable` and this
-    /// type must be — `EntityQuery: Sendable`.
-    private func currentDatabase() -> any DatabaseWriter {
-        Dependency(key: \DependencyValues.defaultDatabase).wrappedValue
-    }
-
     /// Pulls the planned session whose week contains today, then enriches
     /// it with the latest VDOT-derived pace range. Returns nil if the
     /// runner hasn't set up a race goal yet, or if today's day-of-week
     /// has no scheduled session.
     public func loadToday() async throws -> TodaySessionEntity? {
-        let database = currentDatabase()
+        let database: any DatabaseWriter = Dependencies.Dependency(\.defaultDatabase).wrappedValue
 
         let today = try await database.read { db in try TodaysSession.current(in: db) }
         guard let today else { return nil }

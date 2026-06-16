@@ -39,7 +39,7 @@ public struct AdjustVDOTIntent: AppIntent {
     }
 
     public func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
-        let database: any DatabaseWriter = Dependency(key: \DependencyValues.defaultDatabase).wrappedValue
+        let database: any DatabaseWriter = Dependencies.Dependency(\.defaultDatabase).wrappedValue
 
         let clamped = max(30, min(85, vdot))
         let snapshot = VDOTSnapshot(vdot: clamped, recordedAt: Date(), source: .manual)

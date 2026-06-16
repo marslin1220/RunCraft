@@ -29,6 +29,29 @@ struct WorkoutPlanBuilderTests {
         #expect(custom.displayName == "Test")
     }
 
+    @Test("makePlan(name:blocks:) matches makePlan(from:) for the same data")
+    func nameBlocks_matchesFromTemplate() throws {
+        let warmup  = WorkoutStep(kind: .warmup,  goal: .time(seconds: 600))
+        let work    = WorkoutStep(kind: .work,    goal: .distance(metres: 1_000))
+        let cooldown = WorkoutStep(kind: .cooldown, goal: .time(seconds: 600))
+        let blocks: [WorkoutBlock] = [.step(warmup), .step(work), .step(cooldown)]
+
+        let template = WorkoutTemplate(name: "Test", blocks: blocks)
+
+        let fromTemplate = try WorkoutPlanBuilder.makePlan(from: template)
+        let fromNameBlocks = try WorkoutPlanBuilder.makePlan(name: "Test", blocks: blocks)
+
+        guard case .custom(let expected) = fromTemplate.workout,
+              case .custom(let actual) = fromNameBlocks.workout
+        else {
+            Issue.record("expected custom workouts"); return
+        }
+        #expect(actual.displayName == expected.displayName)
+        #expect((actual.warmup != nil) == (expected.warmup != nil))
+        #expect((actual.cooldown != nil) == (expected.cooldown != nil))
+        #expect(actual.blocks.count == expected.blocks.count)
+    }
+
     @Test("Repeat group becomes a multi-iteration IntervalBlock")
     func repeatGroup_iterations() throws {
         let work     = WorkoutStep(kind: .work,     goal: .distance(metres: 400))

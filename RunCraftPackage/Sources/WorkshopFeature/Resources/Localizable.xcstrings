@@ -1190,31 +1190,31 @@
         }
       }
     },
-    "Started · Check Apple Watch": {
+    "Starting on your Apple Watch…": {
       "extractionState": "manual",
       "localizations": {
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "開始 · Apple Watch を確認"
+            "value": "Apple Watch で開始中…"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "시작됨 · Apple Watch 확인"
+            "value": "Apple Watch에서 시작 중…"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "已启动 · 请查看 Apple Watch"
+            "value": "正在 Apple Watch 上启动…"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "已啟動 · 請查看 Apple Watch"
+            "value": "正在 Apple Watch 上啟動…"
           }
         }
       }
