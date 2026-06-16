@@ -1,0 +1,132 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Cancel" : {
+
+    },
+    "Couldn't start workout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトを開始できませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동을 시작할 수 없습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法开始训练"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法開始訓練"
+          }
+        }
+      }
+    },
+    "Dismiss" : {
+
+    },
+    "End" : {
+
+    },
+    "End Workout" : {
+
+    },
+    "End Workout?" : {
+
+    },
+    "Open RunCraft on your iPhone to sync your schedule." : {
+
+    },
+    "Pause" : {
+
+    },
+    "Ready" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "準備完了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "준비됨"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已就绪"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已就緒"
+          }
+        }
+      }
+    },
+    "Resume" : {
+
+    },
+    "RunCraft" : {
+
+    },
+    "Start" : {
+
+    },
+    "Starting workout…" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトを開始中…"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 시작 중…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在开始训练…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在開始訓練…"
+          }
+        }
+      }
+    },
+    "This Week" : {
+
+    },
+    "Today" : {
+
+    },
+    "Training Paces" : {
+
+    }
+  },
+  "version" : "1.0"
+}
