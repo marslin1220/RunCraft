@@ -38,7 +38,7 @@ Intelligence can read and mutate plan state without launching the UI.
 | **The Composable Architecture** (TCA)                     | Every feature is a `@Reducer`. State changes are deterministic, effects are explicit, and tests use `TestStore` against a small interface. |
 | **SQLiteData** with `@FetchAll` / `@FetchOne` in views    | Views observe queries directly; reducers write through repositories or via `@Dependency(\.defaultDatabase)`. JSON blobs are used only for nested authoring structures (Workout Blocks). |
 | **One module per coherent responsibility**                | Splits domain (RunCraftModels), calculation (VDOTEngine), framework adapters (HealthKitClient, AppleWatchSync), and features (TrainingPlanFeature, WorkshopFeature). |
-| **`@Dependency(\.healthKitClient)`, `@Dependency(\.workoutKitClient)`, `@Dependency(\.workoutTemplateRepository)`** | Apple-framework boundaries and persistence are seams. `liveValue` does the real work; `testValue` returns sensible no-ops or fakes so reducers can be exercised in isolation. |
+| **`@Dependency(\.healthKitClient)`, `@Dependency(\.watchConnectivityClient)`, `@Dependency(\.workoutTemplateRepository)`** | Apple-framework boundaries and persistence are seams. `liveValue` does the real work; `testValue` returns sensible no-ops or fakes so reducers can be exercised in isolation. |
 | **Cross-tab navigation via `delegate` actions**           | A tab never reaches into another tab's state. Instead it emits a `delegate` case that the root `AppFeature` translates into a sibling tab's action. |
 | **`DesignSystem` SPM target for design tokens**           | Every colour token resolves dynamically per `UIUserInterfaceStyle` via `UIColor(dynamicProvider:)`. Views never apply `.preferredColorScheme(.dark)` — system theme propagates. Light and dark variants are tuned for WCAG AA contrast independently. See [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). |
 
@@ -119,8 +119,13 @@ and the canonical `Color(hex:)` initialiser.
 
 A `WatchAppFeature` target used to exist for an Apple Watch companion app,
 but was removed once iPhone-side `WorkoutScheduler.shared.schedule()`
-proved sufficient (the native Watch Workout app handles the real-time
-running session itself). See commit `517c325`.
+seemed sufficient (see commit `517c325`). On real hardware (watchOS 26.5)
+that turned out not to be true — `WorkoutScheduler.schedule()` alone never
+surfaces a workout on the Watch without a companion app. A much smaller
+companion app, `RunCraftWatch`, was reintroduced to close that gap: its
+entire job is to receive a WatchConnectivity message and call
+`WorkoutPlan.openInWorkoutApp()`, handing off straight to the native
+Workout app. See §4.4 and §4.4.1.
 
 The arrows show **public** dependencies (declared in `Package.swift`).
 Transitive deps reach further than the diagram shows — e.g. `WorkshopFeature`
@@ -198,23 +203,65 @@ internally decides INSERT vs UPDATE by looking up the id — callers
 don't pass an "existing?" flag. `testValue` returns no-op defaults so
 TestStore tests can exercise reducer logic without a real database.
 
-### 4.4 AppleWatchSync (2 files · RunCraftModels + Dependencies)
+### 4.4 AppleWatchSync (6 files · RunCraftModels + Dependencies)
 
-The Apple Watch port. Two responsibilities:
+The Apple Watch port. Shared by both the iPhone app and the
+`RunCraftWatch` companion app (§4.4.1):
 
-- **`WorkoutPlanBuilder.makePlan(from:)` — pure conversion.** Walks the
-  template's `[WorkoutBlock]` and builds a WorkoutKit `CustomWorkout`.
-  First `.warmup` step becomes the WorkoutKit warmup slot; last
-  `.cooldown` step becomes the cooldown slot; everything in between
-  becomes `IntervalBlock`s (a single `.step` → 1-iteration block; a
-  Repeat Group → multi-iteration block). Pace alerts get reciprocal-
-  converted from sec/km to m/s for WorkoutKit's `SpeedRangeAlert`.
-- **`WorkoutKitClient` — TCA Dependency.** `requestAuthorization()`
-  delegates to `WorkoutScheduler.shared.requestAuthorization()`;
-  `openInWorkoutApp(template)` builds the plan and calls
-  `WorkoutScheduler.shared.schedule(plan, at: now + 1min)`.
-  The whole liveValue is gated behind `#if canImport(WorkoutKit)` so the
-  module compiles on platforms without WorkoutKit (e.g. macOS host).
+- **`WorkoutPlanBuilder` — pure conversion.** `makePlan(name:blocks:)`
+  walks a `[WorkoutBlock]` and builds a WorkoutKit `CustomWorkout`. First
+  `.warmup` step becomes the WorkoutKit warmup slot; last `.cooldown` step
+  becomes the cooldown slot; everything in between becomes
+  `IntervalBlock`s (a single `.step` → 1-iteration block; a Repeat Group →
+  multi-iteration block). Pace alerts get reciprocal-converted from sec/km
+  to m/s for WorkoutKit's `SpeedRangeAlert`. Gated behind
+  `#if canImport(WorkoutKit)`.
+- **`WatchWorkoutPayload` — shared wire DTO.** `{ name: String, subtitle:
+  String?, blocks: [WorkoutBlock] }`, `Codable & Sendable & Equatable`,
+  no `#if`. `subtitle` is optional (nil for editor payloads; populated with
+  a pace-range string like "5:10 – 5:30 /km" for training-pace templates).
+- **`WatchSchedulePayload` — schedule wire DTO.** Carries the current
+  week's sessions (with `dayName`, `title`, `isToday`, and a nested
+  `WatchWorkoutPayload`) plus five pace-zone quick-start templates.
+  Sent via `WatchConnectivityClient.sendSchedule` and stored in
+  `WCSession.receivedApplicationContext["schedule"]` so the Watch can
+  read it immediately on launch.
+- **`WatchConnectivityClient` — iOS-only TCA Dependency.** Wraps
+  `WCSession`. `isWatchPaired()` checks `isPaired && isWatchAppInstalled`
+  (not `isReachable` — the Watch need not be in Bluetooth range for the
+  application context to work). `sendWorkout(payload)` JSON-encodes via
+  `updateApplicationContext["payload"]`, merging to avoid clobbering
+  the `"schedule"` key. `sendSchedule(payload)` mirrors that under
+  `"schedule"`.
+- **`HKWatchTriggerClient` — iOS-only TCA Dependency.** Wraps
+  `HKHealthStore.startWatchApp(with:)`. Fire-and-forget: called after
+  `sendWorkout` at every "Start Workout" call site. The system
+  auto-launches `RunCraftWatch` on the paired Watch and delivers the
+  workout configuration to `WKApplicationDelegate.handle(_:)`.
+
+#### 4.4.1 RunCraftWatch (native Xcode app target)
+
+A full-featured watchOS companion app at `/RunCraftWatch Watch App/`,
+linking `AppleWatchSync` + `RunCraftModels` SPM products. Requires the
+`com.apple.developer.healthkit` + `com.apple.security.application-groups`
+entitlements (the App Group shares the `paceUnit` preference with the
+iPhone).
+
+Key files:
+
+| File                          | Role                                                                 |
+| ----------------------------- | -------------------------------------------------------------------- |
+| `RunCraftWatchApp.swift`      | `@main`; `@WKApplicationDelegateAdaptor(WatchAppDelegate.self)`. Routes between `WatchHomeView` and `ActiveWorkoutView` based on `manager.phase`. |
+| `WatchAppDelegate.swift`      | `WKApplicationDelegate + WCSessionDelegate`. Activates `WCSession` on launch, decodes `"schedule"` from `receivedApplicationContext`, handles `HKWorkoutConfiguration` delivered by `HKHealthStore.startWatchApp(with:)`. |
+| `WorkoutSessionManager.swift` | `@MainActor ObservableObject`. Owns `HKWorkoutSession + HKLiveWorkoutBuilder`. Runs an interval state machine: flattens blocks → `[(WorkoutStep, displayName)]`; time steps advance via a 0.5s Task loop; distance steps advance via `HKLiveWorkoutBuilderDelegate`. Published: `phase`, `elapsedSeconds`, `heartRate`, `paceSecPerKm`, `totalMetres`, `stepName`, `stepGoalText`, `stepProgress`. Pace and distance display respects `paceUnit` from the shared App Group. |
+| `WatchHomeView.swift`         | Navigation shell shown when `phase == .inactive`. Two sections: **This Week** (sessions from `WatchSchedulePayload`) and **Training Paces** (five pace-zone quick-starts with pace-range subtitles). Falls back to a "sync on iPhone" prompt when no schedule. |
+| `ActiveWorkoutView.swift`     | `TabView(.page)`. Metrics page: step name + `ProgressView` + goal text + HR / Pace / Dist / Time grid. Controls page: Pause/Resume + End with confirmation. |
+| `WorkoutStartView.swift`      | Tapped from `WatchHomeView`. Shows workout name + step list + Start button. Requests HK auth, creates `HKWorkoutSession`, calls `workoutManager.startWorkout(session:blocks:healthStore:)` (same path as the HK-triggered auto-start). |
+
+**Two workout start paths share the same `startWorkout` entry point:**
+
+1. **iPhone-triggered auto-start.** iPhone calls `HKWatchTriggerClient.startWatchSession()` → system delivers `HKWorkoutConfiguration` to `WatchAppDelegate.handle(_:)` → reads blocks from `receivedApplicationContext["payload"]` → starts session.
+2. **Watch standalone.** User opens `RunCraftWatch`, taps a session in `WatchHomeView` → `WorkoutStartView` → taps Start → creates `HKWorkoutConfiguration` locally → starts session.
 
 ### 4.5 TrainingPlanFeature (7+ files · VDOTEngine + HealthKitClient + RunCraftModels + AppleWatchSync + WorkshopFeature + DesignSystem + ComposableArchitecture)
 
@@ -340,7 +387,7 @@ queries + four SwiftUI snippet views.
 | `WhatIsTodaysTrainingIntent.swift`| Voice phrase: "What's today's training in RunCraft". Returns dialog + snippet. |
 | `WorkoutTemplateEntity.swift`     | `AppEntity` covering both built-in presets and user-saved templates. |
 | `WorkoutTemplateQuery.swift`      | `EntityStringQuery` — name-fuzzy lookup so "Yasso" / "Mona" / "Recovery" resolves. |
-| `StartWorkoutIntent.swift`        | `@Parameter var workout` → `workoutKitClient.openInWorkoutApp`. |
+| `StartWorkoutIntent.swift`        | `@Parameter var workout` → `watchConnectivityClient.sendWorkout(WatchWorkoutPayload(...))`. |
 | `AdjustVDOTIntent.swift`          | `@Parameter var vdot: Double` (30–85). Writes `RaceGoal.currentVDOT` + a `VDOTSnapshot(source: .manual)`. |
 | `LogCompletedRunIntent.swift`     | Conversational refinement — Siri asks for distance + duration; writes a `CompletedWorkout`. |
 | `*SnippetView.swift`              | Static SwiftUI snippets rendered inline in Siri / Spotlight responses. |
@@ -444,11 +491,12 @@ migrations are forgiving during development.
 
 Three Dependencies wrap framework or persistence I/O:
 
-| Dependency                          | Module           | Live target                                    |
-| ----------------------------------- | ---------------- | ---------------------------------------------- |
-| `\.healthKitClient`                 | HealthKitClient  | `HKHealthStore` queries (workouts, HRV, sleep) |
-| `\.workoutKitClient`                | AppleWatchSync   | `WorkoutScheduler.shared.schedule(...)`        |
-| `\.workoutTemplateRepository`       | RunCraftModels   | `database.write/read { ... }` via SQLiteData   |
+| Dependency                          | Module           | Live target                                                |
+| ----------------------------------- | ---------------- | ---------------------------------------------------------- |
+| `\.healthKitClient`                 | HealthKitClient  | `HKHealthStore` queries (workouts, HRV, sleep)             |
+| `\.watchConnectivityClient`         | AppleWatchSync   | `WCSession.updateApplicationContext` (workout + schedule)  |
+| `\.hkWatchTriggerClient`            | AppleWatchSync   | `HKHealthStore.startWatchApp(with:)` — triggers Watch launch |
+| `\.workoutTemplateRepository`       | RunCraftModels   | `database.write/read { ... }` via SQLiteData               |
 
 Each provides a `testValue` that returns sensible defaults; reducers'
 `TestStore` tests override only the closures they care about. Example
@@ -498,31 +546,43 @@ Neither tab knows about the other. AppFeature is the only place that
 sees both. Adding a third tab that wants to trigger Workshop navigation
 would add one case to AppFeature's switch, nothing else.
 
-### 5.5 Domain → WorkoutKit conversion
+### 5.5 iPhone → Watch workout dispatch (HK Mirroring)
 
-The path from "user taps Start" to "workout on the wrist" is:
+The path from "user taps Start" to "workout auto-starts on the wrist":
 
 ```
-WorkoutDetail.Action.startTapped
+WorkoutEditor.Action.startTapped                          (iPhone)
     │
-    ▼   (in reducer)
-.run { [workoutKitClient] send in
-    try await workoutKitClient.requestAuthorization()
-    try await workoutKitClient.openInWorkoutApp(workout)
-}
+    ├─▶ watchConnectivityClient.sendWorkout(WatchWorkoutPayload)
+    │       └─ WCSession.updateApplicationContext["payload"] = jsonData
     │
-    ▼   (in AppleWatchSync.liveValue)
-WorkoutPlanBuilder.makePlan(from: template)
-    │      walks blocks → CustomWorkout(warmup, [IntervalBlock], cooldown)
-    │      pace alerts: sec/km → m/s SpeedRangeAlert
-    ▼
-WorkoutScheduler.shared.schedule(plan, at: components 1 min from now)
-    │
-    ▼
-workout appears at the top of the Watch's Workout app
+    └─▶ hkWatchTriggerClient.startWatchSession()
+            └─ HKHealthStore.startWatchApp(with: HKWorkoutConfiguration)
+                    │
+                    ▼   ──────────────────────────────── (paired Apple Watch)
+            WatchAppDelegate.handle(_ config: HKWorkoutConfiguration)
+                    │
+                    ├─ reads blocks: WCSession.receivedApplicationContext["payload"]
+                    ├─ requests HK auth (share: workout/energy/distance;
+                    │   read: HR/speed/distance/energy)
+                    └─▶ WorkoutSessionManager.startWorkout(session:blocks:healthStore:)
+                                │
+                                ├─ HKWorkoutSession + HKLiveWorkoutBuilder
+                                ├─ flattenBlocks → [(WorkoutStep, displayName)]
+                                │   ├─ distance steps: advance via HKLiveWorkoutBuilderDelegate
+                                │   └─ time steps: advance via 0.5s Task loop
+                                └─▶ ActiveWorkoutView (metrics + controls)
+
+                        Workout ends (auto or manual)
+                                │
+                        builder.finishWorkout() → HKWorkout saved
+                                │
+                        TrainingPlanFeature.syncBackWorkouts picks it up ✓
 ```
 
-The reducer never sees a WorkoutKit type. Only AppleWatchSync does.
+The reducer never imports HealthKit. `WorkoutSessionManager` is watchOS-only
+and never touches TCA — it's a plain `ObservableObject` owned by
+`WatchAppDelegate`.
 
 ---
 
@@ -556,15 +616,25 @@ The reducer never sees a WorkoutKit type. Only AppleWatchSync does.
    to get a runnable `WorkoutTemplate` (warmup + tempo on 70% of distance
    + cooldown, pace alerts derived from current VDOT).
 3. Emits `.delegate(.openWorkoutInWorkshop(template, .planSession))`.
-4. `AppFeature` catches the delegate, switches `selectedTab = .workshop`,
-   sends `.workshop(.openDetail(template, .planSession))`.
-5. `Workshop` reducer clears its path and pushes `.detail(...)`.
-6. TabView animates to Workshop; user sees `WorkoutDetailView` with the
-   block preview and a green "Send to Apple Watch" button.
-7. Tap Start → `.startTapped` → repository-less effect: calls
-   `workoutKitClient.requestAuthorization()` then `openInWorkoutApp(workout)`.
-8. `WorkoutPlanBuilder.makePlan` converts the template; `WorkoutScheduler`
-   schedules it. `syncStatus = .sent`. Watch app shows the planned workout.
+4. `AppFeature` catches the delegate, switches `selectedTab = .workouts`,
+   sends `.workouts(.openDetail(template, .planSession))`.
+5. `Workshop` reducer clears its path and pushes `.editor(...)`.
+6. TabView animates to Workouts; user sees `WorkoutEditorView` with the
+   block list and a green "Start Workout" button.
+7. Tap Start → `.startTapped` → calls `watchConnectivityClient.sendWorkout`
+   (writes `WCSession.updateApplicationContext["payload"]`) then
+   `hkWatchTriggerClient.startWatchSession()` (calls
+   `HKHealthStore.startWatchApp(with:)`).
+8. System auto-launches `RunCraftWatch` on the Watch.
+   `WatchAppDelegate.handle(_:HKWorkoutConfiguration)` fires, reads blocks
+   from `receivedApplicationContext["payload"]`, requests HK auth, creates
+   `HKWorkoutSession`, calls `workoutManager.startWorkout(...)`.
+9. `ActiveWorkoutView` appears on the Watch — step name, progress ring, HR,
+   pace, distance. Intervals advance automatically when time/distance goals
+   are met. `syncStatus = .sent` on the iPhone ("Starting on your Apple Watch…").
+10. User ends the workout on the Watch. `builder.finishWorkout()` saves an
+    `HKWorkout`. On next iPhone foreground, `TrainingPlan.syncBackWorkouts`
+    imports it as a `CompletedWorkout`.
 
 ### 6.3 Save a preset as your own
 
@@ -611,7 +681,7 @@ Five test targets:
 | `RunCraftModelsTests`     | `PlanSessionAdapter` (13 tests, branch coverage); `TrainingWeek.current` boundary tests; `WorkoutSyncBack` mapping. |
 | `TrainingPlanFeatureTests`| `TrainingPlanGenerator` periodisation structure.                 |
 | `WorkshopFeatureTests`    | `EditStep` validation, `WorkoutEditor` persistence via fake repository. |
-| `AppleWatchSyncTests`     | `WorkoutPlanBuilder` warmup hoisting and repeat-group iterations. |
+| `AppleWatchSyncTests`     | `WorkoutPlanBuilder` warmup hoisting, repeat-group iterations, and `makePlan(name:blocks:)` parity with `makePlan(from:)`. |
 
 ### 7.2 The "no transitive deps in test targets" rule
 
