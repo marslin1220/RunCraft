@@ -61,6 +61,19 @@ public struct AppView: View {
                 store.send(.tabSelected(.plan))
             })
         }
+        #if os(iOS)
+        .task { await store.send(.onTask).finish() }
+        .fullScreenCover(
+            isPresented: Binding(
+                get: { store.liveWorkout != nil },
+                set: { _ in }
+            )
+        ) {
+            if let display = store.liveWorkout {
+                LiveWorkoutView(store: store, display: display)
+            }
+        }
+        #endif
     }
 }
 

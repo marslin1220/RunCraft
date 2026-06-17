@@ -113,6 +113,7 @@ let package = Package(
         .target(
             name: "AppFeature",
             dependencies: [
+                "AppleWatchSync",
                 "DesignSystem",
                 "HealthKitClient",
                 "InsightsFeature",

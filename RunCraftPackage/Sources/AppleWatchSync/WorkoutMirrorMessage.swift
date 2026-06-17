@@ -2,7 +2,7 @@ import Foundation
 
 /// Sent from Watch → iPhone once per step change (and on metric updates)
 /// via `HKWorkoutSession.sendToRemoteWorkoutSession(data:)`.
-public struct WorkoutMirrorMessage: Codable, Sendable {
+public struct WorkoutMirrorMessage: Codable, Sendable, Equatable {
     public var stepName: String
     public var stepGoalText: String
     public var stepProgress: Double

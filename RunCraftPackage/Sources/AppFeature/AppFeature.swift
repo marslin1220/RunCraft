@@ -1,3 +1,4 @@
+import AppleWatchSync
 import ComposableArchitecture
 import InsightsFeature
 import TrainingPlanFeature
@@ -10,9 +11,26 @@ import WorkshopFeature
         public var workouts: Workshop.State = .init()
         public var insights: InsightsFeature.State = .init()
         public var settings: Settings.State = .init()
+        #if os(iOS)
+        public var liveWorkout: LiveWorkoutDisplay? = nil
+        #endif
 
         public init() {}
     }
+
+    #if os(iOS)
+    public struct LiveWorkoutDisplay: Equatable {
+        public var message: WorkoutMirrorMessage
+
+        public init() {
+            message = WorkoutMirrorMessage(
+                stepName: "", stepGoalText: "", stepProgress: 0,
+                heartRate: 0, paceSecPerKm: 0, totalMetres: 0,
+                elapsedSeconds: 0, isPaused: false
+            )
+        }
+    }
+    #endif
 
     public enum Tab: String, Equatable, CaseIterable {
         case plan
@@ -27,9 +45,20 @@ import WorkshopFeature
         case workouts(Workshop.Action)
         case insights(InsightsFeature.Action)
         case settings(Settings.Action)
+        #if os(iOS)
+        case onTask
+        case liveWorkoutEvent(LiveWorkoutEvent)
+        case pauseWorkoutTapped
+        case resumeWorkoutTapped
+        case endWorkoutTapped
+        #endif
     }
 
     public init() {}
+
+    #if os(iOS)
+    @Dependency(\.liveWorkoutClient) var liveWorkoutClient
+    #endif
 
     public var body: some Reducer<State, Action> {
         Scope(state: \.plan, action: \.plan) {
@@ -46,9 +75,44 @@ import WorkshopFeature
         }
         Reduce { state, action in
             switch action {
-            case let .tabSelected(tab):
-                state.selectedTab = tab
+            #if os(iOS)
+            case .onTask:
+                return .run { send in
+                    for await event in liveWorkoutClient.events() {
+                        await send(.liveWorkoutEvent(event))
+                    }
+                }
+
+            case .liveWorkoutEvent(let event):
+                switch event {
+                case .sessionStarted:
+                    state.liveWorkout = LiveWorkoutDisplay()
+                case .messageReceived(let msg):
+                    state.liveWorkout?.message = msg
+                case .sessionPaused:
+                    state.liveWorkout?.message.isPaused = true
+                case .sessionResumed:
+                    state.liveWorkout?.message.isPaused = false
+                case .sessionEnded:
+                    state.liveWorkout = nil
+                }
                 return .none
+
+            case .pauseWorkoutTapped:
+                return .run { _ in
+                    await liveWorkoutClient.sendCommand(WorkoutMirrorCommand(kind: .pause))
+                }
+
+            case .resumeWorkoutTapped:
+                return .run { _ in
+                    await liveWorkoutClient.sendCommand(WorkoutMirrorCommand(kind: .resume))
+                }
+
+            case .endWorkoutTapped:
+                return .run { _ in
+                    await liveWorkoutClient.sendCommand(WorkoutMirrorCommand(kind: .end))
+                }
+            #endif
 
             case let .plan(.delegate(.openWorkoutInWorkshop(template, source, isTodaySession))):
                 state.selectedTab = .workouts
