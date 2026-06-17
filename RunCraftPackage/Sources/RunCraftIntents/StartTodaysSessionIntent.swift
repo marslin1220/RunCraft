@@ -10,7 +10,7 @@ import SQLiteData
 /// action on the Today's-session widget, and mirrors
 /// `TrainingPlanFeature.quickStartSession`'s
 /// `PlanSessionAdapter.makeTemplate(from:vdot:)` →
-/// `watchConnectivityClient.sendWorkout(WatchWorkoutPayload(...))` flow.
+/// `hkWatchTriggerClient.startWatchSession(WatchWorkoutPayload(...))` flow.
 public struct StartTodaysSessionIntent: AppIntent {
 
     public static let title: LocalizedStringResource = "Start today's session"
@@ -38,14 +38,12 @@ public struct StartTodaysSessionIntent: AppIntent {
             )))
         }
 
-        let watchConnectivityClient: WatchConnectivityClient = Dependencies.Dependency(\.watchConnectivityClient).wrappedValue
         let hkWatchTriggerClient: HKWatchTriggerClient = Dependencies.Dependency(\.hkWatchTriggerClient).wrappedValue
         let template = PlanSessionAdapter.makeTemplate(from: today.session, vdot: today.vdot)
         do {
-            try await watchConnectivityClient.sendWorkout(
+            try await hkWatchTriggerClient.startWatchSession(
                 WatchWorkoutPayload(name: template.name, blocks: template.blocks)
             )
-            try await hkWatchTriggerClient.startWatchSession()
         } catch {
             return .result(dialog: IntentDialog(stringLiteral: error.localizedDescription))
         }

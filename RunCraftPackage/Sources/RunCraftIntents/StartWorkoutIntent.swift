@@ -42,14 +42,12 @@ public struct StartWorkoutIntent: AppIntent {
     public func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         let template = try resolveTemplate(for: workout)
 
-        let watchConnectivityClient: WatchConnectivityClient = Dependencies.Dependency(\.watchConnectivityClient).wrappedValue
         let hkWatchTriggerClient: HKWatchTriggerClient = Dependencies.Dependency(\.hkWatchTriggerClient).wrappedValue
 
         do {
-            try await watchConnectivityClient.sendWorkout(
+            try await hkWatchTriggerClient.startWatchSession(
                 WatchWorkoutPayload(name: template.name, blocks: template.blocks)
             )
-            try await hkWatchTriggerClient.startWatchSession()
         } catch {
             let name = workout.name
             let errorMsg = error.localizedDescription

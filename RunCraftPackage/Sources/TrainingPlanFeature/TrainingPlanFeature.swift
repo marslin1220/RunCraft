@@ -125,6 +125,7 @@ import WorkshopFeature
         case checkHealthAuthorization
         case healthAuthorizationChecked(lost: Bool)
         case dismissHealthPermissionBanner
+        case requestHealthAuthorization
         case syncBackWorkouts
         case syncBackCompleted
         case watchScheduleSync
@@ -554,6 +555,12 @@ import WorkshopFeature
                 state.$healthPermissionBannerLastDismissAt.withLock { $0 = now }
                 return .none
 
+            case .requestHealthAuthorization:
+                return .run { [healthKitClient] send in
+                    try? await healthKitClient.requestAuthorization()
+                    await send(.checkHealthAuthorization)
+                }
+
             case .syncBackWorkouts:
                 let vdot = state.currentVDOT
                 return .run { [database, healthKitClient] send in
@@ -665,12 +672,11 @@ import WorkshopFeature
                 state.quickStartSendingSessionId = session.id
                 let id = session.id
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: state.currentVDOT)
-                return .run { [watchConnectivityClient, hkWatchTriggerClient] send in
+                return .run { [hkWatchTriggerClient] send in
                     await send(.quickStartResponse(sessionId: id, Result {
-                        try await watchConnectivityClient.sendWorkout(
+                        try await hkWatchTriggerClient.startWatchSession(
                             WatchWorkoutPayload(name: template.name, blocks: template.blocks)
                         )
-                        try await hkWatchTriggerClient.startWatchSession()
                     }))
                 }
 
@@ -788,7 +794,6 @@ import WorkshopFeature
         }
     }
 
-    @Dependency(\.watchConnectivityClient) var watchConnectivityClient
     @Dependency(\.hkWatchTriggerClient) var hkWatchTriggerClient
     @Dependency(\.continuousClock) var clock
 
@@ -808,12 +813,11 @@ import WorkshopFeature
                 guard state.watchAvailable else { return .none }
                 state.quickStartStatus = .sending(sessionId: session.id)
                 let template = PlanSessionAdapter.makeTemplate(from: session, vdot: vdot)
-                return .run { [watchConnectivityClient, hkWatchTriggerClient] send in
+                return .run { [hkWatchTriggerClient] send in
                     await send(.quickStartResponse(Result {
-                        try await watchConnectivityClient.sendWorkout(
+                        try await hkWatchTriggerClient.startWatchSession(
                             WatchWorkoutPayload(name: template.name, blocks: template.blocks)
                         )
-                        try await hkWatchTriggerClient.startWatchSession()
                     }))
                 }
 

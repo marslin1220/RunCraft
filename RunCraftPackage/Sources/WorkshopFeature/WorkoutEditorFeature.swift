@@ -264,12 +264,11 @@ import RunCraftModels
                     createdAt: now,
                     updatedAt: now
                 )
-                return .run { [watchConnectivityClient, hkWatchTriggerClient] send in
+                return .run { [hkWatchTriggerClient] send in
                     await send(.syncResponse(Result {
-                        try await watchConnectivityClient.sendWorkout(
+                        try await hkWatchTriggerClient.startWatchSession(
                             WatchWorkoutPayload(name: template.name, blocks: template.blocks)
                         )
-                        try await hkWatchTriggerClient.startWatchSession()
                     }))
                 }
 
