@@ -123,9 +123,9 @@ seemed sufficient (see commit `517c325`). On real hardware (watchOS 26.5)
 that turned out not to be true — `WorkoutScheduler.schedule()` alone never
 surfaces a workout on the Watch without a companion app. A much smaller
 companion app, `RunCraftWatch`, was reintroduced to close that gap: its
-entire job is to receive a WatchConnectivity message and call
-`WorkoutPlan.openInWorkoutApp()`, handing off straight to the native
-Workout app. See §4.4 and §4.4.1.
+job is to auto-start the workout (via `WKApplicationDelegate.handle(_:)`)
+and run the full interval state machine with live metrics via HealthKit
+Mirroring. See §4.4 and §4.4.1.
 
 The arrows show **public** dependencies (declared in `Package.swift`).
 Transitive deps reach further than the diagram shows — e.g. `WorkshopFeature`
@@ -229,15 +229,30 @@ The Apple Watch port. Shared by both the iPhone app and the
 - **`WatchConnectivityClient` — iOS-only TCA Dependency.** Wraps
   `WCSession`. `isWatchPaired()` checks `isPaired && isWatchAppInstalled`
   (not `isReachable` — the Watch need not be in Bluetooth range for the
-  application context to work). `sendWorkout(payload)` JSON-encodes via
-  `updateApplicationContext["payload"]`, merging to avoid clobbering
-  the `"schedule"` key. `sendSchedule(payload)` mirrors that under
-  `"schedule"`.
-- **`HKWatchTriggerClient` — iOS-only TCA Dependency.** Wraps
-  `HKHealthStore.startWatchApp(with:)`. Fire-and-forget: called after
-  `sendWorkout` at every "Start Workout" call site. The system
-  auto-launches `RunCraftWatch` on the paired Watch and delivers the
-  workout configuration to `WKApplicationDelegate.handle(_:)`.
+  application context to work). `sendSchedule(payload)` JSON-encodes via
+  `updateApplicationContext["schedule"]`. Note: `sendWorkout` was removed;
+  workout payload delivery now happens inside `HKWatchTriggerClient` (below).
+- **`HKWatchTriggerClient` — iOS-only TCA Dependency.** Combines two
+  steps in one call: (1) writes `WatchWorkoutPayload` into
+  `WCSession.updateApplicationContext[pendingWorkoutPayloadContextKey]`
+  so the Watch can decode it in `handle(_:)`; (2) calls
+  `HKHealthStore.startWatchApp(toHandle:)` to auto-launch `RunCraftWatch`.
+  The Watch reads the payload from `receivedApplicationContext` (fast path)
+  or `didReceiveApplicationContext` (slow path, with a 5-second
+  `CheckedContinuation` timeout) before starting the session.
+- **`LiveWorkoutClient` — iOS-only TCA Dependency.** Registers
+  `HKHealthStore.workoutSessionMirroringStartHandler` to receive the
+  mirrored session when the Watch starts. Exposes an
+  `AsyncStream<LiveWorkoutEvent>` (`sessionStarted`, `messageReceived`,
+  `sessionPaused`, `sessionResumed`, `sessionEnded`) and a
+  `sendCommand(WorkoutMirrorCommand)` closure that relays pause/resume/end
+  to the Watch via `HKWorkoutSession.sendToRemoteWorkoutSession(data:)`.
+  Subscribed at app launch from `AppFeature.onTask`.
+- **`WorkoutMirrorMessage` / `WorkoutMirrorCommand` — shared wire types.**
+  `WorkoutMirrorMessage` (Watch → iPhone): step name, goal text, progress,
+  HR, pace, metres, elapsed seconds, `isPaused`. `WorkoutMirrorCommand`
+  (iPhone → Watch): `pause` / `resume` / `end`. Both are `Codable & Sendable & Equatable`
+  and carry no platform guards — used by both sides.
 
 #### 4.4.1 RunCraftWatch (native Xcode app target)
 
@@ -252,16 +267,18 @@ Key files:
 | File                          | Role                                                                 |
 | ----------------------------- | -------------------------------------------------------------------- |
 | `RunCraftWatchApp.swift`      | `@main`; `@WKApplicationDelegateAdaptor(WatchAppDelegate.self)`. Routes between `WatchHomeView` and `ActiveWorkoutView` based on `manager.phase`. |
-| `WatchAppDelegate.swift`      | `WKApplicationDelegate + WCSessionDelegate`. Activates `WCSession` on launch, decodes `"schedule"` from `receivedApplicationContext`, handles `HKWorkoutConfiguration` delivered by `HKHealthStore.startWatchApp(with:)`. |
-| `WorkoutSessionManager.swift` | `@MainActor ObservableObject`. Owns `HKWorkoutSession + HKLiveWorkoutBuilder`. Runs an interval state machine: flattens blocks → `[(WorkoutStep, displayName)]`; time steps advance via a 0.5s Task loop; distance steps advance via `HKLiveWorkoutBuilderDelegate`. Published: `phase`, `elapsedSeconds`, `heartRate`, `paceSecPerKm`, `totalMetres`, `stepName`, `stepGoalText`, `stepProgress`. Pace and distance display respects `paceUnit` from the shared App Group. |
+| `WatchAppDelegate.swift`      | `WKApplicationDelegate + WCSessionDelegate`. Activates `WCSession` on launch; decodes `"schedule"` from `receivedApplicationContext`; handles `HKWorkoutConfiguration` delivered by `HKHealthStore.startWatchApp(toHandle:)`. Uses a `CheckedContinuation<WatchWorkoutPayload?, Never>` for the slow-path payload race (5-second timeout). Calls `startMirroringToCompanionDevice()` before `startActivity(with:)` + `beginCollection(at:)` (Apple's required order). |
+| `WorkoutSessionManager.swift` | `@MainActor ObservableObject`. Owns `HKWorkoutSession + HKLiveWorkoutBuilder`. Runs an interval state machine: flattens blocks → `[(WorkoutStep, displayName)]`; time steps advance via a 0.5 s Task loop; distance steps advance via `HKLiveWorkoutBuilderDelegate`. Published: `phase`, `elapsedSeconds`, `heartRate`, `paceSecPerKm`, `totalMetres`, `stepName`, `stepGoalText`, `stepProgress`. Sends `WorkoutMirrorMessage` to iPhone via `session.sendToRemoteWorkoutSession(data:)` on each step change and metric update; receives `WorkoutMirrorCommand` (pause / resume / end) from iPhone. Pace and distance display respects `paceUnit` from the shared App Group. |
 | `WatchHomeView.swift`         | Navigation shell shown when `phase == .inactive`. Two sections: **This Week** (sessions from `WatchSchedulePayload`) and **Training Paces** (five pace-zone quick-starts with pace-range subtitles). Falls back to a "sync on iPhone" prompt when no schedule. |
 | `ActiveWorkoutView.swift`     | `TabView(.page)`. Metrics page: step name + `ProgressView` + goal text + HR / Pace / Dist / Time grid. Controls page: Pause/Resume + End with confirmation. |
 | `WorkoutStartView.swift`      | Tapped from `WatchHomeView`. Shows workout name + step list + Start button. Requests HK auth, creates `HKWorkoutSession`, calls `workoutManager.startWorkout(session:blocks:healthStore:)` (same path as the HK-triggered auto-start). |
 
 **Two workout start paths share the same `startWorkout` entry point:**
 
-1. **iPhone-triggered auto-start.** iPhone calls `HKWatchTriggerClient.startWatchSession()` → system delivers `HKWorkoutConfiguration` to `WatchAppDelegate.handle(_:)` → reads blocks from `receivedApplicationContext["payload"]` → starts session.
-2. **Watch standalone.** User opens `RunCraftWatch`, taps a session in `WatchHomeView` → `WorkoutStartView` → taps Start → creates `HKWorkoutConfiguration` locally → starts session.
+1. **iPhone-triggered auto-start.** iPhone calls `HKWatchTriggerClient.startWatchSession(payload)` → writes payload to WCSession context + calls `HKHealthStore.startWatchApp(toHandle:)` → system delivers `HKWorkoutConfiguration` to `WatchAppDelegate.handle(_:)` → reads blocks from `receivedApplicationContext[pendingWorkoutPayloadContextKey]` → starts session via `WorkoutSessionManager.startWorkout(session:blocks:healthStore:)`.
+2. **Watch standalone.** User opens `RunCraftWatch`, taps a session in `WatchHomeView` → `WorkoutStartView` → taps Start → creates `HKWorkoutConfiguration` locally → starts session via the same `WorkoutSessionManager.startWorkout`.
+
+**iPhone live workout mirror.** `AppFeature` subscribes to `liveWorkoutClient.events()` at launch. When the Watch starts a mirrored session, `LiveWorkoutClient` fires `.sessionStarted`; `AppFeature` sets `state.liveWorkout = LiveWorkoutDisplay()` and `AppView` shows `LiveWorkoutView` as a `.fullScreenCover`. Subsequent `WorkoutMirrorMessage` packets update step name, progress, HR, pace, and distance in real time. `LiveWorkoutView` sends `WorkoutMirrorCommand` (pause / resume / end) back to the Watch. On `.sessionEnded`, `state.liveWorkout` is cleared and the cover dismisses.
 
 ### 4.5 TrainingPlanFeature (7+ files · VDOTEngine + HealthKitClient + RunCraftModels + AppleWatchSync + WorkshopFeature + DesignSystem + ComposableArchitecture)
 
@@ -327,14 +344,15 @@ Three reducers sit at three navigation depths:
 
 Two sheet reducers (`EditStep`, `EditRepeatGroup`) sit inside the editor.
 
-### 4.7 AppFeature (5 files · TrainingPlanFeature + WorkshopFeature + ComposableArchitecture)
+### 4.7 AppFeature (6 files · TrainingPlanFeature + WorkshopFeature + AppleWatchSync + ComposableArchitecture)
 
 The root.
 
 | File                        | Role                                                       |
 | --------------------------- | ---------------------------------------------------------- |
-| `AppFeature.swift`          | Tab enum, root reducer composing Plan / Workshop / Settings, cross-tab delegate handler. |
-| `AppView.swift`             | `TabView` with the four tabs (Plan / Workouts / Insights / Settings). |
+| `AppFeature.swift`          | Tab enum, root reducer composing Plan / Workshop / Settings. Subscribes to `liveWorkoutClient.events()` via `.onTask`; updates `state.liveWorkout` with live metrics; sends `WorkoutMirrorCommand` back to Watch. |
+| `AppView.swift`             | `TabView` with the four tabs (Plan / Workouts / Insights / Settings). Shows `LiveWorkoutView` as a `.fullScreenCover` when `store.liveWorkout != nil`. |
+| `LiveWorkoutView.swift`     | iPhone live workout overlay. Step card with `ProgressView`, 2×2 metrics grid (HR / Pace / Dist / Time), Pause/Resume/End controls. Reads `paceUnit` from the App Group to format pace and distance. |
 | `SettingsFeature.swift`     | Settings reducer — minimal today (just an `onAppear`). HealthKit linking is intentionally **not** in Settings: per HIG, authorisation is requested at point-of-use (Setup Race Goal's Auto-detect button), not pre-emptively from a Settings toggle. |
 | `SettingsView.swift`        | Settings form. Pace unit Picker writes directly to `@AppStorage("paceUnit")` so the bind sidesteps a BindingReducer + `@Shared` quirk; every other view reads via `@Shared(.appStorage("paceUnit"))`. |
 | `Bootstrap.swift`           | `makeAppStore()` (`@MainActor`) + `bootstrapApp()` (calls `prepareDependencies { try! $0.bootstrapDatabase() }`). |
@@ -494,8 +512,9 @@ Three Dependencies wrap framework or persistence I/O:
 | Dependency                          | Module           | Live target                                                |
 | ----------------------------------- | ---------------- | ---------------------------------------------------------- |
 | `\.healthKitClient`                 | HealthKitClient  | `HKHealthStore` queries (workouts, HRV, sleep)             |
-| `\.watchConnectivityClient`         | AppleWatchSync   | `WCSession.updateApplicationContext` (workout + schedule)  |
-| `\.hkWatchTriggerClient`            | AppleWatchSync   | `HKHealthStore.startWatchApp(with:)` — triggers Watch launch |
+| `\.watchConnectivityClient`         | AppleWatchSync   | `WCSession.updateApplicationContext` (schedule sync)       |
+| `\.hkWatchTriggerClient`            | AppleWatchSync   | Writes WCSession context + `HKHealthStore.startWatchApp(toHandle:)` |
+| `\.liveWorkoutClient`               | AppleWatchSync   | `HKHealthStore.workoutSessionMirroringStartHandler` — iPhone-side metrics stream |
 | `\.workoutTemplateRepository`       | RunCraftModels   | `database.write/read { ... }` via SQLiteData               |
 
 Each provides a `testValue` that returns sensible defaults; reducers'
@@ -546,35 +565,54 @@ Neither tab knows about the other. AppFeature is the only place that
 sees both. Adding a third tab that wants to trigger Workshop navigation
 would add one case to AppFeature's switch, nothing else.
 
-### 5.5 iPhone → Watch workout dispatch (HK Mirroring)
+### 5.5 iPhone → Watch workout dispatch + live mirror
 
-The path from "user taps Start" to "workout auto-starts on the wrist":
+The path from "user taps Start" to "workout auto-starts on the wrist" and
+live metrics flowing back to the iPhone:
 
 ```
 WorkoutEditor.Action.startTapped                          (iPhone)
     │
-    ├─▶ watchConnectivityClient.sendWorkout(WatchWorkoutPayload)
-    │       └─ WCSession.updateApplicationContext["payload"] = jsonData
-    │
-    └─▶ hkWatchTriggerClient.startWatchSession()
-            └─ HKHealthStore.startWatchApp(with: HKWorkoutConfiguration)
+    └─▶ hkWatchTriggerClient.startWatchSession(WatchWorkoutPayload)
+            ├─ WCSession.updateApplicationContext[pendingWorkoutPayloadContextKey] = jsonData
+            └─ HKHealthStore.startWatchApp(toHandle: HKWorkoutConfiguration)
                     │
                     ▼   ──────────────────────────────── (paired Apple Watch)
             WatchAppDelegate.handle(_ config: HKWorkoutConfiguration)
                     │
-                    ├─ reads blocks: WCSession.receivedApplicationContext["payload"]
-                    ├─ requests HK auth (share: workout/energy/distance;
-                    │   read: HR/speed/distance/energy)
+                    ├─ reads blocks: WCSession.receivedApplicationContext[key]
+                    │   (fast path) or awaits didReceiveApplicationContext
+                    │   via CheckedContinuation, 5-second timeout
                     └─▶ WorkoutSessionManager.startWorkout(session:blocks:healthStore:)
                                 │
-                                ├─ HKWorkoutSession + HKLiveWorkoutBuilder
+                                ├─ startMirroringToCompanionDevice()   ← mirroring first
+                                ├─ session.startActivity(with:)
+                                ├─ builder.beginCollection(at:)        ← then collection
                                 ├─ flattenBlocks → [(WorkoutStep, displayName)]
-                                │   ├─ distance steps: advance via HKLiveWorkoutBuilderDelegate
-                                │   └─ time steps: advance via 0.5s Task loop
-                                └─▶ ActiveWorkoutView (metrics + controls)
+                                │   ├─ distance steps: HKLiveWorkoutBuilderDelegate
+                                │   └─ time steps: 0.5s Task loop
+                                └─▶ ActiveWorkoutView (watch-side metrics + controls)
 
-                        Workout ends (auto or manual)
+    ◀──────────────────────────── WorkoutMirrorMessage (Watch → iPhone) ──────────────
+    │   stepName, stepGoalText, stepProgress, heartRate, paceSecPerKm,
+    │   totalMetres, elapsedSeconds, isPaused
+    │   (sent via HKWorkoutSession.sendToRemoteWorkoutSession on each update)
+    │
+    ▼   (AppFeature via LiveWorkoutClient.events())
+AppFeature.State.liveWorkout = LiveWorkoutDisplay(message: msg)
+    │
+    └─▶ AppView shows LiveWorkoutView (.fullScreenCover)
+            │
+            ├─ metrics grid: HR / Pace / Dist / Time
+            ├─ step card with ProgressView
+            └─ Pause / Resume / End buttons
+                    │
+    ──────────────────▶ WorkoutMirrorCommand (iPhone → Watch)
+                        (pause / resume / end)
+
+                        Workout ends (auto or manual on Watch)
                                 │
+                        LiveWorkoutEvent.sessionEnded → state.liveWorkout = nil
                         builder.finishWorkout() → HKWorkout saved
                                 │
                         TrainingPlanFeature.syncBackWorkouts picks it up ✓
@@ -582,7 +620,8 @@ WorkoutEditor.Action.startTapped                          (iPhone)
 
 The reducer never imports HealthKit. `WorkoutSessionManager` is watchOS-only
 and never touches TCA — it's a plain `ObservableObject` owned by
-`WatchAppDelegate`.
+`WatchAppDelegate`. `LiveWorkoutClient` is the iPhone counterpart, living
+inside `AppleWatchSync` and exposed as a TCA dependency to `AppFeature`.
 
 ---
 
@@ -621,20 +660,27 @@ and never touches TCA — it's a plain `ObservableObject` owned by
 5. `Workshop` reducer clears its path and pushes `.editor(...)`.
 6. TabView animates to Workouts; user sees `WorkoutEditorView` with the
    block list and a green "Start Workout" button.
-7. Tap Start → `.startTapped` → calls `watchConnectivityClient.sendWorkout`
-   (writes `WCSession.updateApplicationContext["payload"]`) then
-   `hkWatchTriggerClient.startWatchSession()` (calls
-   `HKHealthStore.startWatchApp(with:)`).
+7. Tap Start → `.startTapped` → calls
+   `hkWatchTriggerClient.startWatchSession(payload)`: writes payload to
+   `WCSession.updateApplicationContext[pendingWorkoutPayloadContextKey]`,
+   then calls `HKHealthStore.startWatchApp(toHandle:)`.
 8. System auto-launches `RunCraftWatch` on the Watch.
    `WatchAppDelegate.handle(_:HKWorkoutConfiguration)` fires, reads blocks
-   from `receivedApplicationContext["payload"]`, requests HK auth, creates
-   `HKWorkoutSession`, calls `workoutManager.startWorkout(...)`.
-9. `ActiveWorkoutView` appears on the Watch — step name, progress ring, HR,
-   pace, distance. Intervals advance automatically when time/distance goals
-   are met. `syncStatus = .sent` on the iPhone ("Starting on your Apple Watch…").
-10. User ends the workout on the Watch. `builder.finishWorkout()` saves an
-    `HKWorkout`. On next iPhone foreground, `TrainingPlan.syncBackWorkouts`
-    imports it as a `CompletedWorkout`.
+   from `receivedApplicationContext` (or awaits the slow-path via
+   `CheckedContinuation`), calls `workoutManager.startWorkout(session:blocks:healthStore:)`.
+9. `ActiveWorkoutView` appears on the Watch — step name, progress, HR, pace,
+   distance. Intervals advance automatically when time/distance goals are met.
+   `syncStatus = .sent` on the iPhone ("Starting on your Apple Watch…").
+10. As the Watch workout runs, `WorkoutMirrorMessage` packets flow to the
+    iPhone via HealthKit Mirroring. `AppFeature.liveWorkoutEvent(.messageReceived)`
+    updates `liveWorkout.message`. `AppView` shows `LiveWorkoutView` as a
+    full-screen cover with live HR, pace, distance, and elapsed time. User
+    can pause/resume/end from iPhone or Watch — commands round-trip via
+    `WorkoutMirrorCommand`.
+11. Workout ends (auto when final step completes, or manual). `builder.finishWorkout()`
+    saves an `HKWorkout`. `LiveWorkoutEvent.sessionEnded` dismisses
+    `LiveWorkoutView`. On next iPhone foreground, `TrainingPlan.syncBackWorkouts`
+    imports the workout as a `CompletedWorkout`.
 
 ### 6.3 Save a preset as your own
 
