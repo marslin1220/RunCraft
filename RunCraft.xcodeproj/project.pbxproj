@@ -440,12 +440,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9PRFX23G7R;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = RunCraftWatch;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days for your training plan.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "RunCraft saves completed workouts so they sync with the Fitness app and inform your training progress.";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.marstudio.RunCraft.RunCraft;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = RunCraftWatch-Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -476,12 +472,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9PRFX23G7R;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = RunCraftWatch;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days for your training plan.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "RunCraft saves completed workouts so they sync with the Fitness app and inform your training progress.";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.marstudio.RunCraft.RunCraft;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = RunCraftWatch-Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
