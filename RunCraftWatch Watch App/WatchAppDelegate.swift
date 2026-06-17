@@ -1,75 +1,126 @@
-//
-//  WatchAppDelegate.swift
-//  RunCraftWatch Watch App
-//
-//  Created by Cheng Lung, Lin on 2026/6/16.
-//
-
 import AppleWatchSync
 import Combine
 import Foundation
 import HealthKit
+import os
 import RunCraftModels
 import WatchConnectivity
 import WatchKit
+
+nonisolated(unsafe) private let watchLogger = Logger(subsystem: "io.marstudio.RunCraft.watchkitapp", category: "WatchAppDelegate")
 
 final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate, ObservableObject, @unchecked Sendable {
 
     let workoutManager = WorkoutSessionManager()
     @Published var schedule: WatchSchedulePayload?
 
+    // Set by handle(_:) when the payload hasn't arrived yet.
+    // Resolved by didReceiveApplicationContext or a 5-second timeout Task.
+    private var pendingPayloadContinuation: CheckedContinuation<WatchWorkoutPayload?, Never>?
+
     // MARK: - WKApplicationDelegate
 
     func applicationDidFinishLaunching() {
-        // Activate WCSession early so receivedApplicationContext is available
-        // when handle(_:HKWorkoutConfiguration) fires.
+        watchLogger.log("applicationDidFinishLaunching")
+        requestHealthKitAuthorization()
         guard WCSession.isSupported() else { return }
         WCSession.default.delegate = self
         WCSession.default.activate()
-        if let data = WCSession.default.receivedApplicationContext["schedule"] as? Data,
+        let ctx = WCSession.default.receivedApplicationContext
+        watchLogger.log("receivedApplicationContext keys: \(ctx.keys.sorted().joined(separator: ","), privacy: .public)")
+        if let data = ctx["schedule"] as? Data,
            let payload = try? JSONDecoder().decode(WatchSchedulePayload.self, from: data) {
             schedule = payload
         }
     }
 
-    func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
-        // Read the workout blocks the iPhone queued via updateApplicationContext.
-        let context = WCSession.isSupported() ? WCSession.default.receivedApplicationContext : [:]
-        let blocks: [WorkoutBlock] = {
-            guard let data = context["payload"] as? Data,
-                  let payload = try? JSONDecoder().decode(WatchWorkoutPayload.self, from: data)
-            else { return [] }
-            return payload.blocks
-        }()
-
-        Task { @MainActor in
-            let healthStore = HKHealthStore()
-            do {
-                try await healthStore.requestAuthorization(
-                    toShare: [
-                        HKObjectType.workoutType(),
-                        HKQuantityType(.activeEnergyBurned),
-                        HKQuantityType(.distanceWalkingRunning),
-                    ],
-                    read: [
-                        HKQuantityType(.heartRate),
-                        HKQuantityType(.distanceWalkingRunning),
-                        HKQuantityType(.runningSpeed),
-                        HKQuantityType(.activeEnergyBurned),
-                    ]
-                )
-                let session = try HKWorkoutSession(
-                    healthStore: healthStore,
-                    configuration: workoutConfiguration
-                )
-                try self.workoutManager.startWorkout(
-                    session: session,
-                    blocks: blocks,
-                    healthStore: healthStore
-                )
-            } catch {
-                self.workoutManager.phase = .failed(error.localizedDescription)
+    private func requestHealthKitAuthorization() {
+        let healthStore = HKHealthStore()
+        healthStore.requestAuthorization(
+            toShare: [
+                HKObjectType.workoutType(),
+                HKQuantityType(.activeEnergyBurned),
+                HKQuantityType(.distanceWalkingRunning),
+            ],
+            read: [
+                HKQuantityType(.heartRate),
+                HKQuantityType(.distanceWalkingRunning),
+                HKQuantityType(.runningSpeed),
+                HKQuantityType(.activeEnergyBurned),
+            ]
+        ) { success, error in
+            if let error {
+                watchLogger.error("HealthKit auth error: \(error.localizedDescription, privacy: .public)")
+            } else {
+                watchLogger.log("HealthKit auth completed: success=\(success, privacy: .public)")
             }
+        }
+    }
+
+    // nonisolated so the HealthKit daemon can call this from any thread.
+    nonisolated func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
+        watchLogger.log("handle(_:HKWorkoutConfiguration) activityType=\(workoutConfiguration.activityType.rawValue, privacy: .public)")
+        Task { @MainActor in
+            let payload = await waitForPayload()
+            guard let payload else {
+                watchLogger.error("no payload received within timeout — aborting")
+                workoutManager.phase = .failed("Workout data not received from iPhone. Please try again.")
+                return
+            }
+            watchLogger.log("got payload: \(payload.name, privacy: .public), \(payload.blocks.count, privacy: .public) blocks")
+            await startWorkout(payload: payload, configuration: workoutConfiguration)
+        }
+    }
+
+    // MARK: - Private
+
+    private func waitForPayload() async -> WatchWorkoutPayload? {
+        // Fast path: context was already delivered before handle(_:) ran.
+        if let payload = payloadFromContext() {
+            watchLogger.log("payload found immediately in receivedApplicationContext")
+            return payload
+        }
+
+        // Slow path: wait for didReceiveApplicationContext, timeout after 5 s.
+        watchLogger.log("payload not in context yet — awaiting didReceiveApplicationContext…")
+        return await withCheckedContinuation { continuation in
+            pendingPayloadContinuation = continuation
+            Task {
+                try? await Task.sleep(for: .seconds(5))
+                if let c = pendingPayloadContinuation {
+                    watchLogger.error("timed out waiting for workout payload")
+                    pendingPayloadContinuation = nil
+                    c.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    private func payloadFromContext() -> WatchWorkoutPayload? {
+        guard WCSession.isSupported(),
+              let data = WCSession.default.receivedApplicationContext[pendingWorkoutPayloadContextKey] as? Data,
+              let payload = try? JSONDecoder().decode(WatchWorkoutPayload.self, from: data)
+        else { return nil }
+        return payload
+    }
+
+    private func startWorkout(payload: WatchWorkoutPayload, configuration: HKWorkoutConfiguration) async {
+        let healthStore = HKHealthStore()
+        do {
+            watchLogger.log("creating HKWorkoutSession")
+            let session = try HKWorkoutSession(
+                healthStore: healthStore,
+                configuration: configuration
+            )
+            try await workoutManager.startWorkout(
+                session: session,
+                blocks: payload.blocks,
+                healthStore: healthStore
+            )
+            watchLogger.log("workoutManager.startWorkout succeeded")
+        } catch {
+            watchLogger.error("failed to start workout: \(error.localizedDescription, privacy: .public)")
+            workoutManager.phase = .failed(error.localizedDescription)
         }
     }
 
@@ -79,14 +130,30 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate
         _ session: WCSession,
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: (any Error)?
-    ) {}
+    ) {
+        watchLogger.log(
+            "WCSession activated: state=\(activationState.rawValue, privacy: .public) error=\(error?.localizedDescription ?? "nil", privacy: .public)"
+        )
+    }
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
-        guard let data = applicationContext["schedule"] as? Data,
-              let payload = try? JSONDecoder().decode(WatchSchedulePayload.self, from: data)
-        else { return }
+        watchLogger.log("didReceiveApplicationContext: keys=\(applicationContext.keys.sorted().joined(separator: ","), privacy: .public)")
         Task { @MainActor in
-            self.schedule = payload
+            // Resolve handle(_:) if it's waiting for the payload.
+            if let data = applicationContext[pendingWorkoutPayloadContextKey] as? Data,
+               let payload = try? JSONDecoder().decode(WatchWorkoutPayload.self, from: data) {
+                if let continuation = pendingPayloadContinuation {
+                    watchLogger.log("payload arrived — resolving handle(_:) continuation")
+                    pendingPayloadContinuation = nil
+                    continuation.resume(returning: payload)
+                }
+            }
+            // Always apply schedule updates.
+            if let data = applicationContext["schedule"] as? Data,
+               let payload = try? JSONDecoder().decode(WatchSchedulePayload.self, from: data) {
+                watchLogger.log("schedule updated (\(data.count, privacy: .public) bytes)")
+                schedule = payload
+            }
         }
     }
 }
