@@ -9,7 +9,10 @@ import AppleWatchSync
 import Combine
 import Foundation
 import HealthKit
+import os
 import RunCraftModels
+
+nonisolated(unsafe) private let sessionLogger = Logger(subsystem: "io.marstudio.RunCraft.watchkitapp", category: "WorkoutSession")
 
 @MainActor
 final class WorkoutSessionManager: NSObject, ObservableObject {
@@ -41,7 +44,7 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     private var elapsedTimerTask: Task<Void, Never>?
     private var stepTimerTask: Task<Void, Never>?
 
-    func startWorkout(session: HKWorkoutSession, blocks: [WorkoutBlock], healthStore: HKHealthStore) throws {
+    func startWorkout(session: HKWorkoutSession, blocks: [WorkoutBlock], healthStore: HKHealthStore) async throws {
         self.session = session
         session.delegate = self
 
@@ -53,21 +56,23 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         flatSteps = flattenBlocks(blocks)
         currentStepIndex = 0
 
-        builder.beginCollection(withStart: Date()) { [weak self] _, error in
-            guard let self else { return }
-            if let error {
-                Task { @MainActor in
-                    self.phase = .failed(error.localizedDescription)
-                }
-                return
-            }
-            Task { @MainActor in
-                session.startActivity(with: Date())
-                self.phase = .running
-                self.startElapsedTimer()
-                self.updateCurrentStep()
-            }
+        // Follow Apple's sample order: mirror → startActivity → beginCollection.
+        // Calling beginCollection before startActivity puts HKLiveWorkoutBuilder
+        // into an error state it cannot recover from.
+        do {
+            try await session.startMirroringToCompanionDevice()
+            sessionLogger.log("startMirroringToCompanionDevice succeeded")
+        } catch {
+            sessionLogger.warning("startMirroringToCompanionDevice failed (non-fatal): \(error.localizedDescription, privacy: .public)")
         }
+
+        let startDate = Date()
+        session.startActivity(with: startDate)
+        try await builder.beginCollection(at: startDate)
+
+        phase = .running
+        startElapsedTimer()
+        updateCurrentStep()
     }
 
     func endWorkout() {
@@ -111,6 +116,7 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
             stepName = ""
             stepGoalText = ""
             stepProgress = 1
+            sendMirrorMessage()
             return
         }
 
@@ -132,6 +138,29 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
             let s = seconds % 60
             stepGoalText = s == 0 ? "\(m) min" : "\(m):\(String(format: "%02d", s))"
             startStepTimer(duration: TimeInterval(seconds))
+        }
+        sendMirrorMessage()
+    }
+
+    private func sendMirrorMessage() {
+        guard let session else { return }
+        let message = WorkoutMirrorMessage(
+            stepName: stepName,
+            stepGoalText: stepGoalText,
+            stepProgress: stepProgress,
+            heartRate: heartRate,
+            paceSecPerKm: paceSecPerKm,
+            totalMetres: totalMetres,
+            elapsedSeconds: elapsedSeconds,
+            isPaused: phase == .paused
+        )
+        guard let data = try? JSONEncoder().encode(message) else { return }
+        Task {
+            do {
+                try await session.sendToRemoteWorkoutSession(data: data)
+            } catch {
+                sessionLogger.debug("sendToRemoteWorkoutSession failed (non-fatal): \(error.localizedDescription, privacy: .public)")
+            }
         }
     }
 
@@ -255,6 +284,22 @@ extension WorkoutSessionManager: HKWorkoutSessionDelegate {
             self.phase = .failed(error.localizedDescription)
         }
     }
+
+    nonisolated func workoutSession(
+        _ workoutSession: HKWorkoutSession,
+        didReceiveDataFromRemoteWorkoutSession data: [Data]
+    ) {
+        for item in data {
+            guard let command = try? JSONDecoder().decode(WorkoutMirrorCommand.self, from: item) else { continue }
+            Task { @MainActor in
+                switch command.kind {
+                case .pause:  self.pauseWorkout()
+                case .resume: self.resumeWorkout()
+                case .end:    self.endWorkout()
+                }
+            }
+        }
+    }
 }
 
 // MARK: - HKLiveWorkoutBuilderDelegate
@@ -293,6 +338,7 @@ extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
                     break
                 }
             }
+            self.sendMirrorMessage()
         }
     }
 

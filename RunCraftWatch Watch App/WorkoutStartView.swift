@@ -107,7 +107,7 @@ struct WorkoutStartView: View {
                 config.activityType = .running
                 config.locationType = .outdoor
                 let session = try HKWorkoutSession(healthStore: healthStore, configuration: config)
-                try manager.startWorkout(session: session, blocks: payload.blocks, healthStore: healthStore)
+                try await manager.startWorkout(session: session, blocks: payload.blocks, healthStore: healthStore)
             } catch {
                 isStarting = false
                 manager.phase = .failed(error.localizedDescription)
