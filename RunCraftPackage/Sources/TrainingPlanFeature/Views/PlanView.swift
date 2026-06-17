@@ -155,7 +155,10 @@ public struct PlanView: View {
         }
 
         if store.healthPermissionLost {
-            HealthPermissionBanner(onDismiss: { store.send(.dismissHealthPermissionBanner) })
+            HealthPermissionBanner(
+                onGrantAccess: { store.send(.requestHealthAuthorization) },
+                onDismiss: { store.send(.dismissHealthPermissionBanner) }
+            )
         }
     }
 

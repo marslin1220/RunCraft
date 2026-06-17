@@ -1,10 +1,9 @@
 import DesignSystem
 import SwiftUI
-import UIKit
 
 struct HealthPermissionBanner: View {
+    let onGrantAccess: () -> Void
     let onDismiss: () -> Void
-    @Environment(\.openURL) private var openURL
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -15,10 +14,10 @@ struct HealthPermissionBanner: View {
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Health permission lost")
+                    Text("Health permission needed")
                         .font(.subheadline.bold())
                         .foregroundStyle(Color.brand.textPrimary)
-                    Text("RunCraft can no longer read your Health data. HRV, race times and completed-workout sync will stop updating until you re-grant access.")
+                    Text("RunCraft needs access to Health data. HRV, race times and completed-workout sync will stop updating until access is granted.")
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
@@ -39,11 +38,9 @@ struct HealthPermissionBanner: View {
             }
 
             Button {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    openURL(url)
-                }
+                onGrantAccess()
             } label: {
-                Text("Open Settings")
+                Text("Grant Access")
                     .font(.subheadline.bold())
                     .foregroundStyle(.black)
                     .padding(.horizontal, 14)
@@ -53,7 +50,7 @@ struct HealthPermissionBanner: View {
                     .clipShape(Capsule())
             }
             .buttonStyle(.plain)
-            .accessibilityHint("Opens Settings → Health → Data Access & Devices → RunCraft")
+            .accessibilityHint("Re-opens the Health authorization dialog")
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
