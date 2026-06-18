@@ -7,6 +7,8 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.widgetkit-extension</string>
 	</dict>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSHealthShareUsageDescription</key>
 	<string>RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days for your training plan.</string>
 	<key>NSHealthUpdateUsageDescription</key>

@@ -11,5 +11,6 @@ struct TodayWidgetBundle: WidgetBundle {
 
     var body: some Widget {
         TodaySessionWidget()
+        WorkoutLiveActivity()
     }
 }

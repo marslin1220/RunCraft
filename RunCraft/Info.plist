@@ -10,6 +10,8 @@
 		<string>ja</string>
 		<string>ko</string>
 	</array>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSHealthShareUsageDescription</key>
 	<string>RunCraft reads your running history, HRV, and sleep to detect VDOT improvements and recommend recovery days for your training plan.</string>
 	<key>NSHealthUpdateUsageDescription</key>

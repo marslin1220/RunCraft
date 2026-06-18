@@ -58,6 +58,7 @@ import WorkshopFeature
 
     #if os(iOS)
     @Dependency(\.liveWorkoutClient) var liveWorkoutClient
+    @Dependency(\.liveActivityClient) var liveActivityClient
     #endif
 
     public var body: some Reducer<State, Action> {
@@ -92,16 +93,37 @@ import WorkshopFeature
                 switch event {
                 case .sessionStarted:
                     state.liveWorkout = LiveWorkoutDisplay()
+                    return .none
+
                 case .messageReceived(let msg):
+                    let isFirstMessage = state.liveWorkout?.message.stepName.isEmpty == true
                     state.liveWorkout?.message = msg
+                    let client = liveActivityClient
+                    return .run { _ in
+                        if isFirstMessage {
+                            await client.startSession(msg.stepName, msg)
+                        } else {
+                            await client.updateSession(msg)
+                        }
+                    }
+
                 case .sessionPaused:
                     state.liveWorkout?.message.isPaused = true
+                    guard let msg = state.liveWorkout?.message else { return .none }
+                    let clientP = liveActivityClient
+                    return .run { _ in await clientP.updateSession(msg) }
+
                 case .sessionResumed:
                     state.liveWorkout?.message.isPaused = false
+                    guard let msg = state.liveWorkout?.message else { return .none }
+                    let clientR = liveActivityClient
+                    return .run { _ in await clientR.updateSession(msg) }
+
                 case .sessionEnded:
                     state.liveWorkout = nil
+                    let clientE = liveActivityClient
+                    return .run { _ in await clientE.endSession() }
                 }
-                return .none
 
             case .pauseWorkoutTapped:
                 let client = liveWorkoutClient
