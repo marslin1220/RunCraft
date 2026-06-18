@@ -11,6 +11,7 @@ import VDOTEngine
 @Reducer public struct SetupVDOT {
     @ObservableState public struct State: Equatable {
         public var vdotInput: VDOTInput.State = .init()
+        public var trainingDaysInput: TrainingDaysInput.State = .init()
 
         public init() {}
     }
@@ -18,6 +19,7 @@ import VDOTEngine
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
         case vdotInput(VDOTInput.Action)
+        case trainingDaysInput(TrainingDaysInput.Action)
         case saveButtonTapped
         case cancelButtonTapped
     }
@@ -33,26 +35,37 @@ import VDOTEngine
         Scope(state: \.vdotInput, action: \.vdotInput) {
             VDOTInput()
         }
+        Scope(state: \.trainingDaysInput, action: \.trainingDaysInput) {
+            TrainingDaysInput()
+        }
         Reduce { state, action in
             switch action {
-            case .binding, .vdotInput:
+            case .binding, .vdotInput, .trainingDaysInput:
                 return .none
 
             case .saveButtonTapped:
                 guard let vdot = state.vdotInput.effectiveVDOT else { return .none }
-                let goal = RaceGoal(
+                let availableDays = state.trainingDaysInput.availableDays
+                let longRunDay = state.trainingDaysInput.longRunDay
+                var goal = RaceGoal(
                     name: "Base Training",
                     targetDate: now,
                     distanceKm: 0,
                     currentVDOT: vdot,
                     createdAt: now,
-                    isPlaceholder: true
+                    isPlaceholder: true,
+                    longRunDay: longRunDay
                 )
-                let (week, sessions) = TrainingPlanGenerator.rollingWeek(raceGoalId: goal.id, vdot: vdot, weekNumber: 0)
+                goal.availableDays = availableDays
+                let savedGoal = goal
+                let (week, sessions) = TrainingPlanGenerator.rollingWeek(
+                    raceGoalId: goal.id, vdot: vdot, weekNumber: 0,
+                    availableDays: availableDays, longRunDay: longRunDay
+                )
                 let snapshot = VDOTSnapshot(vdot: vdot, recordedAt: now, source: .initial)
                 return .run { [database, dismiss] _ in
                     try await database.write { db in
-                        try RaceGoal.upsert { goal }.execute(db)
+                        try RaceGoal.upsert { savedGoal }.execute(db)
                         try TrainingWeek.upsert { week }.execute(db)
                         for session in sessions {
                             try PlannedSession.upsert { session }.execute(db)

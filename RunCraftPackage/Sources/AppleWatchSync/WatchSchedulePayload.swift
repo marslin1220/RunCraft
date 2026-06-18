@@ -1,4 +1,5 @@
 import Foundation
+import RunCraftModels
 
 /// Watch-side summary of the current week's training plan, pushed from iPhone
 /// via `updateApplicationContext["schedule"]` whenever the plan loads.
@@ -13,20 +14,27 @@ public struct WatchSchedulePayload: Codable, Sendable {
         public var dayName: String
         /// Human-readable session title, e.g. "Easy Run", "Intervals".
         public var title: String
+        public var sessionType: SessionType
         public var isToday: Bool
+        /// Whether this session's day is in the past (before today).
+        public var isPast: Bool
         public var payload: WatchWorkoutPayload
 
         public init(
             id: UUID,
             dayName: String,
             title: String,
+            sessionType: SessionType,
             isToday: Bool,
+            isPast: Bool,
             payload: WatchWorkoutPayload
         ) {
             self.id = id
             self.dayName = dayName
             self.title = title
+            self.sessionType = sessionType
             self.isToday = isToday
+            self.isPast = isPast
             self.payload = payload
         }
     }

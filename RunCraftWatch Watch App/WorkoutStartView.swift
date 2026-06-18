@@ -53,17 +53,19 @@ struct WorkoutStartView: View {
 
     enum StepRow {
         case repeatHeader(String)
-        case step(kind: StepKind, label: String, indented: Bool)
+        case step(kind: StepKind, label: String, pace: String?, indented: Bool)
     }
 
     private var stepRows: [StepRow] {
         payload.blocks.flatMap { block -> [StepRow] in
             switch block {
             case .step(let s):
-                return [.step(kind: s.kind, label: stepGoalText(s), indented: false)]
+                return [.step(kind: s.kind, label: stepGoalText(s), pace: stepPaceText(s), indented: false)]
             case .repeatGroup(let g):
                 let header = StepRow.repeatHeader("\(g.iterations)× repeat")
-                let steps = g.steps.map { StepRow.step(kind: $0.kind, label: stepGoalText($0), indented: true) }
+                let steps = g.steps.map {
+                    StepRow.step(kind: $0.kind, label: stepGoalText($0), pace: stepPaceText($0), indented: true)
+                }
                 return [header] + steps
             }
         }
@@ -85,6 +87,13 @@ struct WorkoutStartView: View {
             return "\(step.kind.displayName) · \(timeStr)"
         }
     }
+
+    private func stepPaceText(_ step: WorkoutStep) -> String? {
+        guard let alert = step.alert, case .paceRange(let lo, let hi) = alert else { return nil }
+        return "\(fmt(lo))–\(fmt(hi)) /km"
+    }
+
+    private func fmt(_ sec: Int) -> String { String(format: "%d:%02d", sec / 60, sec % 60) }
 
     // MARK: - Start
 
@@ -130,8 +139,8 @@ private struct StepRowView: View {
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .padding(.top, 2)
-        case .step(let kind, let label, let indented):
-            HStack(spacing: 5) {
+        case .step(let kind, let label, let pace, let indented):
+            HStack(alignment: .top, spacing: 5) {
                 if indented {
                     Spacer().frame(width: 8)
                 }
@@ -139,9 +148,17 @@ private struct StepRowView: View {
                     .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(kind.stepColor)
                     .frame(width: 14)
-                Text(label)
-                    .font(.caption2)
-                    .foregroundStyle(.primary)
+                    .padding(.top, 1)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(label)
+                        .font(.caption2)
+                        .foregroundStyle(.primary)
+                    if let pace {
+                        Text(pace)
+                            .font(.system(size: 9))
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
         }
     }

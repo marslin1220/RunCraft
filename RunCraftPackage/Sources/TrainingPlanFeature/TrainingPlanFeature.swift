@@ -653,7 +653,9 @@ import WorkshopFeature
                                     id: s.id,
                                     dayName: dayNames[max(0, min(s.dayOfWeek - 1, 6))],
                                     title: s.sessionType.displayName,
+                                    sessionType: s.sessionType,
                                     isToday: s.dayOfWeek == today,
+                                    isPast: s.dayOfWeek < today,
                                     payload: WatchWorkoutPayload(name: template.name, blocks: template.blocks)
                                 )
                             }
@@ -668,6 +670,7 @@ import WorkshopFeature
                             return WatchWorkoutPayload(
                                 name: "\(zone.displayName) · 30 min",
                                 subtitle: paceZones[zone].formatted(unit: unit),
+                                zoneLetter: zone.letter,
                                 blocks: [.step(step)]
                             )
                         }

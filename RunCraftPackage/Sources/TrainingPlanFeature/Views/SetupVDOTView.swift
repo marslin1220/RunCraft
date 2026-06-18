@@ -27,6 +27,14 @@ public struct SetupVDOTView: View {
                 if let zones = store.vdotInput.paceZones {
                     PaceZonesPreviewSection(zones: zones)
                 }
+
+                Section {
+                    TrainingDaysGrid(store: store.scope(state: \.trainingDaysInput, action: \.trainingDaysInput))
+                } header: {
+                    Text("Training Days")
+                } footer: {
+                    Text("Choose the days you're available to train. The schedule will be built around these days.")
+                }
             }
             .navigationTitle("Set Up VDOT")
             .navigationBarTitleDisplayMode(.inline)
