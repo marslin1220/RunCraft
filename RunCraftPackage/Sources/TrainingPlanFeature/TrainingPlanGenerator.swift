@@ -260,7 +260,12 @@ public struct TrainingPlanGenerator {
         }
 
         let easyDays = days.filter { placements[$0] == nil }
-        for (day, spec) in zip(easyDays, easySpecs) {
+        let chosenEasyDays = spreadEasyDays(
+            count: easySpecs.count,
+            from: easyDays,
+            occupied: Set(placements.keys)
+        )
+        for (day, spec) in zip(chosenEasyDays, easySpecs) {
             placements[day] = spec
         }
 
@@ -303,6 +308,35 @@ public struct TrainingPlanGenerator {
         if hardDays.contains(7) { return 7 }
         if hardDays.contains(6) { return 6 }
         return hardDays.max() ?? 7
+    }
+
+    /// Picks `count` days from `candidates` for easy-run sessions.
+    ///
+    /// Evaluates every combination and picks the one that minimises the
+    /// maximum linear consecutive training-day run (days 1–7) when the
+    /// chosen days are merged with the already-placed hard-session days.
+    /// Ties are broken by lexicographic order (smallest day numbers first).
+    ///
+    /// - Complexity: O(C(candidates, count)) — at most C(6,3)=20 combos.
+    private static func spreadEasyDays(count: Int, from candidates: [Int], occupied: Set<Int>) -> [Int] {
+        guard count > 0 else { return [] }
+        guard count < candidates.count else { return candidates }
+        let combos = combinations(of: candidates, choose: count)
+        return combos.min { lhs, rhs in
+            let ls = maxLinearConsecutiveRun(occupied.union(lhs))
+            let rs = maxLinearConsecutiveRun(occupied.union(rhs))
+            return ls != rs ? ls < rs : lhs.lexicographicallyPrecedes(rhs)
+        } ?? Array(candidates.prefix(count))
+    }
+
+    /// Maximum run of consecutive integers (1…7) that appear in `days`.
+    private static func maxLinearConsecutiveRun(_ days: Set<Int>) -> Int {
+        var maxRun = 0, current = 0
+        for d in 1...7 {
+            if days.contains(d) { current += 1; maxRun = max(maxRun, current) }
+            else { current = 0 }
+        }
+        return maxRun
     }
 
     /// All `choose`-sized subsets of `array`, preserving ascending order.

@@ -219,18 +219,42 @@ import WorkshopFeature
                             // or if it's missing its planned sessions.
                             if let current = TrainingWeek.current(in: weeks),
                                try hasSessions(forWeekId: current.id) {
-                                return
+                                // Check whether any completed workouts are
+                                // linked to this week's sessions. If so,
+                                // only patch weekNumber to avoid breaking FK
+                                // links; otherwise regenerate with the
+                                // corrected scheduling algorithm.
+                                let currentSessionIds = Set(
+                                    try PlannedSession
+                                        .where { $0.weekId.eq(current.id) }
+                                        .fetchAll(db)
+                                        .map(\.id)
+                                )
+                                let hasCompletions = try CompletedWorkout.all
+                                    .fetchAll(db)
+                                    .contains {
+                                        $0.plannedSessionId.map { currentSessionIds.contains($0) } ?? false
+                                    }
+                                if hasCompletions {
+                                    if current.weekNumber != 0 {
+                                        var fixed = current
+                                        fixed.weekNumber = 0
+                                        try TrainingWeek.upsert { fixed }.execute(db)
+                                    }
+                                    return
+                                }
+                                // No completions — fall through to delete + regenerate below.
                             }
                             try TrainingWeek
                                 .where { $0.raceGoalId.eq(goal.id) }
                                 .delete()
                                 .execute(db)
-                            let (week, sessions) = TrainingPlanGenerator.rollingWeek(
-                                raceGoalId: goal.id, vdot: goal.currentVDOT,
+                            let (week, newSessions) = TrainingPlanGenerator.rollingWeek(
+                                raceGoalId: goal.id, vdot: goal.currentVDOT, weekNumber: 0,
                                 availableDays: goal.availableDays, longRunDay: goal.longRunDay
                             )
                             try TrainingWeek.upsert { week }.execute(db)
-                            for session in sessions {
+                            for session in newSessions {
                                 try PlannedSession.upsert { session }.execute(db)
                             }
                             return

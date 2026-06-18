@@ -149,4 +149,49 @@ struct TrainingPlanGeneratorTests {
         #expect(week.phase == .base)
         #expect(!sessions.isEmpty)
     }
+
+    // MARK: - Consecutive-day distribution
+
+    @Test("Base-phase weeks (5 sessions / 7 days): no more than 2 consecutive training days")
+    func basePhase_noMoreThan2ConsecutiveTrainingDays() {
+        let (weeks, sessions) = TrainingPlanGenerator.generate(goal: sampleGoal, vdot: 40)
+        let baseWeeks = weeks.filter { $0.phase == .base }
+
+        for week in baseWeeks {
+            let trainingDays = sessions
+                .filter { $0.weekId == week.id && $0.sessionType != .rest }
+                .map(\.dayOfWeek)
+                .sorted()
+
+            let maxRun = maxConsecutiveRun(trainingDays)
+            #expect(maxRun <= 2,
+                    "Base week \(week.weekNumber) has \(maxRun) consecutive training days: \(trainingDays)")
+        }
+    }
+
+    @Test("rollingWeek (Base Training / 5 sessions / 7 days): no more than 2 consecutive training days")
+    func rollingWeek_noMoreThan2ConsecutiveTrainingDays() {
+        let (_, sessions) = TrainingPlanGenerator.rollingWeek(raceGoalId: UUID(), vdot: 40)
+
+        let trainingDays = sessions
+            .filter { $0.sessionType != .rest }
+            .map(\.dayOfWeek)
+            .sorted()
+
+        let maxRun = maxConsecutiveRun(trainingDays)
+        #expect(maxRun <= 2,
+                "rollingWeek has \(maxRun) consecutive training days: \(trainingDays)")
+    }
+
+    // MARK: - Test helper
+
+    private func maxConsecutiveRun(_ sortedDays: [Int]) -> Int {
+        var maxRun = 0, current = 0, prev = -2
+        for d in sortedDays {
+            current = d == prev + 1 ? current + 1 : 1
+            maxRun = max(maxRun, current)
+            prev = d
+        }
+        return maxRun
+    }
 }

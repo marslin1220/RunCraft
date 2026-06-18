@@ -25,10 +25,8 @@ struct WorkoutStartView: View {
 
                 Divider()
 
-                ForEach(Array(stepDescriptions.enumerated()), id: \.offset) { _, desc in
-                    Text(desc)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                ForEach(Array(stepRows.enumerated()), id: \.offset) { _, row in
+                    StepRowView(row: row)
                 }
 
                 Button {
@@ -51,36 +49,40 @@ struct WorkoutStartView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    // MARK: - Step descriptions
+    // MARK: - Step rows
 
-    private var stepDescriptions: [String] {
-        payload.blocks.flatMap { block -> [String] in
+    enum StepRow {
+        case repeatHeader(String)
+        case step(kind: StepKind, label: String, indented: Bool)
+    }
+
+    private var stepRows: [StepRow] {
+        payload.blocks.flatMap { block -> [StepRow] in
             switch block {
             case .step(let s):
-                return [stepLabel(s)]
+                return [.step(kind: s.kind, label: stepGoalText(s), indented: false)]
             case .repeatGroup(let g):
-                let header = "\(g.iterations)× repeat"
-                let lines = g.steps.map { "  \(stepLabel($0))" }
-                return [header] + lines
+                let header = StepRow.repeatHeader("\(g.iterations)× repeat")
+                let steps = g.steps.map { StepRow.step(kind: $0.kind, label: stepGoalText($0), indented: true) }
+                return [header] + steps
             }
         }
     }
 
-    private func stepLabel(_ step: WorkoutStep) -> String {
-        let kindName = step.kind.displayName
+    private func stepGoalText(_ step: WorkoutStep) -> String {
         switch step.goal {
         case .openEnded:
-            return kindName
+            return step.kind.displayName
         case .distance(let m):
             let dist = m >= 1000
                 ? String(format: "%.1f km", m / 1_000)
                 : "\(Int(m)) m"
-            return "\(kindName) · \(dist)"
+            return "\(step.kind.displayName) · \(dist)"
         case .time(let s):
             let mins = s / 60
             let secs = s % 60
             let timeStr = secs == 0 ? "\(mins) min" : "\(mins):\(String(format: "%02d", secs))"
-            return "\(kindName) · \(timeStr)"
+            return "\(step.kind.displayName) · \(timeStr)"
         }
     }
 
@@ -112,6 +114,46 @@ struct WorkoutStartView: View {
                 isStarting = false
                 manager.phase = .failed(error.localizedDescription)
             }
+        }
+    }
+}
+
+// MARK: - StepRowView
+
+private struct StepRowView: View {
+    let row: WorkoutStartView.StepRow
+
+    var body: some View {
+        switch row {
+        case .repeatHeader(let text):
+            Text(text)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .padding(.top, 2)
+        case .step(let kind, let label, let indented):
+            HStack(spacing: 5) {
+                if indented {
+                    Spacer().frame(width: 8)
+                }
+                Image(systemName: kind.symbolName)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(kind.stepColor)
+                    .frame(width: 14)
+                Text(label)
+                    .font(.caption2)
+                    .foregroundStyle(.primary)
+            }
+        }
+    }
+}
+
+private extension StepKind {
+    var stepColor: Color {
+        switch self {
+        case .warmup:   .orange
+        case .work:     .green
+        case .recovery: .cyan
+        case .cooldown: .yellow
         }
     }
 }

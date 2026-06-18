@@ -1,6 +1,15 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "--" : {
+
+    },
+    "%lld" : {
+
+    },
+    "bpm" : {
+
+    },
     "Cancel" : {
 
     },
@@ -34,6 +43,9 @@
       }
     },
     "Dismiss" : {
+
+    },
+    "dist" : {
 
     },
     "End" : {
@@ -119,6 +131,9 @@
       }
     },
     "This Week" : {
+
+    },
+    "time" : {
 
     },
     "Today" : {

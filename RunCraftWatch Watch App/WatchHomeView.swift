@@ -79,18 +79,22 @@ private struct SessionRow: View {
     let session: WatchSchedulePayload.Session
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 5) {
                 Text(session.dayName)
-                    .font(.caption2)
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.secondary)
                 if session.isToday {
                     Text("Today")
-                        .font(.caption2)
-                        .foregroundStyle(.tint)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(.black)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 1)
+                        .background(.tint, in: Capsule())
                 }
             }
             Text(session.title)
+                .font(.body)
         }
     }
 }

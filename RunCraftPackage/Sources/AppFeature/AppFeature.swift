@@ -75,10 +75,15 @@ import WorkshopFeature
         }
         Reduce { state, action in
             switch action {
+            case .tabSelected(let tab):
+                state.selectedTab = tab
+                return .none
+
             #if os(iOS)
             case .onTask:
+                let client = liveWorkoutClient
                 return .run { send in
-                    for await event in liveWorkoutClient.events() {
+                    for await event in client.events() {
                         await send(.liveWorkoutEvent(event))
                     }
                 }
@@ -99,18 +104,21 @@ import WorkshopFeature
                 return .none
 
             case .pauseWorkoutTapped:
+                let client = liveWorkoutClient
                 return .run { _ in
-                    await liveWorkoutClient.sendCommand(WorkoutMirrorCommand(kind: .pause))
+                    await client.sendCommand(WorkoutMirrorCommand(kind: .pause))
                 }
 
             case .resumeWorkoutTapped:
+                let client = liveWorkoutClient
                 return .run { _ in
-                    await liveWorkoutClient.sendCommand(WorkoutMirrorCommand(kind: .resume))
+                    await client.sendCommand(WorkoutMirrorCommand(kind: .resume))
                 }
 
             case .endWorkoutTapped:
+                let client = liveWorkoutClient
                 return .run { _ in
-                    await liveWorkoutClient.sendCommand(WorkoutMirrorCommand(kind: .end))
+                    await client.sendCommand(WorkoutMirrorCommand(kind: .end))
                 }
             #endif
 

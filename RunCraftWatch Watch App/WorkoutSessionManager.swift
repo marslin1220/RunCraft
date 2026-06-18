@@ -32,6 +32,7 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     @Published var stepName: String = ""
     @Published var stepGoalText: String = ""
     @Published var stepProgress: Double = 0
+    @Published var stepKind: StepKind? = nil
 
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
@@ -116,12 +117,14 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
             stepName = ""
             stepGoalText = ""
             stepProgress = 1
+            stepKind = nil
             sendMirrorMessage()
             return
         }
 
         let (step, displayName) = flatSteps[currentStepIndex]
         stepName = displayName
+        stepKind = step.kind
         stepStartMetres = totalMetres
         stepStartDate = Date()
         stepProgress = 0

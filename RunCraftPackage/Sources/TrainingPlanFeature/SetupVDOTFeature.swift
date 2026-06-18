@@ -48,7 +48,7 @@ import VDOTEngine
                     createdAt: now,
                     isPlaceholder: true
                 )
-                let (week, sessions) = TrainingPlanGenerator.rollingWeek(raceGoalId: goal.id, vdot: vdot)
+                let (week, sessions) = TrainingPlanGenerator.rollingWeek(raceGoalId: goal.id, vdot: vdot, weekNumber: 0)
                 let snapshot = VDOTSnapshot(vdot: vdot, recordedAt: now, source: .initial)
                 return .run { [database, dismiss] _ in
                     try await database.write { db in
