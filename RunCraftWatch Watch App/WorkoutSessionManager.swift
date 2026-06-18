@@ -6,11 +6,13 @@
 //
 
 import AppleWatchSync
+import AVFoundation
 import Combine
 import Foundation
 import HealthKit
 import os
 import RunCraftModels
+import WatchKit
 
 nonisolated(unsafe) private let sessionLogger = Logger(subsystem: "io.marstudio.RunCraft.watchkitapp", category: "WorkoutSession")
 
@@ -33,6 +35,16 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     @Published var stepGoalText: String = ""
     @Published var stepProgress: Double = 0
     @Published var stepKind: StepKind? = nil
+    /// "Rep 3/5 · Recovery · 90 sec" — empty string when on the last step.
+    @Published var nextStepSummary: String = ""
+    /// Countdown/remaining for the current step: "380 m", "1:48". Empty for open-ended steps.
+    @Published var stepRemainingText: String = ""
+    /// 1-based position for display, e.g. "3 / 12".
+    @Published var stepPosition: Int = 0
+    @Published var totalStepCount: Int = 0
+
+    private var previousStepDisplayName: String = ""
+    private let speechSynthesizer = AVSpeechSynthesizer()
 
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
@@ -56,6 +68,7 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
 
         flatSteps = flattenBlocks(blocks)
         currentStepIndex = 0
+        totalStepCount = flatSteps.count
 
         // Follow Apple's sample order: mirror → startActivity → beginCollection.
         // Calling beginCollection before startActivity puts HKLiveWorkoutBuilder
@@ -118,6 +131,8 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
             stepGoalText = ""
             stepProgress = 1
             stepKind = nil
+            nextStepSummary = ""
+            stepPosition = flatSteps.count
             sendMirrorMessage()
             return
         }
@@ -128,20 +143,45 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         stepStartMetres = totalMetres
         stepStartDate = Date()
         stepProgress = 0
+        stepPosition = currentStepIndex + 1
 
         switch step.goal {
         case .openEnded:
             stepGoalText = "Open"
+            stepRemainingText = ""
         case .distance(let metres):
             stepGoalText = metres >= 1000
                 ? String(format: "%.1f km", metres / 1000)
                 : "\(Int(metres)) m"
+            stepRemainingText = stepGoalText
         case .time(let seconds):
             let m = seconds / 60
             let s = seconds % 60
             stepGoalText = s == 0 ? "\(m) min" : "\(m):\(String(format: "%02d", s))"
+            stepRemainingText = String(format: "%d:%02d", m, s)
             startStepTimer(duration: TimeInterval(seconds))
         }
+
+        // Voice + haptic announcement
+        announceStep(name: displayName, goal: stepGoalText, previous: previousStepDisplayName)
+
+        // Build next-step summary
+        let nextIdx = currentStepIndex + 1
+        if nextIdx < flatSteps.count {
+            let (nextStep, nextName) = flatSteps[nextIdx]
+            let goalStr: String
+            switch nextStep.goal {
+            case .openEnded:            goalStr = ""
+            case .distance(let m):      goalStr = m >= 1000 ? String(format: "%.1f km", m / 1000) : "\(Int(m)) m"
+            case .time(let s):
+                let min = s / 60; let sec = s % 60
+                goalStr = sec == 0 ? "\(min) min" : "\(min):\(String(format: "%02d", sec))"
+            }
+            nextStepSummary = goalStr.isEmpty ? nextName : "\(nextName) · \(goalStr)"
+        } else {
+            nextStepSummary = ""
+        }
+
         sendMirrorMessage()
     }
 
@@ -168,12 +208,42 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     }
 
     private func advanceStep() {
+        previousStepDisplayName = currentStepIndex < flatSteps.count
+            ? flatSteps[currentStepIndex].displayName : ""
         currentStepIndex += 1
         if currentStepIndex >= flatSteps.count {
+            announceWorkoutComplete()
             endWorkout()
         } else {
             updateCurrentStep()
         }
+    }
+
+    private func announceStep(name: String, goal: String, previous: String) {
+        WKInterfaceDevice.current().play(.notification)
+        let voiceName = name.replacingOccurrences(of: " · ", with: " ")
+        let text: String
+        if previous.isEmpty {
+            text = "\(voiceName). Goal: \(goal)."
+        } else {
+            let voicePrev = previous.replacingOccurrences(of: " · ", with: " ")
+            text = "\(voicePrev) complete. \(voiceName). Goal: \(goal)."
+        }
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9
+        speechSynthesizer.stopSpeaking(at: .immediate)
+        speechSynthesizer.speak(utterance)
+    }
+
+    private func announceWorkoutComplete() {
+        WKInterfaceDevice.current().play(.success)
+        let voicePrev = previousStepDisplayName.replacingOccurrences(of: " · ", with: " ")
+        let text = voicePrev.isEmpty
+            ? "Workout complete!"
+            : "\(voicePrev) complete. Workout complete!"
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9
+        speechSynthesizer.speak(utterance)
     }
 
     private func startStepTimer(duration: TimeInterval) {
@@ -185,6 +255,9 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
                 await MainActor.run {
                     let elapsed = Date().timeIntervalSince(start)
                     self.stepProgress = min(elapsed / duration, 1.0)
+                    let remaining = max(0, duration - elapsed)
+                    let r = Int(remaining.rounded())
+                    self.stepRemainingText = String(format: "%d:%02d", r / 60, r % 60)
                     if elapsed >= duration {
                         self.advanceStep()
                     }
@@ -351,7 +424,11 @@ extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
         guard case .distance(let targetMetres) = step.goal else { return }
 
         let done = totalMetres - stepStartMetres
+        let remaining = max(0, targetMetres - done)
         stepProgress = min(done / targetMetres, 1.0)
+        stepRemainingText = remaining >= 1000
+            ? String(format: "%.1f km", remaining / 1000)
+            : "\(Int(remaining.rounded())) m"
         if done >= targetMetres {
             advanceStep()
         }
