@@ -144,14 +144,15 @@ spaced arrangement was possible.
 
 ## Status
 
-Implemented and tested (`TrainingPlanGenerator` +
-`FlexibleTrainingDaysTests`, 27/27 passing). **Not yet wired up**:
+Fully implemented and shipped:
 
-- No UI for the runner to choose `availableDays` / `longRunDay`.
-- No persisted column for these preferences (would live on `RaceGoal`
-  or a settings table — TBD).
-- No "regenerate current + future weeks" flow when the runner changes
-  these preferences mid-plan.
-
-See `ARCHITECTURE.md` §8 (Open questions and future work) for how this
-fits alongside the rest of the roadmap.
+- **Logic** — `TrainingPlanGenerator` with flexible-days placement
+  (27/27 `FlexibleTrainingDaysTests` passing).
+- **Persistence** — `availableDaysData` + `longRunDay` columns on
+  `RaceGoal` (schema migration v4, commit `4be3d7d`).
+- **Setup UI** — `TrainingDaysInputFeature` + `TrainingDaysGrid` in the
+  race-goal creation flow (commit `010323c`).
+- **Mid-plan adjustment** — `AdjustTrainingDaysFeature` +
+  `AdjustTrainingDaysView` lets the runner change days after the plan
+  is live; current + future weeks regenerate automatically (commit
+  `22916c5`).

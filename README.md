@@ -8,8 +8,9 @@ plan and dispatches structured workouts to Apple Watch via WorkoutKit —
 all reachable by voice through Siri and Apple Intelligence.
 
 > **Status:** active development. Not yet shipped to the App Store.
-> iPhone-only — the paired Apple Watch is driven through `WorkoutScheduler`
-> rather than a companion app.
+> The paired Apple Watch runs a dedicated `RunCraftWatch` companion app that
+> auto-starts workouts via HealthKit Mirroring and streams live metrics back
+> to the iPhone.
 
 ## What it does
 
@@ -17,8 +18,9 @@ all reachable by voice through Siri and Apple Intelligence.
   generates 16 periodised weeks (base → build → peak → taper) with daily
   sessions, each tagged with a target pace zone derived from your VDOT.
 - **One-tap workout dispatch.** Today's session card on the Plan tab has
-  a play button — taps schedule a `WorkoutPlan` for the paired Apple
-  Watch, which surfaces it in the native Workout app.
+  a play button — taps auto-launch the `RunCraftWatch` companion app and
+  start the structured workout directly on the wrist via HealthKit Mirroring.
+  Live HR, pace, and interval progress stream back to the iPhone in real time.
 - **Voice-first control.** Four App Intents drive Siri / Spotlight /
   Apple Intelligence:
   - "What's today's training in RunCraft" — reads the session out loud

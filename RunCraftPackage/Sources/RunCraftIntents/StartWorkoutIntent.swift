@@ -10,15 +10,15 @@ import WorkshopFeature
 /// "Start Yasso 800 in RunCraft" — voice-driven workout dispatch.
 ///
 /// Resolves the chosen template (either a built-in preset or a user-saved
-/// row) and sends it to the paired Apple Watch over WatchConnectivity. The
-/// RunCraftWatch app converts it to a WorkoutKit `WorkoutPlan` and hands it
-/// straight to the native Workout app.
+/// row), writes the payload to WCSession application context, and calls
+/// `HKHealthStore.startWatchApp(toHandle:)` via `HKWatchTriggerClient` to
+/// auto-launch `RunCraftWatch` and begin the structured workout on the wrist.
 public struct StartWorkoutIntent: AppIntent {
 
     public static let title: LocalizedStringResource = "Start a workout"
 
     public static let description = IntentDescription(
-        "Send a RunCraft workout to your paired Apple Watch and start it in the Workout app.",
+        "Auto-start a RunCraft workout on your paired Apple Watch.",
         categoryName: "Training"
     )
 
