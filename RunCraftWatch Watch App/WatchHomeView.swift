@@ -2,314 +2,377 @@ import AppleWatchSync
 import RunCraftModels
 import SwiftUI
 
+// MARK: - WatchHomeView
+
 struct WatchHomeView: View {
     let schedule: WatchSchedulePayload?
     @ObservedObject var manager: WorkoutSessionManager
 
     var body: some View {
-        NavigationStack {
-            if let schedule, !schedule.sessions.isEmpty || !schedule.paceTemplates.isEmpty {
-                ScrollView {
-                    VStack(spacing: 8) {
-                        if !schedule.sessions.isEmpty {
-                            sessionsSection(schedule.sessions)
-                        }
-                        if !schedule.paceTemplates.isEmpty {
-                            paceTemplatesSection(schedule.paceTemplates)
-                        }
+        if let schedule, !schedule.sessions.isEmpty || !schedule.paceTemplates.isEmpty {
+            NavigationStack {
+                TabView {
+                    if !schedule.sessions.isEmpty {
+                        SessionsWheelView(sessions: schedule.sessions, manager: manager)
                     }
-                    .padding(.horizontal, 6)
-                    .padding(.bottom, 8)
-                }
-                .navigationTitle("RunCraft")
-            } else {
-                VStack(spacing: 10) {
-                    Image(systemName: "iphone.and.arrow.forward")
-                        .font(.largeTitle)
-                        .foregroundStyle(.secondary)
-                    Text("Open RunCraft on your iPhone to sync your schedule.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-                .padding()
-                .navigationTitle("RunCraft")
-            }
-        }
-    }
-
-    // MARK: - Sessions
-
-    @ViewBuilder
-    private func sessionsSection(_ sessions: [WatchSchedulePayload.Session]) -> some View {
-        let sorted = sessions.sorted { lhs, rhs in
-            if lhs.isToday != rhs.isToday { return lhs.isToday }
-            return lhs.isPast == rhs.isPast ? false : !lhs.isPast
-        }
-
-        if let today = sorted.first(where: \.isToday) {
-            NavigationLink {
-                WorkoutStartView(name: today.title, payload: today.payload, manager: manager)
-            } label: {
-                TodayCard(session: today)
-            }
-            .buttonStyle(.plain)
-        }
-
-        let rest = sorted.filter { !$0.isToday }
-        if !rest.isEmpty {
-            VStack(spacing: 4) {
-                ForEach(rest) { session in
-                    NavigationLink {
-                        WorkoutStartView(name: session.title, payload: session.payload, manager: manager)
-                    } label: {
-                        CompactSessionRow(session: session)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-    }
-
-    // MARK: - Pace templates
-
-    @ViewBuilder
-    private func paceTemplatesSection(_ templates: [WatchWorkoutPayload]) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Training Paces")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 4)
-            ForEach(templates, id: \.name) { template in
-                let zColor = zoneColor(template.zoneLetter)
-                let zSymbol = zoneSymbol(template.zoneLetter)
-                NavigationLink {
-                    WorkoutStartView(name: template.name, payload: template, manager: manager)
-                } label: {
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(zColor.opacity(0.12))
-
-                        // Left accent bar flush to edge
-                        HStack(spacing: 0) {
-                            RoundedRectangle(cornerRadius: 2)
-                                .fill(zColor)
-                                .frame(width: 3)
-                            Spacer()
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-
-                        HStack(spacing: 8) {
-                            Image(systemName: zSymbol)
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundStyle(zColor)
-                                .frame(width: 16)
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(template.name)
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundStyle(.primary)
-                                let pace = primaryPaceText(template) ?? template.subtitle
-                                if let pace {
-                                    Text(pace)
-                                        .font(.system(size: 11))
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 10))
-                                .foregroundStyle(.tertiary)
-                        }
-                        .padding(.leading, 10)
-                        .padding(.trailing, 10)
-                        .padding(.vertical, 8)
+                    if !schedule.paceTemplates.isEmpty {
+                        PacesWheelView(templates: schedule.paceTemplates, manager: manager)
                     }
                 }
-                .buttonStyle(.plain)
+                .tabViewStyle(.page(indexDisplayMode: schedule.paceTemplates.isEmpty ? .never : .automatic))
             }
-        }
-    }
-
-    private func zoneColor(_ letter: String?) -> Color {
-        switch letter {
-        case "E": .green
-        case "M": .blue
-        case "T": .yellow
-        case "I": .orange
-        case "R": .red
-        default:  .secondary
-        }
-    }
-
-    private func zoneSymbol(_ letter: String?) -> String {
-        switch letter {
-        case "E": "figure.run"
-        case "M": "figure.run.circle"
-        case "T": "flame"
-        case "I": "bolt"
-        case "R": "bolt.circle"
-        default:  "figure.run"
+        } else {
+            VStack(spacing: 10) {
+                Image(systemName: "iphone.and.arrow.forward")
+                    .font(.largeTitle)
+                    .foregroundStyle(.secondary)
+                Text("Open RunCraft on your iPhone to sync your schedule.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding()
         }
     }
 }
 
-// MARK: - TodayCard
+// MARK: - Sessions vertical wheel
 
-private struct TodayCard: View {
-    let session: WatchSchedulePayload.Session
+private struct SessionsWheelView: View {
+    let sessions: [WatchSchedulePayload.Session]
+    @ObservedObject var manager: WorkoutSessionManager
+    @State private var scrollID: UUID?
 
-    private var sessionColor: Color { session.sessionType.watchColor }
+    /// Today-first order, then upcoming by day-of-week, then past sessions last.
+    private var sorted: [WatchSchedulePayload.Session] {
+        let todayDOW = PlannedSession.dayOfWeek(for: Date())
+        return sessions.sorted { lhs, rhs in
+            let lOffset = (lhs.dayOfWeek - todayDOW + 7) % 7
+            let rOffset = (rhs.dayOfWeek - todayDOW + 7) % 7
+            return lOffset < rOffset
+        }
+    }
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(sessionColor.opacity(0.18))
+        GeometryReader { geo in
+            let cardH = geo.size.height * 0.80
+            let vInset = (geo.size.height - cardH) / 2
 
-            // Left accent bar
-            HStack(spacing: 0) {
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(sessionColor)
-                    .frame(width: 3)
-                Spacer()
+            ScrollView(.vertical) {
+                LazyVStack(spacing: 8) {
+                    ForEach(sorted) { session in
+                        NavigationLink {
+                            WorkoutStartView(
+                                name: session.title,
+                                payload: session.payload,
+                                manager: manager
+                            )
+                        } label: {
+                            SessionWheelCard(session: session)
+                        }
+                        .buttonStyle(.plain)
+                        .frame(width: geo.size.width - 4, height: cardH)
+                        .id(session.id)
+                        .scrollTransition(.interactive, axis: .vertical) { content, phase in
+                            content
+                                .scaleEffect(phase.isIdentity ? 1 : 0.82)
+                                .opacity(phase.isIdentity ? 1 : 0.5)
+                        }
+                    }
+                }
+                .scrollTargetLayout()
             }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .contentMargins(.vertical, vInset, for: .scrollContent)
+            .scrollTargetBehavior(.viewAligned)
+            .scrollPosition(id: $scrollID)
+            .scrollIndicators(.hidden)
+        }
+        .task {
+            guard scrollID == nil else { return }
+            scrollID = sorted.first?.id
+        }
+    }
+}
 
-            VStack(alignment: .leading, spacing: 5) {
-                // Header row: icon + "Today" badge
-                HStack(spacing: 6) {
+// MARK: - Training Paces vertical wheel
+
+private struct PacesWheelView: View {
+    let templates: [WatchWorkoutPayload]
+    @ObservedObject var manager: WorkoutSessionManager
+
+    var body: some View {
+        GeometryReader { geo in
+            let cardH = geo.size.height * 0.80
+            let vInset = (geo.size.height - cardH) / 2
+
+            ScrollView(.vertical) {
+                LazyVStack(spacing: 8) {
+                    ForEach(templates, id: \.name) { template in
+                        NavigationLink {
+                            WorkoutStartView(
+                                name: template.name,
+                                payload: template,
+                                manager: manager
+                            )
+                        } label: {
+                            PaceWheelCard(template: template)
+                        }
+                        .buttonStyle(.plain)
+                        .frame(width: geo.size.width - 4, height: cardH)
+                        .id(template.name)
+                        .scrollTransition(.interactive, axis: .vertical) { content, phase in
+                            content
+                                .scaleEffect(phase.isIdentity ? 1 : 0.82)
+                                .opacity(phase.isIdentity ? 1 : 0.5)
+                        }
+                    }
+                }
+                .scrollTargetLayout()
+            }
+            .contentMargins(.vertical, vInset, for: .scrollContent)
+            .scrollTargetBehavior(.viewAligned)
+            .scrollIndicators(.hidden)
+        }
+    }
+}
+
+// MARK: - Session card
+
+private struct SessionWheelCard: View {
+    let session: WatchSchedulePayload.Session
+
+    private var bgColor: Color {
+        session.isPast ? Color(white: 0.18) : session.sessionType.watchColor
+    }
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14)
+                .fill(bgColor)
+
+            VStack(spacing: 0) {
+                // Icon
+                ZStack {
+                    Circle()
+                        .fill(.white.opacity(0.18))
+                        .frame(width: 38, height: 38)
                     Image(systemName: session.sessionType.symbolName)
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(sessionColor)
-                    Spacer()
-                    Text("Today")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 2)
-                        .background(sessionColor, in: Capsule())
+                        .foregroundStyle(.white)
                 }
+                .padding(.top, 14)
 
-                // Session title
+                // Day / Today
+                Group {
+                    if session.isToday {
+                        Text("TODAY")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(.white.opacity(0.2), in: Capsule())
+                    } else {
+                        Text(session.dayName.uppercased())
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+                }
+                .padding(.top, 7)
+
+                // Title
                 Text(session.title)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.primary)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 4)
 
-                // Goal summary: distance/time + pace range
-                let summary = sessionSummary(session.payload)
-                let pace = primaryPaceText(session.payload)
-                if !summary.isEmpty || pace != nil {
-                    HStack(spacing: 4) {
-                        if !summary.isEmpty {
-                            Text(summary)
-                        }
-                        if !summary.isEmpty, pace != nil {
-                            Text("·")
-                                .foregroundStyle(.tertiary)
-                        }
-                        if let pace {
-                            Text(pace)
-                        }
+                Spacer()
+
+                // Goal metric
+                if let metric = sessionGoalMetric(session.payload) {
+                    VStack(spacing: 1) {
+                        Text(metric.label)
+                            .font(.system(size: 9, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.55))
+                        Text(metric.value)
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                        Text(metric.unit)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.7))
                     }
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
                 }
 
-                // Step count hint
-                let stepCount = totalSteps(session.payload)
-                if stepCount > 1 {
+                // Step dots
+                let steps = totalSteps(session.payload)
+                if steps > 1 {
                     HStack(spacing: 3) {
-                        ForEach(0..<min(stepCount, 7), id: \.self) { _ in
+                        ForEach(0..<min(steps, 7), id: \.self) { _ in
                             Capsule()
-                                .fill(sessionColor.opacity(0.6))
-                                .frame(width: 10, height: 3)
+                                .fill(.white.opacity(0.35))
+                                .frame(width: 9, height: 2.5)
                         }
-                        if stepCount > 7 {
-                            Text("+\(stepCount - 7)")
-                                .font(.system(size: 9))
-                                .foregroundStyle(.secondary)
+                        if steps > 7 {
+                            Text("+\(steps - 7)")
+                                .font(.system(size: 8))
+                                .foregroundStyle(.white.opacity(0.35))
                         }
                     }
+                    .padding(.top, 8)
                 }
+
+                Spacer(minLength: 14)
             }
-            .padding(.leading, 10)
-            .padding(.trailing, 8)
-            .padding(.vertical, 10)
         }
-        .frame(minHeight: 90)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(.white.opacity(session.isToday ? 0.5 : 0), lineWidth: 1.5)
+        )
     }
 }
 
-// MARK: - CompactSessionRow
+// MARK: - Pace card
 
-private struct CompactSessionRow: View {
-    let session: WatchSchedulePayload.Session
+private struct PaceWheelCard: View {
+    let template: WatchWorkoutPayload
 
-    private var sessionColor: Color {
-        session.isPast ? .secondary : session.sessionType.watchColor
+    private var bgColor: Color { zoneCardColor(template.zoneLetter) }
+    private var letter: String { template.zoneLetter ?? "?" }
+    private var fullName: String {
+        switch template.zoneLetter {
+        case "E": "EASY"
+        case "M": "MARATHON"
+        case "T": "THRESHOLD"
+        case "I": "INTERVAL"
+        case "R": "REPETITION"
+        default:  "PACE"
+        }
     }
 
     var body: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(sessionColor.opacity(session.isPast ? 0.4 : 1))
-                .frame(width: 8, height: 8)
+        ZStack {
+            RoundedRectangle(cornerRadius: 14)
+                .fill(bgColor)
 
-            Text(session.dayName)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.secondary)
-                .frame(width: 26, alignment: .leading)
+            VStack(spacing: 0) {
+                // Zone letter in circle
+                ZStack {
+                    Circle()
+                        .fill(.white.opacity(0.18))
+                        .frame(width: 44, height: 44)
+                    Text(letter)
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                }
+                .padding(.top, 14)
 
-            Image(systemName: session.sessionType.symbolName)
-                .font(.system(size: 11))
-                .foregroundStyle(sessionColor)
+                Text(fullName)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .padding(.top, 7)
 
-            Text(session.title)
-                .font(.system(size: 13))
-                .foregroundStyle(session.isPast ? .secondary : .primary)
+                Text(template.name)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 4)
 
-            Spacer(minLength: 0)
+                Spacer()
 
-            let dist = compactDistanceText(session.payload)
-            if !dist.isEmpty {
-                Text(dist)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
+                // Pace range
+                let paceStr = primaryPaceText(template) ?? template.subtitle
+                if let paceStr {
+                    VStack(spacing: 1) {
+                        Text("PACE")
+                            .font(.system(size: 9, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.55))
+                        Text(paceStr)
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.center)
+                    }
+                }
+
+                Spacer(minLength: 14)
             }
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 9))
-                .foregroundStyle(.quaternary)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
-        .opacity(session.isPast ? 0.6 : 1)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 
-// MARK: - Helpers
+// MARK: - SessionType helpers
 
-private func sessionSummary(_ payload: WatchWorkoutPayload) -> String {
+extension SessionType {
+    var watchColor: Color {
+        switch self {
+        case .easy:       .green
+        case .tempo:      Color(hue: 0.13, saturation: 0.85, brightness: 0.9) // amber — white text readable
+        case .interval:   .red
+        case .long:       .blue
+        case .repetition: .orange
+        case .rest:       Color(white: 0.28)
+        case .fartlek:    .purple
+        case .mixed:      .cyan
+        }
+    }
+}
+
+// MARK: - Private helpers
+
+private struct GoalMetric {
+    var label: String   // "DISTANCE" / "TIME"
+    var value: String   // e.g. "8", "30"
+    var unit: String    // "km" / "min" / "h"
+}
+
+private func sessionGoalMetric(_ payload: WatchWorkoutPayload) -> GoalMetric? {
     let totalM = totalDistanceMeters(payload)
     if totalM >= 500 {
         if totalM >= 1000 {
-            return String(format: "%.0f km", totalM / 1_000)
+            let km = totalM / 1000
+            let valStr = km == km.rounded(.towardZero)
+                ? "\(Int(km))"
+                : String(format: "%.1f", km)
+            return GoalMetric(label: "DISTANCE", value: valStr, unit: "km")
         }
-        return "\(Int(totalM)) m"
+        return GoalMetric(label: "DISTANCE", value: "\(Int(totalM))", unit: "m")
     }
     let totalSec = totalTimeSeconds(payload)
     if totalSec > 0 {
         let mins = totalSec / 60
-        return "\(mins) min"
+        if mins >= 60 {
+            let h = mins / 60
+            let m = mins % 60
+            return GoalMetric(
+                label: "TIME",
+                value: m > 0 ? "\(h):\(String(format: "%02d", m))" : "\(h)",
+                unit: m > 0 ? "h" : "hr"
+            )
+        }
+        return GoalMetric(label: "TIME", value: "\(mins)", unit: "min")
     }
-    return ""
+    return nil
 }
 
-private func compactDistanceText(_ payload: WatchWorkoutPayload) -> String {
-    let totalM = totalDistanceMeters(payload)
-    guard totalM >= 500 else { return "" }
-    if totalM >= 1000 { return String(format: "%.0f km", totalM / 1_000) }
-    return "\(Int(totalM)) m"
+private func zoneCardColor(_ letter: String?) -> Color {
+    switch letter {
+    case "E": .green
+    case "M": .blue
+    case "T": Color(hue: 0.13, saturation: 0.85, brightness: 0.9) // amber
+    case "I": .orange
+    case "R": .red
+    default:  .gray
+    }
 }
 
 private func allSteps(_ payload: WatchWorkoutPayload) -> [WorkoutStep] {
@@ -337,7 +400,6 @@ private func totalTimeSeconds(_ payload: WatchWorkoutPayload) -> Int {
     }
 }
 
-/// Returns the pace-range string from the first step that carries a paceRange alert.
 private func primaryPaceText(_ payload: WatchWorkoutPayload) -> String? {
     for block in payload.blocks {
         let steps: [WorkoutStep]
@@ -358,34 +420,12 @@ private func formatPaceSec(_ sec: Int) -> String {
     String(format: "%d:%02d", sec / 60, sec % 60)
 }
 
-// MARK: - SessionType + watchColor
-
-extension SessionType {
-    var watchColor: Color {
-        switch self {
-        case .easy:       .green
-        case .tempo:      .yellow
-        case .interval:   .red
-        case .long:       .blue
-        case .repetition: .orange
-        case .rest:       .secondary
-        case .fartlek:    .purple
-        case .mixed:      Color(white: 0.5)
-        }
-    }
-}
-
 // MARK: - Previews
 
-#Preview("Has today + upcoming") {
+#Preview("Has today + upcoming + paces") {
     let easyPayload = WatchWorkoutPayload(name: "Easy Run", blocks: [
-        .step(WorkoutStep(kind: .warmup, goal: .time(seconds: 5 * 60))),
-        .step(WorkoutStep(kind: .work,   goal: .distance(metres: 8_000))),
-        .step(WorkoutStep(kind: .cooldown, goal: .time(seconds: 5 * 60))),
-    ])
-    let longPayload = WatchWorkoutPayload(name: "Long Run", blocks: [
-        .step(WorkoutStep(kind: .warmup, goal: .time(seconds: 10 * 60))),
-        .step(WorkoutStep(kind: .work,   goal: .distance(metres: 24_000))),
+        .step(WorkoutStep(kind: .warmup,   goal: .time(seconds: 5 * 60))),
+        .step(WorkoutStep(kind: .work,     goal: .distance(metres: 8_000))),
         .step(WorkoutStep(kind: .cooldown, goal: .time(seconds: 5 * 60))),
     ])
     let intervalPayload = WatchWorkoutPayload(name: "Intervals", blocks: [
@@ -396,20 +436,34 @@ extension SessionType {
         ])),
         .step(WorkoutStep(kind: .cooldown, goal: .time(seconds: 5 * 60))),
     ])
+    let longPayload = WatchWorkoutPayload(name: "Long Run", blocks: [
+        .step(WorkoutStep(kind: .warmup, goal: .time(seconds: 10 * 60))),
+        .step(WorkoutStep(kind: .work,   goal: .distance(metres: 24_000))),
+        .step(WorkoutStep(kind: .cooldown, goal: .time(seconds: 5 * 60))),
+    ])
+    let easyPace = WatchWorkoutPayload(name: "Easy Run · 30 min", zoneLetter: "E", blocks: [
+        .step(WorkoutStep(kind: .work, goal: .time(seconds: 30 * 60),
+                          alert: .paceRange(minSecPerKm: 360, maxSecPerKm: 420))),
+    ])
+    let tempoPace = WatchWorkoutPayload(name: "Threshold · 20 min", zoneLetter: "T", blocks: [
+        .step(WorkoutStep(kind: .work, goal: .time(seconds: 20 * 60),
+                          alert: .paceRange(minSecPerKm: 255, maxSecPerKm: 270))),
+    ])
 
+    // Thursday = dayOfWeek 4 (Mon=1), today is Thursday 2026-06-19
     let schedule = WatchSchedulePayload(
         sessions: [
             .init(id: UUID(), dayName: "Mon", title: "Easy Run",  sessionType: .easy,     dayOfWeek: 1, payload: easyPayload),
             .init(id: UUID(), dayName: "Wed", title: "Intervals", sessionType: .interval, dayOfWeek: 3, payload: intervalPayload),
-            .init(id: UUID(), dayName: "Fri", title: "Long Run",  sessionType: .long,     dayOfWeek: 5, payload: longPayload),
+            .init(id: UUID(), dayName: "Thu", title: "Long Run",  sessionType: .long,     dayOfWeek: 4, payload: longPayload),
             .init(id: UUID(), dayName: "Sat", title: "Easy Run",  sessionType: .easy,     dayOfWeek: 6, payload: easyPayload),
         ],
-        paceTemplates: []
+        paceTemplates: [easyPace, tempoPace]
     )
     WatchHomeView(schedule: schedule, manager: WorkoutSessionManager())
 }
 
-#Preview("No today session") {
+#Preview("Sessions only — no paces") {
     let tempoPayload = WatchWorkoutPayload(name: "Tempo Run", blocks: [
         .step(WorkoutStep(kind: .warmup, goal: .time(seconds: 10 * 60))),
         .step(WorkoutStep(kind: .work,   goal: .distance(metres: 10_000))),
@@ -423,4 +477,8 @@ extension SessionType {
         paceTemplates: []
     )
     WatchHomeView(schedule: schedule, manager: WorkoutSessionManager())
+}
+
+#Preview("No schedule — sync prompt") {
+    WatchHomeView(schedule: nil, manager: WorkoutSessionManager())
 }

@@ -12,7 +12,11 @@ nonisolated(unsafe) private let watchLogger = Logger(subsystem: "io.marstudio.Ru
 final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate, ObservableObject, @unchecked Sendable {
 
     let workoutManager = WorkoutSessionManager()
-    @Published var schedule: WatchSchedulePayload?
+    @Published var schedule: WatchSchedulePayload? {
+        didSet { persistSchedule() }
+    }
+
+    private static let kSchedule = "RunCraft.cachedSchedule"
 
     // Set by handle(_:) when the payload hasn't arrived yet.
     // Resolved by didReceiveApplicationContext or a 5-second timeout Task.
@@ -22,16 +26,38 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate
 
     func applicationDidFinishLaunching() {
         watchLogger.log("applicationDidFinishLaunching")
+
+        // Fast path: restore from local cache — available immediately without WCSession.
+        loadCachedSchedule()
+
         requestHealthKitAuthorization()
         guard WCSession.isSupported() else { return }
         WCSession.default.delegate = self
         WCSession.default.activate()
+
+        // Also merge whatever is already in the application context (may be newer than cache).
         let ctx = WCSession.default.receivedApplicationContext
         watchLogger.log("receivedApplicationContext keys: \(ctx.keys.sorted().joined(separator: ","), privacy: .public)")
         if let data = ctx["schedule"] as? Data,
            let payload = try? JSONDecoder().decode(WatchSchedulePayload.self, from: data) {
-            schedule = payload
+            schedule = payload  // didSet saves to cache
         }
+    }
+
+    private func loadCachedSchedule() {
+        guard let data = UserDefaults.standard.data(forKey: Self.kSchedule),
+              let payload = try? JSONDecoder().decode(WatchSchedulePayload.self, from: data)
+        else { return }
+        schedule = payload   // shows training list instantly on repeat launches
+        watchLogger.log("schedule restored from local cache (\(data.count, privacy: .public) bytes)")
+    }
+
+    private func persistSchedule() {
+        guard let payload = schedule,
+              let data = try? JSONEncoder().encode(payload)
+        else { return }
+        UserDefaults.standard.set(data, forKey: Self.kSchedule)
+        watchLogger.log("schedule persisted to local cache (\(data.count, privacy: .public) bytes)")
     }
 
     private func requestHealthKitAuthorization() {
