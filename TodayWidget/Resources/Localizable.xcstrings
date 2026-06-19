@@ -1,10 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ avg" : {
+
+    },
+    "avg" : {
+
+    },
     "bpm" : {
 
     },
+    "Dist" : {
+
+    },
     "Goal: %@" : {
+
+    },
+    "HR" : {
 
     },
     "No plan yet" : {
@@ -93,6 +105,9 @@
           }
         }
       }
+    },
+    "Pace" : {
+
     },
     "Rest day" : {
       "extractionState" : "manual",

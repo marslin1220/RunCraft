@@ -1,5 +1,7 @@
 # RunCraft
 
+<img src="docs/icon.png" width="120" alt="RunCraft app icon" />
+
 iOS training planner for serious runners following Jack Daniels' VDOT
 methodology. RunCraft turns a single race goal into a 16-week periodised
 plan and dispatches structured workouts to Apple Watch via WorkoutKit —
