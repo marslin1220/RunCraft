@@ -16,6 +16,7 @@ picks the canonical name and tells you which aliases to stop using.
 | **I (Interval)**| 91% of VO2max — 3–5 min reps that hit and sustain VO2max                                  | "VO2max pace"                    |
 | **R (Repetition)**| ~mile race pace — short fast reps with long recoveries; targets economy and speed       | "rep pace", "speed work"         |
 | **Pace Range**  | A two-sided pace target (min/max sec per km) attached to a workout step                  | "speed alert" (Apple's name)     |
+| **HR Zone**     | One of five heart rate training bands (1 = very light → 5 = maximum) displayed during Active Workout | "heart rate zone", "zone" (unqualified) |
 | **PaceZoneName**| Enum of the five Daniels zones (E/M/T/I/R). Lives in **VDOTEngine** as of `63839b7`.    | _previously in RunCraftModels_   |
 
 ## Race Plan Lifecycle
@@ -45,6 +46,23 @@ picks the canonical name and tells you which aliases to stop using.
 | **Preset**          | A Workout Template hard-coded in `WorkoutPresets.all` (Yasso 800s, Tempo Run, etc.)                 | "default", "built-in"           |
 | **Duplicate**       | Make a user-owned copy of a Preset or Plan-derived Workout Template, written to *Yours*             | "clone", "fork"                 |
 
+## Active Workout (Apple Watch)
+
+The in-progress state after the user starts a workout on Apple Watch. Managed by
+`WorkoutSessionManager`; surfaced in `ActiveWorkoutView` and the **Live Activity**.
+
+| Term                  | Definition                                                                                          | Aliases to avoid                     |
+| --------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| **Active Workout**    | A workout currently being tracked on Apple Watch (phase = running or paused)                        | "live workout", "current session"    |
+| **Workout Phase**     | The lifecycle state of an Active Workout: *inactive*, *running*, *paused*, *ended*, *failed*        | "status", "state"                    |
+| **Step Name**         | Human-readable label for the current Workout Step shown on Watch during Active Workout (e.g. "Rep 2/5 · Run") | "interval name", "step label" |
+| **Step Progress**     | A 0–1 scalar representing how far through the current Step's goal the runner is                      | "completion", "progress fraction"    |
+| **Elapsed Time**      | Total seconds the Active Workout has been running (paused time excluded)                             | "duration", "time"                   |
+| **Pace Deviation**    | Whether the runner's current pace is *ahead*, *behind*, or *on target* relative to the Step's Pace Range | "pace status", "pace comparison" |
+| **Watch Schedule**    | The synced payload of this week's Planned Sessions and Training Paces delivered to Apple Watch via WCSession | "watch data", "sync payload"   |
+| **Schedule Cache**    | A local `UserDefaults` copy of the Watch Schedule on the Watch, restored instantly on relaunch      | "offline data", "cached schedule"    |
+| **Live Activity**     | The iOS Lock Screen and Dynamic Island display showing real-time Active Workout metrics on iPhone    | "lock screen widget", "notification" |
+
 ## App Surfaces (User-facing)
 
 | Term             | Definition                                                                                                | Aliases to avoid          |
@@ -56,7 +74,9 @@ picks the canonical name and tells you which aliases to stop using.
 | **Plan**         | Workshop segment listing this week's Planned Sessions, converted on the fly to Workout Templates           | (collides with "Plan tab" — disambiguate by context) |
 | **Workout Detail**| Read-only preview of a Workout Template with the Start button                                              | "summary page"            |
 | **Workout Editor**| The drag-and-drop authoring surface (Steps, Repeat Groups, Edit sheets)                                    | "compose view"            |
-| **Start**        | Send the Workout Template to the paired Apple Watch via WorkoutKit                                         | "begin", "run" (not literal — does NOT start a timer in-app) |
+| **Sessions Wheel**| The Apple Watch home view page showing this week's Planned Sessions as a vertically-scrollable wheel; today's session is centred by default | "training list", "schedule list" |
+| **Paces Wheel**  | The Apple Watch home view page (swipe left from Sessions Wheel) showing Training Paces as a wheel          | "pace list"               |
+| **Start**        | Send the Workout Template to the paired Apple Watch and auto-launch the Watch app via HealthKit Workout Mirroring | "begin", "run" |
 
 ## Architectural Seams
 
@@ -66,7 +86,8 @@ interface. New code should reach for the seam, never around it.
 | Seam                          | Module          | Responsibility                                                                  |
 | ----------------------------- | --------------- | ------------------------------------------------------------------------------- |
 | **WorkoutTemplateRepository** | RunCraftModels  | The only path to persist, query, or remove **Workout Templates**. Replaces direct `@Dependency(\.defaultDatabase)` in feature reducers. |
-| **AppleWatchSync**            | AppleWatchSync  | All WorkoutKit interaction lives here — `WorkoutKitClient` (scheduler dependency) and `WorkoutPlanBuilder` (pure model→`WorkoutPlan` conversion). |
+| **AppleWatchSync**            | AppleWatchSync  | All WCSession and HealthKit Watch interaction lives here — `WatchConnectivityClient` (schedule sync), `WorkoutPlanBuilder` (model→`WorkoutPlan`), `HKWatchTriggerClient` (auto-launch). |
+| **WorkoutSessionManager**     | RunCraftWatch Watch App | Owns the `HKWorkoutSession` + `HKLiveWorkoutBuilder` lifecycle and the interval state machine that advances through flattened Workout Steps. |
 | **TrainingWeek.current**      | RunCraftModels  | Single static function that answers _"which `TrainingWeek` contains this `Date`?"_ Used by both the Plan tab and the Workshop Plan segment. |
 | **VDOTCalculator.paceRange**  | VDOTEngine      | Single-zone lookup: `paceRange(for: PaceZoneName, vdot: Double) → PaceRange`. The deep way to ask "what's T pace for VDOT 40?" |
 
@@ -87,6 +108,8 @@ live in the **AppleWatchSync** module.
 | Workout Step (cooldown) | `WorkoutKit.WorkoutStep` (cooldown slot) | Last Step of kind `.cooldown` is hoisted into CustomWorkout's cooldown slot |
 | Pace Range alert  | `WorkoutKit.SpeedRangeAlert`   | sec/km → m/s reciprocal: max speed = min pace                    |
 | Heart Rate alert  | `WorkoutKit.HeartRateRangeAlert` | BPM range, `WorkoutAlertMetric.countPerMinute`                 |
+| Active Workout    | `HKWorkoutSession` + `HKLiveWorkoutBuilder` | Session provides lifecycle; Builder collects and saves metrics |
+| Live Activity     | `ActivityKit.Activity<WorkoutActivityAttributes>` | Started/updated/ended by `WorkoutSessionManager` |
 
 ## Relationships
 
@@ -99,20 +122,27 @@ live in the **AppleWatchSync** module.
 - A **Repeat Group** owns 1+ **Workout Steps** (no nested groups).
 - A **Workout Step** has one **Step Kind**, one **Step Goal**, and zero-or-one **Step Alert**.
 - A **Planned Session** is converted to a **Workout Template** at view time by `PlanSessionAdapter`; the user can Duplicate it to make it permanent.
+- An **Active Workout** runs exactly one flattened sequence of **Workout Steps** derived from the **Workout Template**'s **Workout Blocks** (Repeat Groups are unrolled).
+- A **Live Activity** mirrors the **Active Workout**'s state to the iPhone Lock Screen while the Watch workout runs.
+- The **Watch Schedule** is synced via WCSession and locally persisted as a **Schedule Cache** on the Watch.
 
 ## Example dialogue
 
-> **Dev:** "When the user taps a **Pace Zone** chip in the Plan tab, what gets created?"
+> **Dev:** "The user taps Start on a Workout Template. What happens end-to-end?"
 
-> **Coach:** "A fresh **Workout Template** named after the zone — '*Easy Run · 30 min*' — with a single **Workout Step** whose **Step Goal** is `time(30 min)` and whose **Step Alert** is a **Pace Range** resolved from the current **VDOT**."
+> **Coach:** "iPhone sends the **Watch Schedule** and the **Workout Template** blocks to Watch via WCSession, then calls `HKHealthStore.startWatchApp(toHandle:)`. Watch auto-launches, `WorkoutSessionManager` receives the blocks, flattens **Repeat Groups** into individual **Workout Steps**, and begins an `HKWorkoutSession`. The first **Step Name** and **Step Progress** appear in `ActiveWorkoutView` immediately."
 
-> **Dev:** "Right, so the **Source** when it opens in **Workout Detail** is *Template*, not *Plan Session*?"
+> **Dev:** "What if the runner is going faster than the **Pace Range**?"
 
-> **Coach:** "Correct. *Plan Session* is reserved for a real **Planned Session** from the active **Training Plan**. The Pace Zone shortcut is a generated **Template**, so the Detail page shows the Duplicate button so the user can save it to *Yours*."
+> **Coach:** "`WorkoutSessionManager` sets **Pace Deviation** to `.ahead`. `ActiveWorkoutView` colours the pace cyan; the **Live Activity** on the iPhone Lock Screen does the same via `WorkoutActivityAttributes.ContentState`."
 
-> **Dev:** "And when they hit Start, the **Workout Template** becomes a `WorkoutKit.WorkoutPlan` — the first **Workout Step** of kind *Warm-up* gets hoisted into the WorkoutKit warmup slot?"
+> **Dev:** "When a distance step completes, how does the machine know?"
 
-> **Coach:** "Yes. Everything in between becomes `IntervalBlock`s, the trailing *Cool-down* Step becomes the cooldown slot, and the Pace Range alert is translated to a `SpeedRangeAlert` in m/s."
+> **Coach:** "`HKLiveWorkoutBuilderDelegate.didCollectDataOf` fires. The manager checks `totalMetres − stepStartMetres ≥ step goal`. When true it increments `currentStepIndex`, resets **Step Progress** to 0, and updates **Step Name** to the next entry."
+
+> **Dev:** "And the **Completed Workout** — when does that land in HealthKit?"
+
+> **Coach:** "When the user taps End, `session.end()` triggers `workoutSession(_:didChangeTo:.ended)`. The manager calls `builder.finishWorkout()`, which writes the `HKWorkout` to HealthKit. The existing `HealthKitClient.recentWorkouts()` query on iPhone picks it up and creates the **Completed Workout** record."
 
 ## Flagged ambiguities
 
@@ -139,24 +169,12 @@ WorkoutKit `WorkoutStep` is only the warmup/cooldown slot, and inner steps
 are `IntervalStep`s inside `IntervalBlock`s. **Recommendation:** never drop
 the module qualifier when both are in scope.
 
-### "Pace Zone" vs "Session Type"
-Originally these were tangled — `SessionType.tempo` was used where `PaceZoneName.threshold`
-was meant. The first fix (commit `5284cc8`) introduced **PaceZoneName** as a separate
-enum; the second (commit `63839b7`) moved **PaceZoneName** from RunCraftModels into
-**VDOTEngine** where it conceptually belongs. **Session Type** classifies the
-*daily session* in a Training Plan (Easy / Tempo / Interval / Long / Repetition /
-Rest); **Pace Zone** is the Jack Daniels intensity used as a **Step Alert**
-(E / M / T / I / R).
-They overlap conceptually but are not the same enum and **must not be conflated**
-in code. The mapping for adapter conversions is hard-coded in
-`PlanSessionAdapter` (e.g. `SessionType.tempo` → `PaceZoneName.threshold`).
-
-### "Start"
-"Start Workout" in the UI does NOT start a stopwatch in-app. It schedules the
-Workout Template on the paired Apple Watch via `WorkoutScheduler.shared.schedule`.
-The user must then open the Watch's Workout app to actually begin running.
-**Recommendation:** when describing this action in PRs or docs, prefer
-"Send to Apple Watch" over "Start" to avoid implying in-app timing.
+### "Start" (resolved — behavior changed)
+Previously "Start" sent to Watch and the user had to tap *Start* in the native
+Workout app. As of the HealthKit Workout Mirroring implementation, **Start**
+now auto-launches the RunCraft Watch app and begins the **Active Workout**
+without any Watch interaction. The old guidance ("prefer 'Send to Apple Watch'")
+is retired. **Start** in UI copy is now accurate and unambiguous.
 
 ### "Template"
 Means two different things in the UI: the **Templates** segment (built-in
@@ -165,6 +183,11 @@ storage type for any saved or generated workout, presets included).
 **Recommendation:** in code use **WorkoutTemplate**; in UI/PR copy say
 "preset" when you mean the built-in fixtures and "template" only when you
 mean the **Templates** segment specifically.
+
+### "Zone"
+Used unqualified to mean two distinct things: **HR Zone** (1–5 heart rate
+band during **Active Workout**) and the Jack Daniels **Pace Zone** (E/M/T/I/R).
+**Recommendation:** always qualify — "HR Zone 4" vs "Pace Zone T".
 
 ## Resolved ambiguities (now fixed in code)
 
@@ -188,3 +211,7 @@ mean the **Templates** segment specifically.
   WorkshopFeature. They now live in the dedicated **AppleWatchSync**
   module (commit `9c44e05`, candidate #6) so a future `WatchAppFeature`
   can sync from the wrist without pulling in the editor or the shell.
+- **"Start" meaning Send-only.** Previously Start sent the Workout Template
+  to Watch via WorkoutScheduler and the user had to tap in the native
+  Workout app. HealthKit Workout Mirroring now auto-starts the Watch app.
+  "Start" in UI copy accurately describes the full action end-to-end.
