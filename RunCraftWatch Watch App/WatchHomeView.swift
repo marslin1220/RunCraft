@@ -399,10 +399,10 @@ extension SessionType {
 
     let schedule = WatchSchedulePayload(
         sessions: [
-            .init(id: UUID(), dayName: "Mon", title: "Easy Run",    sessionType: .easy,     isToday: false, isPast: true,  payload: easyPayload),
-            .init(id: UUID(), dayName: "Wed", title: "Intervals",   sessionType: .interval, isToday: false, isPast: true,  payload: intervalPayload),
-            .init(id: UUID(), dayName: "Fri", title: "Long Run",    sessionType: .long,     isToday: true,  isPast: false, payload: longPayload),
-            .init(id: UUID(), dayName: "Sat", title: "Easy Run",    sessionType: .easy,     isToday: false, isPast: false, payload: easyPayload),
+            .init(id: UUID(), dayName: "Mon", title: "Easy Run",  sessionType: .easy,     dayOfWeek: 1, payload: easyPayload),
+            .init(id: UUID(), dayName: "Wed", title: "Intervals", sessionType: .interval, dayOfWeek: 3, payload: intervalPayload),
+            .init(id: UUID(), dayName: "Fri", title: "Long Run",  sessionType: .long,     dayOfWeek: 5, payload: longPayload),
+            .init(id: UUID(), dayName: "Sat", title: "Easy Run",  sessionType: .easy,     dayOfWeek: 6, payload: easyPayload),
         ],
         paceTemplates: []
     )
@@ -417,8 +417,8 @@ extension SessionType {
     ])
     let schedule = WatchSchedulePayload(
         sessions: [
-            .init(id: UUID(), dayName: "Tue", title: "Tempo Run", sessionType: .tempo,  isToday: false, isPast: false, payload: tempoPayload),
-            .init(id: UUID(), dayName: "Thu", title: "Easy Run",  sessionType: .easy,   isToday: false, isPast: false, payload: tempoPayload),
+            .init(id: UUID(), dayName: "Tue", title: "Tempo Run", sessionType: .tempo, dayOfWeek: 2, payload: tempoPayload),
+            .init(id: UUID(), dayName: "Thu", title: "Easy Run",  sessionType: .easy,  dayOfWeek: 4, payload: tempoPayload),
         ],
         paceTemplates: []
     )

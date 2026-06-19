@@ -15,26 +15,35 @@ public struct WatchSchedulePayload: Codable, Sendable {
         /// Human-readable session title, e.g. "Easy Run", "Intervals".
         public var title: String
         public var sessionType: SessionType
-        public var isToday: Bool
-        /// Whether this session's day is in the past (before today).
-        public var isPast: Bool
+        /// Mon=1 … Sun=7 (same encoding as `PlannedSession.dayOfWeek`).
+        /// Stored in the payload so the Watch can recompute `isToday`/`isPast`
+        /// at render time — avoiding stale values when the payload was sent on
+        /// a previous day.
+        public var dayOfWeek: Int
         public var payload: WatchWorkoutPayload
+
+        /// Computed at render time so a cached payload is never stale.
+        public var isToday: Bool { dayOfWeek == Self.currentDayOfWeek }
+        /// Computed at render time so a cached payload is never stale.
+        public var isPast: Bool { dayOfWeek < Self.currentDayOfWeek }
+
+        private static var currentDayOfWeek: Int {
+            PlannedSession.dayOfWeek(for: Date())
+        }
 
         public init(
             id: UUID,
             dayName: String,
             title: String,
             sessionType: SessionType,
-            isToday: Bool,
-            isPast: Bool,
+            dayOfWeek: Int,
             payload: WatchWorkoutPayload
         ) {
             self.id = id
             self.dayName = dayName
             self.title = title
             self.sessionType = sessionType
-            self.isToday = isToday
-            self.isPast = isPast
+            self.dayOfWeek = dayOfWeek
             self.payload = payload
         }
     }

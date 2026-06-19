@@ -79,8 +79,8 @@ struct WeekScheduleView: View {
                         watchAvailable: store.watchAvailable,
                         quickStartStatus: store.quickStartStatus,
                         onToggle: { toggle(gapWeek.id) },
-                        onTap: { session, isToday in
-                            store.send(.sessionTapped(session, isToday: isToday))
+                        onTap: { session in
+                            store.send(.sessionTapped(session))
                         },
                         onQuickStart: { session in
                             store.send(.quickStartTapped(session, vdot: currentVDOT))
@@ -106,8 +106,8 @@ struct WeekScheduleView: View {
                                 watchAvailable: store.watchAvailable,
                                 quickStartStatus: store.quickStartStatus,
                                 onToggle: { toggle(week.id) },
-                                onTap: { session, isToday in
-                                    store.send(.sessionTapped(session, isToday: isToday))
+                                onTap: { session in
+                                    store.send(.sessionTapped(session))
                                 },
                                 onQuickStart: { session in
                                     store.send(.quickStartTapped(session, vdot: currentVDOT))
@@ -258,7 +258,7 @@ private struct WeekSection: View {
     let watchAvailable: Bool
     let quickStartStatus: WeekSchedule.State.QuickStartStatus
     let onToggle: () -> Void
-    let onTap: (PlannedSession, Bool) -> Void
+    let onTap: (PlannedSession) -> Void
     let onQuickStart: (PlannedSession) -> Void
     @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
@@ -371,7 +371,7 @@ private struct WeekSection: View {
         let isSent = quickStartStatus == .sent
 
         Button {
-            onTap(session, isToday)
+            onTap(session)
         } label: {
             // Map the session type onto the dynamic brand zone palette so
             // tints adapt for light + dark instead of using the static

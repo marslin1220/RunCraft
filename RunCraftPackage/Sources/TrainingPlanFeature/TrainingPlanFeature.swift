@@ -643,7 +643,6 @@ import WorkshopFeature
                             .where { $0.weekId.eq(currentWeek.id) }
                             .fetchAll(db)
                         let dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-                        let today = PlannedSession.dayOfWeek(for: Date())
                         let watchSessions = sessions
                             .filter { $0.sessionType != .rest }
                             .sorted { $0.dayOfWeek < $1.dayOfWeek }
@@ -654,8 +653,7 @@ import WorkshopFeature
                                     dayName: dayNames[max(0, min(s.dayOfWeek - 1, 6))],
                                     title: s.sessionType.displayName,
                                     sessionType: s.sessionType,
-                                    isToday: s.dayOfWeek == today,
-                                    isPast: s.dayOfWeek < today,
+                                    dayOfWeek: s.dayOfWeek,
                                     payload: WatchWorkoutPayload(name: template.name, blocks: template.blocks)
                                 )
                             }
@@ -804,7 +802,7 @@ import WorkshopFeature
         /// `isToday`: this session is the current week's session for today
         /// — forwarded to `WorkoutEditor.State.isTodaySession` so "Start
         /// Workout" is only offered for today's actual session.
-        case sessionTapped(PlannedSession, isToday: Bool)
+        case sessionTapped(PlannedSession)
         /// Skips the editor and pushes the workout straight to the Watch.
         /// Surfaces an alert on failure; otherwise just sets `sent`.
         case quickStartTapped(PlannedSession, vdot: Double)
@@ -816,11 +814,12 @@ import WorkshopFeature
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
         public enum Alert: Equatable {}
-        public enum Delegate {
+        public enum Delegate: Equatable {
             case openSession(PlannedSession, isToday: Bool)
         }
     }
 
+    @Dependency(\.date.now) var now
     @Dependency(\.hkWatchTriggerClient) var hkWatchTriggerClient
     @Dependency(\.continuousClock) var clock
 
@@ -833,7 +832,8 @@ import WorkshopFeature
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case let .sessionTapped(s, isToday):
+            case let .sessionTapped(s):
+                let isToday = s.dayOfWeek == PlannedSession.dayOfWeek(for: now)
                 return .send(.delegate(.openSession(s, isToday: isToday)))
 
             case let .quickStartTapped(session, vdot):
