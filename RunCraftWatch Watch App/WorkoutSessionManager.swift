@@ -29,7 +29,13 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     @Published var phase: Phase = .inactive
     @Published var elapsedSeconds: Int = 0
     @Published var heartRate: Double = 0
+    @Published var avgHeartRate: Double = 0
     @Published var paceSecPerKm: Double = 0
+    @Published var avgPaceSecPerKm: Double = 0
+    /// Lower bound of the current step's target pace range (sec/km). `nil` when the step has no pace alert.
+    @Published var targetPaceLo: Int? = nil
+    /// Upper bound of the current step's target pace range (sec/km). `nil` when the step has no pace alert.
+    @Published var targetPaceHi: Int? = nil
     @Published var totalMetres: Double = 0
     @Published var stepName: String = ""
     @Published var stepGoalText: String = ""
@@ -42,6 +48,16 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     /// 1-based position for display, e.g. "3 / 12".
     @Published var stepPosition: Int = 0
     @Published var totalStepCount: Int = 0
+
+    /// Current HR zone (1–5). 0 when heart rate is unavailable.
+    var hrZoneNumber: Int {
+        guard heartRate > 0 else { return 0 }
+        if heartRate < 120 { return 1 }
+        if heartRate < 140 { return 2 }
+        if heartRate < 160 { return 3 }
+        if heartRate < 175 { return 4 }
+        return 5
+    }
 
     private var previousStepDisplayName: String = ""
     private let speechSynthesizer = AVSpeechSynthesizer()
@@ -145,6 +161,14 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         stepProgress = 0
         stepPosition = currentStepIndex + 1
 
+        if let alert = step.alert, case .paceRange(let lo, let hi) = alert {
+            targetPaceLo = lo
+            targetPaceHi = hi
+        } else {
+            targetPaceLo = nil
+            targetPaceHi = nil
+        }
+
         switch step.goal {
         case .openEnded:
             stepGoalText = "Open"
@@ -192,10 +216,15 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
             stepGoalText: stepGoalText,
             stepProgress: stepProgress,
             heartRate: heartRate,
+            avgHeartRate: avgHeartRate,
             paceSecPerKm: paceSecPerKm,
+            avgPaceSecPerKm: avgPaceSecPerKm,
+            targetPaceLo: targetPaceLo,
+            targetPaceHi: targetPaceHi,
             totalMetres: totalMetres,
             elapsedSeconds: elapsedSeconds,
-            isPaused: phase == .paused
+            isPaused: phase == .paused,
+            hrZone: hrZoneNumber
         )
         guard let data = try? JSONEncoder().encode(message) else { return }
         Task {
@@ -312,6 +341,19 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         return String(format: "%d:%02d", m, s)
     }
 
+    var avgPaceText: String {
+        guard avgPaceSecPerKm > 0 else { return "--:--" }
+        let paceSeconds = isPerMile ? avgPaceSecPerKm * 1.60934 : avgPaceSecPerKm
+        let m = Int(paceSeconds) / 60
+        let s = Int(paceSeconds) % 60
+        return String(format: "%d:%02d", m, s)
+    }
+
+    func targetPaceText(_ secPerKm: Int) -> String {
+        let adjusted = isPerMile ? Double(secPerKm) * 1.60934 : Double(secPerKm)
+        return String(format: "%d:%02d", Int(adjusted) / 60, Int(adjusted) % 60)
+    }
+
     var distanceText: String {
         if isPerMile {
             let miles = totalMetres / 1609.34
@@ -397,6 +439,9 @@ extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
                     if let q = stats?.mostRecentQuantity() {
                         self.heartRate = q.doubleValue(for: HKUnit(from: "count/min"))
                     }
+                    if let q = stats?.averageQuantity() {
+                        self.avgHeartRate = q.doubleValue(for: HKUnit(from: "count/min"))
+                    }
 
                 case HKQuantityType(.distanceWalkingRunning):
                     if let q = stats?.sumQuantity() {
@@ -408,6 +453,10 @@ extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
                     if let q = stats?.mostRecentQuantity() {
                         let mps = q.doubleValue(for: HKUnit.meter().unitDivided(by: .second()))
                         self.paceSecPerKm = mps > 0 ? 1000.0 / mps : 0
+                    }
+                    if let q = stats?.averageQuantity() {
+                        let mps = q.doubleValue(for: HKUnit.meter().unitDivided(by: .second()))
+                        self.avgPaceSecPerKm = mps > 0 ? 1000.0 / mps : 0
                     }
 
                 default:

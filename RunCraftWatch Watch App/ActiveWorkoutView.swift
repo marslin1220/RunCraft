@@ -1,56 +1,15 @@
-//
-//  ActiveWorkoutView.swift
-//  RunCraftWatch Watch App
-//
-//  Created by Cheng Lung, Lin on 2026/6/16.
-//
-
 import RunCraftModels
 import SwiftUI
+
+// MARK: - ActiveWorkoutView
 
 struct ActiveWorkoutView: View {
     @ObservedObject var manager: WorkoutSessionManager
     @State private var showEndConfirmation = false
 
-    // MARK: - Derived appearance
-
-    private var stepColor: Color {
-        switch manager.stepKind {
-        case .warmup:   .orange
-        case .work:     .green
-        case .recovery: .cyan
-        case .cooldown: .yellow
-        case nil:       .blue
-        }
-    }
-
-    private var hrZoneNumber: Int {
-        let bpm = manager.heartRate
-        guard bpm > 0 else { return 0 }
-        if bpm < 120  { return 1 }
-        if bpm < 140  { return 2 }
-        if bpm < 160  { return 3 }
-        if bpm < 175  { return 4 }
-        return 5
-    }
-
-    private var hrZoneColor: Color {
-        switch hrZoneNumber {
-        case 1:  .gray
-        case 2:  .green
-        case 3:  .yellow
-        case 4:  .orange
-        case 5:  .red
-        default: .secondary
-        }
-    }
-
-    // MARK: - Body
-
     var body: some View {
         TabView {
-            intervalPage
-            statsPage
+            MetricsTabView(manager: manager)
             controlsPage
         }
         .tabViewStyle(.page)
@@ -60,11 +19,86 @@ struct ActiveWorkoutView: View {
         }
     }
 
-    // MARK: - Page 1: Interval (step header + 3 metrics + progress bar + next)
+    private var controlsPage: some View {
+        VStack(spacing: 14) {
+            if case .paused = manager.phase {
+                Button("Resume") { manager.resumeWorkout() }
+                    .tint(.green)
+            } else {
+                Button("Pause") { manager.pauseWorkout() }
+                    .tint(.yellow)
+            }
+            Button("End Workout") { showEndConfirmation = true }
+                .tint(.red)
+        }
+        .padding()
+    }
+}
 
-    private var intervalPage: some View {
+// MARK: - Metrics tab (vertical-paging between 3 views)
+
+private struct MetricsTabView: View {
+    @ObservedObject var manager: WorkoutSessionManager
+    @State private var page: Int? = 0
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .trailing) {
+                ScrollView(.vertical, showsIndicators: false) {
+                    LazyVStack(spacing: 0) {
+                        IntervalPageView(manager: manager)
+                            .frame(width: geo.size.width, height: geo.size.height)
+                            .id(0)
+                        HRZonePageView(manager: manager)
+                            .frame(width: geo.size.width, height: geo.size.height)
+                            .id(1)
+                        PacePageView(manager: manager)
+                            .frame(width: geo.size.width, height: geo.size.height)
+                            .id(2)
+                    }
+                    .scrollTargetLayout()
+                }
+                .scrollTargetBehavior(.paging)
+                .scrollPosition(id: $page)
+                .ignoresSafeArea(edges: .bottom)
+
+                PageDotsIndicator(currentPage: page ?? 0, pageCount: 3)
+                    .padding(.trailing, 2)
+            }
+        }
+    }
+}
+
+// MARK: - Page dots (right-side vertical indicator)
+
+private struct PageDotsIndicator: View {
+    let currentPage: Int
+    let pageCount: Int
+
+    var body: some View {
+        VStack(spacing: 4) {
+            ForEach(0..<pageCount, id: \.self) { i in
+                Circle()
+                    .fill(i == currentPage ? Color.white : Color.white.opacity(0.3))
+                    .frame(width: i == currentPage ? 5 : 4, height: i == currentPage ? 5 : 4)
+                    .animation(.easeInOut(duration: 0.2), value: currentPage)
+            }
+        }
+        .padding(.vertical, 8)
+    }
+}
+
+// MARK: - Page 0: Interval view
+
+private struct IntervalPageView: View {
+    @ObservedObject var manager: WorkoutSessionManager
+
+    private var stepColor: Color { manager.stepKind.watchColor }
+    private var hrZoneColor: Color { manager.hrZoneNumber.hrZoneColor }
+
+    var body: some View {
         VStack(spacing: 0) {
-            // Step name + position counter
+            // Step badge: icon + name + position
             HStack(spacing: 4) {
                 if let kind = manager.stepKind {
                     Image(systemName: kind.symbolName)
@@ -82,62 +116,68 @@ struct ActiveWorkoutView: View {
                 }
             }
             .foregroundStyle(stepColor)
+            .padding(.horizontal, 8)
+            .padding(.top, 4)
 
             Spacer()
 
-            // Three core metrics: Pace | HR | Remaining
+            // Hero: elapsed time
+            Text(manager.elapsedTimeText)
+                .font(.system(size: 34, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(stepColor)
+
+            Spacer()
+
+            // Three metrics: Pace | HR+zone | Remaining
             HStack(alignment: .top, spacing: 0) {
-                // Pace (primary — largest)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(manager.paceText)
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                        .minimumScaleFactor(0.7)
-                        .lineLimit(1)
                     Text(manager.paceUnitLabel)
-                        .font(.system(size: 10))
+                        .font(.system(size: 9))
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                // Heart rate + zone dots (centre)
                 VStack(alignment: .center, spacing: 2) {
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
                         Text(manager.heartRate > 0 ? "\(Int(manager.heartRate))" : "--")
-                            .font(.system(size: 22, weight: .semibold, design: .rounded))
+                            .font(.system(size: 20, weight: .semibold, design: .rounded))
                             .foregroundStyle(hrZoneColor)
                             .monospacedDigit()
                         Text("bpm")
                             .font(.system(size: 9))
                             .foregroundStyle(.secondary)
                     }
+                    // Zone dots
                     HStack(spacing: 3) {
                         ForEach(1...5, id: \.self) { z in
                             Circle()
-                                .fill(z <= hrZoneNumber ? hrZoneColor : Color.secondary.opacity(0.2))
+                                .fill(z <= manager.hrZoneNumber ? hrZoneColor : Color.secondary.opacity(0.25))
                                 .frame(width: 4, height: 4)
                         }
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
 
-                // Remaining distance/time (right)
                 VStack(alignment: .trailing, spacing: 1) {
                     Text(manager.stepRemainingText.isEmpty ? "--" : manager.stepRemainingText)
                         .font(.system(size: 20, weight: .semibold, design: .rounded))
                         .monospacedDigit()
                         .minimumScaleFactor(0.7)
-                        .lineLimit(1)
                     Text("left")
-                        .font(.system(size: 10))
+                        .font(.system(size: 9))
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
+            .padding(.horizontal, 8)
 
             Spacer()
 
-            // Step progress bar + goal label
+            // Step progress bar + goal
             VStack(alignment: .leading, spacing: 3) {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
@@ -148,13 +188,14 @@ struct ActiveWorkoutView: View {
                             .animation(.linear(duration: 0.35), value: manager.stepProgress)
                     }
                 }
-                .frame(height: 6)
+                .frame(height: 5)
                 if !manager.stepGoalText.isEmpty {
                     Text("Goal: \(manager.stepGoalText)")
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
                 }
             }
+            .padding(.horizontal, 8)
 
             // Next step hint
             if !manager.nextStepSummary.isEmpty {
@@ -164,94 +205,302 @@ struct ActiveWorkoutView: View {
                     Text(manager.nextStepSummary)
                         .font(.system(size: 10))
                         .lineLimit(1)
-                        .truncationMode(.tail)
                 }
-                .foregroundStyle(.secondary.opacity(0.75))
+                .foregroundStyle(.secondary.opacity(0.7))
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 4)
+                .padding(.horizontal, 8)
+                .padding(.top, 3)
             }
+
+            Spacer(minLength: 4)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-    }
-
-    // MARK: - Page 2: Stats (HR + distance + time)
-
-    private var statsPage: some View {
-        VStack(spacing: 10) {
-            // Heart rate (large) + zone bar
-            VStack(spacing: 4) {
-                HStack(alignment: .firstTextBaseline, spacing: 3) {
-                    Text(manager.heartRate > 0 ? "\(Int(manager.heartRate))" : "--")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .foregroundStyle(hrZoneColor)
-                        .monospacedDigit()
-                    Text("bpm")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                }
-                HStack(spacing: 5) {
-                    ForEach(1...5, id: \.self) { zone in
-                        Capsule()
-                            .fill(zone <= hrZoneNumber ? hrZoneColor : Color.secondary.opacity(0.2))
-                            .frame(height: 5)
-                    }
-                }
-                .padding(.horizontal, 4)
-            }
-
-            Divider()
-
-            // Distance + elapsed time side by side
-            HStack(spacing: 0) {
-                VStack(spacing: 1) {
-                    Text(manager.distanceText)
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .minimumScaleFactor(0.7)
-                        .lineLimit(1)
-                    Text("dist")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity)
-
-                VStack(spacing: 1) {
-                    Text(manager.elapsedTimeText)
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .monospacedDigit()
-                        .lineLimit(1)
-                    Text("time")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity)
-            }
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-    }
-
-    // MARK: - Page 3: Controls
-
-    private var controlsPage: some View {
-        VStack(spacing: 12) {
-            if case .paused = manager.phase {
-                Button("Resume") { manager.resumeWorkout() }
-                    .tint(.green)
-            } else {
-                Button("Pause") { manager.pauseWorkout() }
-                    .tint(.yellow)
-            }
-            Button("End Workout") { showEndConfirmation = true }
-                .tint(.red)
-        }
-        .padding()
     }
 }
 
-// MARK: - Preview
+// MARK: - Page 1: HR Zone view
 
-#Preview("Work step") {
+private struct HRZonePageView: View {
+    @ObservedObject var manager: WorkoutSessionManager
+
+    private var hrZoneColor: Color { manager.hrZoneNumber.hrZoneColor }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Small elapsed time at top
+            Text(manager.elapsedTimeText)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 8)
+                .padding(.top, 4)
+
+            Spacer()
+
+            // Large HR
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(manager.heartRate > 0 ? "\(Int(manager.heartRate))" : "--")
+                    .font(.system(size: 46, weight: .bold, design: .rounded))
+                    .foregroundStyle(hrZoneColor)
+                    .monospacedDigit()
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("bpm")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 9))
+                        .foregroundStyle(hrZoneColor)
+                }
+            }
+
+            // Zone badge
+            if manager.hrZoneNumber > 0 {
+                Text("Zone \(manager.hrZoneNumber)")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 3)
+                    .background(hrZoneColor, in: Capsule())
+                    .padding(.top, 4)
+            }
+
+            Spacer()
+
+            // Five-zone bar
+            HStack(spacing: 4) {
+                ForEach(1...5, id: \.self) { z in
+                    Capsule()
+                        .fill(z <= manager.hrZoneNumber ? z.hrZoneColor : Color.secondary.opacity(0.2))
+                        .frame(height: 5)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            .padding(.horizontal, 8)
+
+            Spacer()
+
+            // Secondary metrics: avg pace | avg HR
+            HStack(spacing: 0) {
+                VStack(spacing: 2) {
+                    Text(manager.avgPaceText)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .monospacedDigit()
+                    Text("avg \(manager.paceUnitLabel)")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+
+                Rectangle()
+                    .fill(Color.secondary.opacity(0.3))
+                    .frame(width: 1, height: 24)
+
+                VStack(spacing: 2) {
+                    Text(manager.avgHeartRate > 0 ? "\(Int(manager.avgHeartRate))" : "--")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(hrZoneColor)
+                    Text("avg bpm")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.horizontal, 8)
+
+            Spacer(minLength: 4)
+        }
+    }
+}
+
+// MARK: - Page 2: Pace & Distance view
+
+private struct PacePageView: View {
+    @ObservedObject var manager: WorkoutSessionManager
+
+    private var paceDeviationColor: Color {
+        guard let lo = manager.targetPaceLo, let hi = manager.targetPaceHi,
+              manager.paceSecPerKm > 0 else { return .white }
+        if manager.paceSecPerKm < Double(lo) { return .cyan }
+        if manager.paceSecPerKm > Double(hi) { return .orange }
+        return .green
+    }
+
+    private var paceDeviationLabel: String? {
+        guard let lo = manager.targetPaceLo, let hi = manager.targetPaceHi,
+              manager.paceSecPerKm > 0 else { return nil }
+        if manager.paceSecPerKm < Double(lo) { return "↑ Ahead" }
+        if manager.paceSecPerKm > Double(hi) { return "↓ Behind" }
+        return "On Target"
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Small elapsed time
+            Text(manager.elapsedTimeText)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 8)
+                .padding(.top, 4)
+
+            Spacer()
+
+            // Current pace (large) + deviation badge
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(manager.paceText)
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(paceDeviationColor)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(manager.paceUnitLabel)
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+                    if let label = paceDeviationLabel {
+                        Text(label)
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundStyle(paceDeviationColor)
+                    }
+                }
+            }
+
+            // Target pace range indicator
+            if let lo = manager.targetPaceLo, let hi = manager.targetPaceHi {
+                PaceRangeBar(
+                    current: manager.paceSecPerKm,
+                    lo: lo, hi: hi
+                )
+                .padding(.horizontal, 8)
+                .padding(.top, 4)
+
+                HStack {
+                    Text(manager.targetPaceText(lo))
+                    Spacer()
+                    Text("Target")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(manager.targetPaceText(hi))
+                }
+                .font(.system(size: 9))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.top, 1)
+            }
+
+            Spacer()
+
+            // Distance + avg pace
+            HStack(spacing: 0) {
+                VStack(spacing: 2) {
+                    Text(manager.distanceText)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
+                    Text("dist")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+
+                Rectangle()
+                    .fill(Color.secondary.opacity(0.3))
+                    .frame(width: 1, height: 24)
+
+                VStack(spacing: 2) {
+                    Text(manager.avgPaceText)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .monospacedDigit()
+                    Text("avg \(manager.paceUnitLabel)")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.horizontal, 8)
+
+            Spacer(minLength: 4)
+        }
+    }
+}
+
+// MARK: - Pace range bar
+
+private struct PaceRangeBar: View {
+    let current: Double
+    let lo: Int
+    let hi: Int
+
+    private var deviationColor: Color {
+        if current < Double(lo) { return .cyan }
+        if current > Double(hi) { return .orange }
+        return .green
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            let margin = max(Double(hi - lo) * 0.6, 20.0)
+            let totalRange = Double(hi - lo) + 2 * margin
+            let w = Double(geo.size.width)
+
+            let loX  = CGFloat(margin / totalRange * w)
+            let hiX  = CGFloat((Double(hi - lo) + margin) / totalRange * w)
+            let curX = CGFloat(max(0, min(w, (current - Double(lo) + margin) / totalRange * w)))
+
+            ZStack(alignment: .leading) {
+                // Track
+                Capsule()
+                    .fill(Color.secondary.opacity(0.2))
+                    .frame(height: 6)
+
+                // Target zone highlight
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.green.opacity(0.35))
+                    .frame(width: max(0, hiX - loX), height: 6)
+                    .offset(x: loX)
+
+                // Current pace dot
+                Circle()
+                    .fill(deviationColor)
+                    .frame(width: 10, height: 10)
+                    .offset(x: curX - 5, y: -2)
+            }
+        }
+        .frame(height: 10)
+    }
+}
+
+// MARK: - Color helpers
+
+private extension Optional where Wrapped == StepKind {
+    var watchColor: Color {
+        switch self {
+        case .warmup:   .orange
+        case .work:     .green
+        case .recovery: .cyan
+        case .cooldown: .yellow
+        case nil:       .blue
+        }
+    }
+}
+
+private extension Int {
+    var hrZoneColor: Color {
+        switch self {
+        case 1:  .blue
+        case 2:  .green
+        case 3:  .yellow
+        case 4:  .orange
+        case 5:  .red
+        default: .secondary
+        }
+    }
+}
+
+// MARK: - Previews
+
+#Preview("Interval — work step") {
     ActiveWorkoutView(manager: {
         let m = WorkoutSessionManager()
         m.phase = .running
@@ -260,17 +509,22 @@ struct ActiveWorkoutView: View {
         m.stepProgress = 0.68
         m.stepKind = .work
         m.heartRate = 162
-        m.paceSecPerKm = 292
+        m.avgHeartRate = 158
+        m.paceSecPerKm = 302    // 5'02"
+        m.avgPaceSecPerKm = 310 // 5'10"
+        m.targetPaceLo = 285    // 4'45"
+        m.targetPaceHi = 315    // 5'15"
         m.totalMetres = 1680
         m.elapsedSeconds = 487
         m.stepPosition = 4
         m.totalStepCount = 12
         m.nextStepSummary = "Rep 2/5 · Recovery · 90 sec"
+        m.stepRemainingText = "320 m"
         return m
     }())
 }
 
-#Preview("Warmup") {
+#Preview("Interval — warmup") {
     ActiveWorkoutView(manager: {
         let m = WorkoutSessionManager()
         m.phase = .running
@@ -279,31 +533,99 @@ struct ActiveWorkoutView: View {
         m.stepProgress = 0.3
         m.stepKind = .warmup
         m.heartRate = 128
+        m.avgHeartRate = 122
         m.paceSecPerKm = 360
+        m.avgPaceSecPerKm = 370
         m.totalMetres = 420
         m.elapsedSeconds = 90
         m.stepPosition = 1
         m.totalStepCount = 12
         m.nextStepSummary = "Rep 1/5 · Run · 1 km"
+        m.stepRemainingText = "3:30"
         return m
     }())
 }
 
-#Preview("Stats page") {
-    ActiveWorkoutView(manager: {
+#Preview("HR Zone view") {
+    TabView {
+        // Show page 1 directly by making it the first item
+        HRZonePageView(manager: {
+            let m = WorkoutSessionManager()
+            m.phase = .running
+            m.heartRate = 171
+            m.avgHeartRate = 163
+            m.paceSecPerKm = 295
+            m.avgPaceSecPerKm = 308
+            m.elapsedSeconds = 1372
+            return m
+        }())
+        .padding(.horizontal, 4)
+    }
+    .tabViewStyle(.page(indexDisplayMode: .never))
+}
+
+#Preview("Pace view — on target") {
+    PacePageView(manager: {
         let m = WorkoutSessionManager()
         m.phase = .running
-        m.stepName = "Rep 4/5 · Run"
-        m.stepGoalText = "1000 m"
-        m.stepProgress = 0.45
-        m.stepKind = .work
-        m.heartRate = 172
-        m.paceSecPerKm = 275
-        m.totalMetres = 3450
-        m.elapsedSeconds = 1243
-        m.stepPosition = 9
-        m.totalStepCount = 12
-        m.nextStepSummary = "Rep 4/5 · Recovery · 90 sec"
+        m.paceSecPerKm = 302    // 5'02" — within 4'45"–5'15"
+        m.avgPaceSecPerKm = 308 // 5'08"
+        m.targetPaceLo = 285    // 4'45"
+        m.targetPaceHi = 315    // 5'15"
+        m.totalMetres = 3620
+        m.elapsedSeconds = 1372
+        return m
+    }())
+    .padding(.horizontal, 4)
+}
+
+#Preview("Pace view — behind") {
+    PacePageView(manager: {
+        let m = WorkoutSessionManager()
+        m.phase = .running
+        m.paceSecPerKm = 340    // 5'40" — too slow
+        m.avgPaceSecPerKm = 325
+        m.targetPaceLo = 285
+        m.targetPaceHi = 315
+        m.totalMetres = 2340
+        m.elapsedSeconds = 892
+        return m
+    }())
+    .padding(.horizontal, 4)
+}
+
+#Preview("Pace view — ahead") {
+    PacePageView(manager: {
+        let m = WorkoutSessionManager()
+        m.phase = .running
+        m.paceSecPerKm = 268    // 4'28" — too fast
+        m.avgPaceSecPerKm = 278
+        m.targetPaceLo = 285
+        m.targetPaceHi = 315
+        m.totalMetres = 4100
+        m.elapsedSeconds = 1372
+        return m
+    }())
+    .padding(.horizontal, 4)
+}
+
+#Preview("Pace view — no target") {
+    PacePageView(manager: {
+        let m = WorkoutSessionManager()
+        m.phase = .running
+        m.paceSecPerKm = 350
+        m.avgPaceSecPerKm = 365
+        m.totalMetres = 5200
+        m.elapsedSeconds = 1920
+        return m
+    }())
+    .padding(.horizontal, 4)
+}
+
+#Preview("Controls") {
+    ActiveWorkoutView(manager: {
+        let m = WorkoutSessionManager()
+        m.phase = .paused
         return m
     }())
 }
