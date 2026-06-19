@@ -150,17 +150,17 @@ private struct SessionWheelCard: View {
             RoundedRectangle(cornerRadius: 14)
                 .fill(bgColor)
 
+            // No Spacer() — ZStack centres the block automatically.
             VStack(spacing: 0) {
                 // Icon
                 ZStack {
                     Circle()
                         .fill(.white.opacity(0.18))
-                        .frame(width: 38, height: 38)
+                        .frame(width: 32, height: 32)
                     Image(systemName: session.sessionType.symbolName)
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.white)
                 }
-                .padding(.top, 14)
 
                 // Day / Today
                 Group {
@@ -177,36 +177,38 @@ private struct SessionWheelCard: View {
                             .foregroundStyle(.white.opacity(0.6))
                     }
                 }
-                .padding(.top, 7)
+                .padding(.top, 5)
 
                 // Title
                 Text(session.title)
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .minimumScaleFactor(0.85)
                     .padding(.horizontal, 12)
-                    .padding(.top, 4)
+                    .padding(.top, 3)
 
-                Spacer()
+                // Separator
+                Rectangle()
+                    .fill(.white.opacity(0.25))
+                    .frame(height: 0.5)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .padding(.bottom, 8)
 
-                // Goal metric
+                // Goal metric — value + unit only (no redundant label)
                 if let metric = sessionGoalMetric(session.payload) {
-                    VStack(spacing: 1) {
-                        Text(metric.label)
-                            .font(.system(size: 9, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.55))
-                        Text(metric.value)
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
-                        Text(metric.unit)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.7))
-                    }
+                    Text(metric.value)
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    Text(metric.unit)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.7))
+                        .padding(.top, 1)
                 }
 
                 // Step dots
@@ -224,11 +226,11 @@ private struct SessionWheelCard: View {
                                 .foregroundStyle(.white.opacity(0.35))
                         }
                     }
-                    .padding(.top, 8)
+                    .padding(.top, 6)
                 }
-
-                Spacer(minLength: 14)
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
         }
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .overlay(
@@ -266,45 +268,45 @@ private struct PaceWheelCard: View {
                 ZStack {
                     Circle()
                         .fill(.white.opacity(0.18))
-                        .frame(width: 44, height: 44)
+                        .frame(width: 38, height: 38)
                     Text(letter)
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                 }
-                .padding(.top, 14)
 
                 Text(fullName)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
-                    .padding(.top, 7)
+                    .padding(.top, 5)
 
                 Text(template.name)
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .minimumScaleFactor(0.85)
                     .padding(.horizontal, 12)
-                    .padding(.top, 4)
+                    .padding(.top, 3)
 
-                Spacer()
+                // Separator
+                Rectangle()
+                    .fill(.white.opacity(0.25))
+                    .frame(height: 0.5)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .padding(.bottom, 8)
 
                 // Pace range
                 let paceStr = primaryPaceText(template) ?? template.subtitle
                 if let paceStr {
-                    VStack(spacing: 1) {
-                        Text("PACE")
-                            .font(.system(size: 9, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.55))
-                        Text(paceStr)
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.center)
-                    }
+                    Text(paceStr)
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
                 }
-
-                Spacer(minLength: 14)
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
         }
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
