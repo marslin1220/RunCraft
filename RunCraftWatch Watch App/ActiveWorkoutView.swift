@@ -42,29 +42,27 @@ private struct MetricsTabView: View {
     @State private var page: Int? = 0
 
     var body: some View {
-        GeometryReader { geo in
-            ZStack(alignment: .trailing) {
-                ScrollView(.vertical, showsIndicators: false) {
-                    LazyVStack(spacing: 0) {
-                        IntervalPageView(manager: manager)
-                            .frame(width: geo.size.width, height: geo.size.height)
-                            .id(0)
-                        HRZonePageView(manager: manager)
-                            .frame(width: geo.size.width, height: geo.size.height)
-                            .id(1)
-                        PacePageView(manager: manager)
-                            .frame(width: geo.size.width, height: geo.size.height)
-                            .id(2)
-                    }
-                    .scrollTargetLayout()
+        ZStack(alignment: .trailing) {
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack(spacing: 0) {
+                    IntervalPageView(manager: manager)
+                        .containerRelativeFrame([.horizontal, .vertical])
+                        .id(0)
+                    HRZonePageView(manager: manager)
+                        .containerRelativeFrame([.horizontal, .vertical])
+                        .id(1)
+                    PacePageView(manager: manager)
+                        .containerRelativeFrame([.horizontal, .vertical])
+                        .id(2)
                 }
-                .scrollTargetBehavior(.paging)
-                .scrollPosition(id: $page)
-                .ignoresSafeArea(edges: .bottom)
-
-                PageDotsIndicator(currentPage: page ?? 0, pageCount: 3)
-                    .padding(.trailing, 2)
+                .scrollTargetLayout()
             }
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: $page)
+            .clipped()
+
+            PageDotsIndicator(currentPage: page ?? 0, pageCount: 3)
+                .padding(.trailing, 2)
         }
     }
 }
@@ -547,21 +545,16 @@ private extension Int {
 }
 
 #Preview("HR Zone view") {
-    TabView {
-        // Show page 1 directly by making it the first item
-        HRZonePageView(manager: {
-            let m = WorkoutSessionManager()
-            m.phase = .running
-            m.heartRate = 171
-            m.avgHeartRate = 163
-            m.paceSecPerKm = 295
-            m.avgPaceSecPerKm = 308
-            m.elapsedSeconds = 1372
-            return m
-        }())
-        .padding(.horizontal, 4)
-    }
-    .tabViewStyle(.page(indexDisplayMode: .never))
+    HRZonePageView(manager: {
+        let m = WorkoutSessionManager()
+        m.phase = .running
+        m.heartRate = 171
+        m.avgHeartRate = 163
+        m.paceSecPerKm = 295
+        m.avgPaceSecPerKm = 308
+        m.elapsedSeconds = 1372
+        return m
+    }())
 }
 
 #Preview("Pace view — on target") {
