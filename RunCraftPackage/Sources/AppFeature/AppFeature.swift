@@ -156,6 +156,10 @@ import WorkshopFeature
                 state.selectedTab = .plan
                 return .send(.plan(.setupVDOTButtonTapped))
 
+            case .settings(.delegate(.openTrainingDays)):
+                state.selectedTab = .plan
+                return .send(.plan(.adjustTrainingDaysFromSettings))
+
             case .plan, .workouts, .insights, .settings:
                 return .none
             }

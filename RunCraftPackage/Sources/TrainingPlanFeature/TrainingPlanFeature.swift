@@ -109,6 +109,7 @@ import WorkshopFeature
         case recalculateVDOTRequested
         case adjustVDOTRequested
         case adjustTrainingDaysRequested(RaceGoal)
+        case adjustTrainingDaysFromSettings
         case editGoalLoaded(RaceGoal?)
         case planDeleted
         case countdownTapped
@@ -365,6 +366,16 @@ import WorkshopFeature
             case let .adjustTrainingDaysRequested(goal):
                 state.destination = .adjustTrainingDays(AdjustTrainingDays.State(goal: goal))
                 return .none
+
+            case .adjustTrainingDaysFromSettings:
+                return .run { [database] send in
+                    let goal = try? await database.read { db in
+                        try RaceGoal.order { $0.createdAt.desc() }.fetchOne(db)
+                    }
+                    if let goal {
+                        await send(.adjustTrainingDaysRequested(goal))
+                    }
+                }
 
             case .destination(.presented(.deleteConfirm(.confirmDelete))):
                 return .run { [database] send in

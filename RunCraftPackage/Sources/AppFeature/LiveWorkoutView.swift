@@ -95,6 +95,27 @@ public struct LiveWorkoutView: View {
 
     // MARK: - Metrics grid
 
+    private var paceDeviationColor: Color? {
+        let pace = display.message.paceSecPerKm
+        guard pace > 0,
+              let lo = display.message.targetPaceLo,
+              let hi = display.message.targetPaceHi else { return nil }
+        if pace < Double(lo) { return .cyan }    // ahead (faster than target window)
+        if pace > Double(hi) { return .orange }  // behind (slower than target window)
+        return .green                            // on target
+    }
+
+    private var hrZoneColor: Color {
+        switch display.message.hrZone {
+        case 1: .blue
+        case 2: .green
+        case 3: .yellow
+        case 4: .orange
+        case 5: .red
+        default: .secondary
+        }
+    }
+
     private var metricsGrid: some View {
         LazyVGrid(
             columns: [GridItem(.flexible()), GridItem(.flexible())],
@@ -103,14 +124,20 @@ public struct LiveWorkoutView: View {
             MetricTile(
                 label: "HR",
                 value: display.message.heartRate > 0 ? "\(Int(display.message.heartRate))" : "--",
-                unit: "bpm"
+                unit: "bpm",
+                valueColor: display.message.hrZone > 0 ? hrZoneColor : nil,
+                subValue: display.message.avgHeartRate > 0
+                    ? "avg \(Int(display.message.avgHeartRate))" : nil
             )
             MetricTile(
                 label: "Pace",
                 value: display.message.paceSecPerKm > 0
                     ? PaceFormatting.paceMinutesSeconds(secondsPerKm: display.message.paceSecPerKm, unit: paceUnit)
                     : "--:--",
-                unit: paceUnit.displayName
+                unit: paceUnit.displayName,
+                valueColor: paceDeviationColor,
+                subValue: display.message.avgPaceSecPerKm > 0
+                    ? "avg \(PaceFormatting.paceMinutesSeconds(secondsPerKm: display.message.avgPaceSecPerKm, unit: paceUnit))" : nil
             )
             MetricTile(
                 label: "Dist",
@@ -178,6 +205,8 @@ private struct MetricTile: View {
     let label: String
     let value: String
     let unit: String
+    var valueColor: Color? = nil
+    var subValue: String? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -189,10 +218,17 @@ private struct MetricTile: View {
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
+                .foregroundStyle(valueColor ?? .primary)
             if !unit.isEmpty {
                 Text(verbatim: unit)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+            if let subValue {
+                Text(verbatim: subValue)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -203,7 +239,7 @@ private struct MetricTile: View {
 
 // MARK: - Preview
 
-#Preview("Live Workout") {
+#Preview("Live Workout — on target (Zone 4)") {
     LiveWorkoutView(
         store: Store(initialState: AppFeature.State()) { AppFeature() },
         display: {
@@ -213,10 +249,65 @@ private struct MetricTile: View {
                 stepGoalText: "1000 m",
                 stepProgress: 0.68,
                 heartRate: 162,
-                paceSecPerKm: 292,
+                avgHeartRate: 157,
+                paceSecPerKm: 302,
+                avgPaceSecPerKm: 310,
+                targetPaceLo: 285,
+                targetPaceHi: 315,
                 totalMetres: 1680,
                 elapsedSeconds: 487,
-                isPaused: false
+                isPaused: false,
+                hrZone: 4
+            )
+            return d
+        }()
+    )
+}
+
+#Preview("Live Workout — ahead (Zone 5)") {
+    LiveWorkoutView(
+        store: Store(initialState: AppFeature.State()) { AppFeature() },
+        display: {
+            var d = AppFeature.LiveWorkoutDisplay()
+            d.message = WorkoutMirrorMessage(
+                stepName: "Rep 4/5 · Run",
+                stepGoalText: "1000 m",
+                stepProgress: 0.35,
+                heartRate: 175,
+                avgHeartRate: 168,
+                paceSecPerKm: 268,
+                avgPaceSecPerKm: 278,
+                targetPaceLo: 285,
+                targetPaceHi: 315,
+                totalMetres: 3900,
+                elapsedSeconds: 1372,
+                isPaused: false,
+                hrZone: 5
+            )
+            return d
+        }()
+    )
+}
+
+#Preview("Live Workout — paused") {
+    LiveWorkoutView(
+        store: Store(initialState: AppFeature.State()) { AppFeature() },
+        display: {
+            var d = AppFeature.LiveWorkoutDisplay()
+            d.message = WorkoutMirrorMessage(
+                stepName: "Rep 2/5 · Run",
+                stepGoalText: "1000 m",
+                stepProgress: 0.45,
+                heartRate: 148,
+                avgHeartRate: 155,
+                paceSecPerKm: 0,
+                avgPaceSecPerKm: 310,
+                targetPaceLo: 285,
+                targetPaceHi: 315,
+                totalMetres: 2130,
+                elapsedSeconds: 840,
+                isPaused: true,
+                hrZone: 3
             )
             return d
         }()

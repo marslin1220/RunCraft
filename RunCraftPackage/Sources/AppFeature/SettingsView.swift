@@ -93,6 +93,19 @@ public struct SettingsView: View {
                     Text("Daily nudge at the time you pick. Tap to open RunCraft and dispatch today's session to Apple Watch.")
                 }
 
+                Section {
+                    Button {
+                        store.send(.delegate(.openTrainingDays))
+                    } label: {
+                        Label("Training days", systemImage: "calendar.badge.checkmark")
+                            .foregroundStyle(.primary)
+                    }
+                } header: {
+                    Text("Training Plan")
+                } footer: {
+                    Text("Choose which days of the week you can train and set your preferred long-run day.")
+                }
+
                 Section("About") {
                     HStack {
                         Text("Version")
