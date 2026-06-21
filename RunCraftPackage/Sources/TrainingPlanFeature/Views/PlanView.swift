@@ -416,6 +416,12 @@ private struct WeekSessionsSection: View {
         PlannedSession.dayOfWeek(for: Date())
     }
 
+    private var adherence: (completed: Int, planned: Int) {
+        let planned = sessions.filter { $0.sessionType != .rest }
+        let completed = planned.filter { completedBySessionId[$0.id] != nil }
+        return (completed.count, planned.count)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -423,6 +429,14 @@ private struct WeekSessionsSection: View {
                     .font(.headline)
                     .foregroundStyle(Color.brand.textPrimary)
                 Spacer()
+                if adherence.planned > 0 && adherence.completed > 0 {
+                    Text("\(adherence.completed)/\(adherence.planned)")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.brand.accent, in: Capsule())
+                }
                 Text("\(week.targetWeeklyKm, format: .number.precision(.fractionLength(0))) km")
                     .font(.subheadline)
                     .foregroundStyle(Color.brand.accent)
