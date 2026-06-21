@@ -110,6 +110,16 @@ Intelligence can read and mutate plan state without launching the UI.
    │  Theme + WorkoutCard +     │  WorkoutCardPalette, TimeWheelPicker.
    │  TimeWheelPicker           │  Imported by every Feature target.
    └────────────────────────────┘
+
+   ┌──────────────────────────────────────────────────────────────┐
+   │              RunCraftWatch Watch App                          │  watchOS companion target:
+   │  WatchAppDelegate    WorkoutSessionManager                    │  auto-starts via HKHealthStore,
+   │  WatchHomeView (Sessions Wheel + Paces Wheel)                 │  runs interval state machine,
+   │  ActiveWorkoutView   WorkoutStartView                         │  mirrors metrics to iPhone
+   └──────────────────────────┬───────────────────────────────────┘
+                               │  imports (SPM)
+                               ├──► AppleWatchSync
+                               └──► RunCraftModels
 ```
 
 `DesignSystem` is a leaf UI-token module imported by every feature target.
@@ -278,7 +288,7 @@ Key files:
 1. **iPhone-triggered auto-start.** iPhone calls `HKWatchTriggerClient.startWatchSession(payload)` → writes payload to WCSession context + calls `HKHealthStore.startWatchApp(toHandle:)` → system delivers `HKWorkoutConfiguration` to `WatchAppDelegate.handle(_:)` → reads blocks from `receivedApplicationContext[pendingWorkoutPayloadContextKey]` → starts session via `WorkoutSessionManager.startWorkout(session:blocks:healthStore:)`.
 2. **Watch standalone.** User opens `RunCraftWatch`, taps a session in `WatchHomeView` → `WorkoutStartView` → taps Start → creates `HKWorkoutConfiguration` locally → starts session via the same `WorkoutSessionManager.startWorkout`.
 
-**iPhone live workout mirror.** `AppFeature` subscribes to `liveWorkoutClient.events()` at launch. When the Watch starts a mirrored session, `LiveWorkoutClient` fires `.sessionStarted`; `AppFeature` sets `state.liveWorkout = LiveWorkoutDisplay()` and `AppView` shows `LiveWorkoutView` as a `.fullScreenCover`. Subsequent `WorkoutMirrorMessage` packets update step name, progress, HR, pace, and distance in real time. `LiveWorkoutView` sends `WorkoutMirrorCommand` (pause / resume / end) back to the Watch. On `.sessionEnded`, `state.liveWorkout` is cleared and the cover dismisses.
+**iPhone live workout mirror.** `AppFeature` subscribes to `liveWorkoutClient.events()` at launch. When the Watch starts a mirrored session, `LiveWorkoutClient` fires `.sessionStarted`; `AppFeature` sets `state.liveWorkout = LiveWorkoutDisplay()` and `AppView` shows `LiveWorkoutView` as a `.fullScreenCover`. Subsequent `WorkoutMirrorMessage` packets update step name, progress, HR, pace, and distance in real time. `LiveWorkoutView` sends `WorkoutMirrorCommand` (pause / resume / end) back to the Watch. On `.sessionEnded`, the final message's metrics (distance, time, avg pace, avg HR) are captured into `state.completionSummary`; `AppView` then shows `WorkoutCompletionView` as a `.sheet` so the runner sees an immediate summary. Dismissing the sheet clears `completionSummary`.
 
 ### 4.5 TrainingPlanFeature (7+ files · VDOTEngine + HealthKitClient + RunCraftModels + AppleWatchSync + WorkshopFeature + DesignSystem + ComposableArchitecture)
 
