@@ -109,7 +109,7 @@ public struct PlanView: View {
                     }
                 }
             }
-            .onAppear { store.send(.onAppear) }
+            .task { await store.send(.onAppear).finish() }
             .sheet(item: $store.scope(state: \.destination?.setupRaceGoal, action: \.destination.setupRaceGoal)) { setupStore in
                 SetupRaceGoalView(store: setupStore)
             }

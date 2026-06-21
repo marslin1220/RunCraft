@@ -30,7 +30,7 @@ public struct InsightsView: View {
             .navigationTitle("Insights")
             .background(Color.brand.background)
         }
-        .onAppear { store.send(.onAppear) }
+        .task { await store.send(.onAppear).finish() }
     }
 
     // MARK: - Cards
@@ -230,7 +230,7 @@ public struct InsightsView: View {
     @ViewBuilder
     private var weeklyMileageCard: some View {
         sectionCard(title: "Weekly mileage · last 8 weeks") {
-            let bars = store.state.weeklyMileage
+            let bars = store.weeklyMileage
             if bars.allSatisfy({ $0.totalKm == 0 }) {
                 emptyState("No completed runs yet. They'll appear here after HealthKit syncs.")
             } else {
@@ -258,11 +258,11 @@ public struct InsightsView: View {
     @ViewBuilder
     private var predictedRacesCard: some View {
         sectionCard(title: "Predicted race times") {
-            if store.state.predictedTimes.isEmpty {
+            if store.predictedTimes.isEmpty {
                 emptyState("Set a VDOT in the Plan tab to see predictions.")
             } else {
                 VStack(spacing: 8) {
-                    ForEach(store.state.predictedTimes) { race in
+                    ForEach(store.predictedTimes) { race in
                         HStack {
                             Text(race.distance.displayName)
                                 .font(.subheadline)
@@ -273,7 +273,7 @@ public struct InsightsView: View {
                         }
                         .accessibilityElement(children: .combine)
                         .accessibilityLabel("\(race.distance.displayName) predicted time \(race.formatted)")
-                        if race.id != store.state.predictedTimes.last?.id {
+                        if race.id != store.predictedTimes.last?.id {
                             Divider().opacity(0.3)
                         }
                     }
@@ -289,7 +289,7 @@ public struct InsightsView: View {
     @ViewBuilder
     private var recentRunsCard: some View {
         sectionCard(title: "Recent runs") {
-            let runs = Array(store.state.recentWorkouts.prefix(10))
+            let runs = Array(store.recentWorkouts.prefix(10))
             if runs.isEmpty {
                 emptyState("No completed runs yet. They'll appear here after HealthKit syncs or after you log a run by voice.")
             } else {

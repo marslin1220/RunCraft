@@ -8,7 +8,6 @@ import VDOTEngine
     }
 
     public enum Action {
-        case onAppear
         case delegate(Delegate)
 
         public enum Delegate {
@@ -21,7 +20,7 @@ import VDOTEngine
     public var body: some Reducer<State, Action> {
         Reduce { _, action in
             switch action {
-            case .onAppear, .delegate:
+            case .delegate:
                 return .none
             }
         }

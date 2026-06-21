@@ -125,7 +125,6 @@ public struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            .onAppear { store.send(.onAppear) }
         }
     }
 
