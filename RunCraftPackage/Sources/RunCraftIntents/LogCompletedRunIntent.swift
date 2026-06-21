@@ -48,6 +48,7 @@ public struct LogCompletedRunIntent: AppIntent {
         self.durationMin = durationMin
     }
 
+    @MainActor
     public func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         let database: any DatabaseWriter = Dependencies.Dependency(\.defaultDatabase).wrappedValue
 

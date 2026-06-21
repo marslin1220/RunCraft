@@ -22,6 +22,7 @@ public struct WhatIsTodaysTrainingIntent: AppIntent {
 
     public init() {}
 
+    @MainActor
     public func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         let entity = try await TodaySessionQuery().loadToday()
 

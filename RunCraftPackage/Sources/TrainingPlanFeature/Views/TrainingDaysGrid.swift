@@ -18,6 +18,7 @@ public struct TrainingDaysGrid: View {
                 dayToggle(day)
             }
         }
+        .frame(height: 40)
         .padding(.vertical, 4)
 
         // TrainingPlanGenerator ignores `longRunDay` in maintenance mode
@@ -40,8 +41,7 @@ public struct TrainingDaysGrid: View {
             Text(weekdayLabel(day))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(isSelected ? Color.white : Color.brand.textSecondary)
-                .frame(maxWidth: .infinity)
-                .aspectRatio(1, contentMode: .fit)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(isSelected ? Color.brand.accent : Color.brand.surface, in: Circle())
         }
         .buttonStyle(.plain)

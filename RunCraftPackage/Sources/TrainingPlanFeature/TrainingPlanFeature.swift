@@ -192,7 +192,7 @@ import WorkshopFeature
                     .send(.watchScheduleSync)
                 )
 
-            case .activeGoalLoaded(.success(.none)):
+            case .activeGoalLoaded(.success(nil)):
                 state.currentVDOT = 0
                 state.paceZones = nil
                 return .none

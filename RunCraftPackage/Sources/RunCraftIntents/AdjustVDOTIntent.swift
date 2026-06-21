@@ -38,6 +38,7 @@ public struct AdjustVDOTIntent: AppIntent {
         self.vdot = vdot
     }
 
+    @MainActor
     public func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         let database: any DatabaseWriter = Dependencies.Dependency(\.defaultDatabase).wrappedValue
 

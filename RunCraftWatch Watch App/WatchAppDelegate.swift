@@ -7,7 +7,7 @@ import RunCraftModels
 import WatchConnectivity
 import WatchKit
 
-nonisolated(unsafe) private let watchLogger = Logger(subsystem: "io.marstudio.RunCraft.watchkitapp", category: "WatchAppDelegate")
+private nonisolated(unsafe) let watchLogger = Logger(subsystem: "io.marstudio.RunCraft.watchkitapp", category: "WatchAppDelegate")
 
 final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate, ObservableObject, @unchecked Sendable {
 

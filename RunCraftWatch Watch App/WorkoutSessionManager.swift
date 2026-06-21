@@ -14,7 +14,7 @@ import os
 import RunCraftModels
 import WatchKit
 
-nonisolated(unsafe) private let sessionLogger = Logger(subsystem: "io.marstudio.RunCraft.watchkitapp", category: "WorkoutSession")
+private let sessionLogger = Logger(subsystem: "io.marstudio.RunCraft.watchkitapp", category: "WorkoutSession")
 
 @MainActor
 final class WorkoutSessionManager: NSObject, ObservableObject {
@@ -386,10 +386,14 @@ extension WorkoutSessionManager: HKWorkoutSessionDelegate {
                 self.phase = .paused
             case .ended:
                 self.stopAllTimers()
-                self.builder?.endCollection(withEnd: Date()) { [weak self] _, _ in
-                    self?.builder?.finishWorkout { _, _ in }
-                }
                 self.phase = .inactive
+                let builder = self.builder
+                Task {
+                    do {
+                        try await builder?.endCollection(at: Date())
+                        try await builder?.finishWorkout()
+                    } catch {}
+                }
             default:
                 break
             }

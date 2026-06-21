@@ -39,6 +39,7 @@ public struct StartWorkoutIntent: AppIntent {
         self.workout = workout
     }
 
+    @MainActor
     public func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
         let template = try resolveTemplate(for: workout)
 
