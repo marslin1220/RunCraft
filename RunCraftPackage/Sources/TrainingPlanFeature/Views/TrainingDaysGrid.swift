@@ -13,7 +13,7 @@ public struct TrainingDaysGrid: View {
     }
 
     public var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             ForEach(1...7, id: \.self) { day in
                 dayToggle(day)
             }
@@ -38,11 +38,11 @@ public struct TrainingDaysGrid: View {
             store.send(.dayToggled(day))
         } label: {
             Text(weekdayLabel(day))
-                .font(.subheadline.weight(.medium))
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(isSelected ? Color.white : Color.brand.textSecondary)
-                .frame(width: 36, height: 36)
-                .background(isSelected ? Color.brand.accent : Color.brand.surface)
-                .clipShape(Circle())
+                .frame(maxWidth: .infinity)
+                .aspectRatio(1, contentMode: .fit)
+                .background(isSelected ? Color.brand.accent : Color.brand.surface, in: Circle())
         }
         .buttonStyle(.plain)
     }
