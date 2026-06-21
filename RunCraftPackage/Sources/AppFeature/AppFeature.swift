@@ -13,6 +13,7 @@ import WorkshopFeature
         public var settings: Settings.State = .init()
         #if os(iOS)
         public var liveWorkout: LiveWorkoutDisplay? = nil
+        public var completionSummary: CompletionSummary? = nil
         #endif
 
         public init() {}
@@ -29,6 +30,13 @@ import WorkshopFeature
                 elapsedSeconds: 0, isPaused: false
             )
         }
+    }
+
+    public struct CompletionSummary: Equatable {
+        public var totalMetres: Double
+        public var elapsedSeconds: Int
+        public var avgPaceSecPerKm: Double
+        public var avgHeartRate: Double
     }
     #endif
 
@@ -51,6 +59,7 @@ import WorkshopFeature
         case pauseWorkoutTapped
         case resumeWorkoutTapped
         case endWorkoutTapped
+        case dismissCompletionSummary
         #endif
     }
 
@@ -120,6 +129,14 @@ import WorkshopFeature
                     return .run { _ in await clientR.updateSession(msg) }
 
                 case .sessionEnded:
+                    if let msg = state.liveWorkout?.message, msg.totalMetres > 0 {
+                        state.completionSummary = CompletionSummary(
+                            totalMetres: msg.totalMetres,
+                            elapsedSeconds: msg.elapsedSeconds,
+                            avgPaceSecPerKm: msg.avgPaceSecPerKm,
+                            avgHeartRate: msg.avgHeartRate
+                        )
+                    }
                     state.liveWorkout = nil
                     let clientE = liveActivityClient
                     return .run { _ in await clientE.endSession() }
@@ -142,6 +159,10 @@ import WorkshopFeature
                 return .run { _ in
                     await client.sendCommand(WorkoutMirrorCommand(kind: .end))
                 }
+
+            case .dismissCompletionSummary:
+                state.completionSummary = nil
+                return .none
             #endif
 
             case let .plan(.delegate(.openWorkoutInWorkshop(template, source, isTodaySession))):

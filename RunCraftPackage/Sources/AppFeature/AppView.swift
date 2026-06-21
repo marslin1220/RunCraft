@@ -73,6 +73,18 @@ public struct AppView: View {
                 LiveWorkoutView(store: store, display: display)
             }
         }
+        .sheet(
+            isPresented: Binding(
+                get: { store.completionSummary != nil },
+                set: { if !$0 { store.send(.dismissCompletionSummary) } }
+            )
+        ) {
+            if let summary = store.completionSummary {
+                WorkoutCompletionView(summary: summary) {
+                    store.send(.dismissCompletionSummary)
+                }
+            }
+        }
         #endif
     }
 }
