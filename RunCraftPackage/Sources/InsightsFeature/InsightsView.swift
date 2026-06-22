@@ -130,6 +130,12 @@ public struct InsightsView: View {
             } else {
                 deltaChart
             }
+        case .threshold:
+            if store.thresholdSeries.count < 2 {
+                emptyState("Not enough VDOT history yet — log a race or finish a hard session to build your trend.")
+            } else {
+                thresholdChart
+            }
         }
     }
 
@@ -356,6 +362,49 @@ public struct InsightsView: View {
     }
 
     @ViewBuilder
+    private var thresholdChart: some View {
+        let series = store.thresholdSeries
+        let values = series.map(\.value)
+        let lo = (values.min() ?? 240) - 10
+        let hi = (values.max() ?? 360) + 10
+        Chart(series) { point in
+            LineMark(
+                x: .value("Date", point.date),
+                y: .value("s/km", point.value)
+            )
+            .interpolationMethod(.monotone)
+            .foregroundStyle(Color.brand.accent)
+
+            PointMark(
+                x: .value("Date", point.date),
+                y: .value("s/km", point.value)
+            )
+            .foregroundStyle(Color.brand.accent)
+            .symbol(.circle)
+            .symbolSize(60)
+            .accessibilityLabel(point.date.formatted(date: .abbreviated, time: .omitted))
+            .accessibilityValue(PaceFormatting.paceMinutesSeconds(secondsPerKm: point.value, unit: paceUnit))
+        }
+        // Y-axis is inverted: a lower s/km value means a faster pace (better LT).
+        // Swift Charts doesn't support axis reversal directly, so we use
+        // chartYScale with reversed domain to flip it visually.
+        .chartYScale(domain: hi...lo)
+        .chartYAxis {
+            AxisMarks { value in
+                AxisGridLine()
+                AxisValueLabel {
+                    if let sec = value.as(Double.self) {
+                        Text(PaceFormatting.paceMinutesSeconds(secondsPerKm: sec, unit: paceUnit))
+                            .font(.caption.monospacedDigit())
+                    }
+                }
+            }
+        }
+        .frame(height: 200)
+        .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
+    }
+
+    @ViewBuilder
     private var weeklyMileageCard: some View {
         sectionCard(title: "Weekly mileage · last 8 weeks") {
             let bars = store.weeklyMileage
@@ -493,6 +542,8 @@ public struct InsightsView: View {
         case .delta:
             let prefix = value > 0 ? "+" : ""
             return "\(prefix)\(value.formatted(.number.precision(.fractionLength(1))))"
+        case .threshold:
+            return PaceFormatting.paceMinutesSeconds(secondsPerKm: value, unit: paceUnit)
         }
     }
 }

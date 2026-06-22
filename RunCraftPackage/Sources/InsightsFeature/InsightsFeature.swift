@@ -32,6 +32,19 @@ import VDOTEngine
                 return vo2MaxSamples.last?.vo2Max
             case .delta:
                 return deltaSeries.last?.value
+            case .threshold:
+                return thresholdSeries.last?.value
+            }
+        }
+
+        /// T-pace midpoint (s/km) derived from each VDOT snapshot. Stored in
+        /// the same TrendPoint wrapper as the other series so the chart layer
+        /// is uniform. Lower value = faster threshold pace = better fitness.
+        public var thresholdSeries: [TrendPoint] {
+            snapshots.map { snap in
+                let mid = VDOTCalculator.paceZones(vdot: snap.vdot).threshold
+                let midpoint = (mid.lower + mid.upper) / 2
+                return TrendPoint(id: snap.id.uuidString, date: snap.recordedAt, value: midpoint)
             }
         }
 
@@ -80,20 +93,23 @@ import VDOTEngine
         case vdot
         case vo2Max
         case delta
+        case threshold
 
         public var label: String {
             switch self {
-            case .vdot:   "VDOT"
-            case .vo2Max: "VO₂max"
-            case .delta:  "Δ"
+            case .vdot:      "VDOT"
+            case .vo2Max:    "VO₂max"
+            case .delta:     "Δ"
+            case .threshold: "T-pace"
             }
         }
 
         public var caption: String {
             switch self {
-            case .vdot:   "Drives your plan"
-            case .vo2Max: "Apple Watch estimate"
-            case .delta:  "VDOT − VO₂max"
+            case .vdot:      "Drives your plan"
+            case .vo2Max:    "Apple Watch estimate"
+            case .delta:     "VDOT − VO₂max"
+            case .threshold: "Lactate threshold pace"
             }
         }
     }
