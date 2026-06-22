@@ -29,6 +29,7 @@ public struct InsightsView: View {
                     trainingZonesCard
                     weeklyMileageCard
                     predictedRacesCard
+                    ltThresholdsCard
                     recentRunsCard
                 }
                 .padding(.horizontal, 16)
@@ -640,6 +641,51 @@ public struct InsightsView: View {
         }
     }
 
+    // MARK: - Lactate thresholds card
+
+    @ViewBuilder
+    private var ltThresholdsCard: some View {
+        sectionCard(title: "Lactate thresholds", info: .ltThresholds) {
+            if store.currentVDOT == 0 {
+                emptyState("Set a VDOT in the Plan tab to see your threshold paces.")
+            } else {
+                let zones = VDOTCalculator.paceZones(vdot: store.currentVDOT)
+                let lt1SecPerKm = zones.easy.lower
+                let lt2SecPerKm = (zones.threshold.lower + zones.threshold.upper) / 2
+                VStack(spacing: 12) {
+                    HStack(alignment: .top, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("LT1 · Aerobic")
+                                .font(.caption)
+                                .foregroundStyle(Color.brand.textSecondary)
+                            Text(
+                                PaceFormatting.paceMinutesSeconds(secondsPerKm: lt1SecPerKm, unit: paceUnit)
+                                    + " " + paceUnit.displayName
+                            )
+                            .font(.system(.title3, design: .monospaced).weight(.medium))
+                            .foregroundStyle(.blue)
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("LT2 · Anaerobic")
+                                .font(.caption)
+                                .foregroundStyle(Color.brand.textSecondary)
+                            Text(
+                                PaceFormatting.paceMinutesSeconds(secondsPerKm: lt2SecPerKm, unit: paceUnit)
+                                    + " " + paceUnit.displayName
+                            )
+                            .font(.system(.title3, design: .monospaced).weight(.medium))
+                            .foregroundStyle(Color.brand.accent)
+                        }
+                    }
+                    Text("LT1 is the top of your aerobic zone — the pace at which lactate begins to rise above baseline. LT2 is your anaerobic threshold, approximately your 60-minute race pace.")
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+            }
+        }
+    }
+
     /// Last ten completed runs. Each row reads as a single sentence —
     /// date, distance, duration, average pace — so the runner can scan
     /// the column. A small arrow ↑/↓ next to the pace flags whether the
@@ -1039,6 +1085,30 @@ Stride length is the distance covered between two consecutive footfalls of the s
 • Stride length naturally increases as GCT decreases and vertical oscillation drops — all three metrics are connected.
 
 • Artificially forcing a longer stride (overstriding) increases injury risk — let it grow as a consequence of fitness, not a target in itself.
+"""
+    )
+
+    static let ltThresholds = InsightInfo(
+        id: "ltThresholds",
+        title: "Lactate Thresholds",
+        body: """
+Lactate thresholds are the two key intensity boundaries that separate aerobic from anaerobic running. Both are derived from your VDOT score using Jack Daniels' pace-zone formula.
+
+**LT1 — Aerobic threshold**
+
+The pace at which blood lactate first begins to rise above resting levels. Below LT1 your body clears lactate as fast as it produces it. In Daniels' system this corresponds to the upper boundary of the Easy zone — your fastest comfortable aerobic pace, sustainable for hours.
+
+**LT2 — Anaerobic threshold (MLSS)**
+
+The Maximal Lactate Steady State — the fastest pace at which lactate production and clearance remain in balance. Above LT2 lactate accumulates and fatigue accelerates. LT2 corresponds to T-pace (Threshold zone midpoint) and represents roughly your 60-minute race effort.
+
+**How to use them**
+
+• Easy runs and long runs should stay below LT1 — if your pace drifts above, you are borrowing from tomorrow.
+
+• Tempo runs and cruise intervals target the LT1–LT2 corridor, pushing the threshold upward over time.
+
+• Race efforts above LT2 (5 K, 10 K) are only sustainable because they are short — not because lactate has stopped accumulating.
 """
     )
 
