@@ -16,6 +16,7 @@
       "filename" : "icon-dark.png",
       "idiom" : "universal",
       "platform" : "watchos",
+      "role" : "2d",
       "size" : "1024x1024"
     },
     {
@@ -28,6 +29,7 @@
       "filename" : "icon-tinted.png",
       "idiom" : "universal",
       "platform" : "watchos",
+      "role" : "2d",
       "size" : "1024x1024"
     }
   ],

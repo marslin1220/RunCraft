@@ -1,3 +1,4 @@
+#if os(iOS)
 import Charts
 import ComposableArchitecture
 import DesignSystem
@@ -7,7 +8,7 @@ import SwiftUI
 import VDOTEngine
 
 public struct InsightsView: View {
-    @Bindable public var store: StoreOf<InsightsFeature>
+    @SwiftUI.Bindable public var store: StoreOf<InsightsFeature>
 
     public init(store: StoreOf<InsightsFeature>) {
         self.store = store
@@ -22,6 +23,7 @@ public struct InsightsView: View {
                     }
                     fitnessTrendCard
                     hrvTrendCard
+                    heartRateRecoveryCard
                     restingHRTrendCard
                     runningEconomyCard
                     trainingZonesCard
@@ -36,8 +38,8 @@ public struct InsightsView: View {
             .background(Color.brand.background)
         }
         .task { await store.send(.onAppear).finish() }
-        .sheet(item: $activeInfo) { info in
-            InfoSheet(info: info)
+        .sheet(item: $activeInfoPresentation) { presentation in
+            InfoSheet(info: presentation.primary, siblings: presentation.siblings)
         }
     }
 
@@ -73,9 +75,19 @@ public struct InsightsView: View {
     /// the three series are *peers* — discoverable side-by-side beats a
     /// swipe gesture that hides options. Hero value + caption explain
     /// what's selected; chart below visualises the trend.
+    private var selectedTrendInfo: InsightInfo {
+        switch store.selectedTrend {
+        case .vdot:      .vdot
+        case .vo2Max:    .vo2Max
+        case .delta:     .delta
+        case .threshold: .threshold
+        }
+    }
+
     @ViewBuilder
     private var fitnessTrendCard: some View {
-        sectionCard(title: "Fitness trend", info: .fitnessTrend) {
+        sectionCard(title: "Fitness trend", info: selectedTrendInfo,
+                    siblings: [.vdot, .vo2Max, .delta, .threshold]) {
             VStack(alignment: .leading, spacing: 14) {
                 Picker("Series", selection: $store.selectedTrend) {
                     ForEach(InsightsFeature.TrendKind.allCases, id: \.self) { kind in
@@ -243,7 +255,7 @@ public struct InsightsView: View {
 
     // MARK: - Info state (shared across all cards)
 
-    @State private var activeInfo: InsightInfo? = nil
+    @State private var activeInfoPresentation: InsightInfoPresentation? = nil
 
     // MARK: - HRV trend card
 
@@ -345,6 +357,76 @@ public struct InsightsView: View {
         }
     }
 
+    // MARK: - Heart rate recovery card
+
+    @ViewBuilder
+    private var heartRateRecoveryCard: some View {
+        sectionCard(title: "HR recovery · 90 days", info: .heartRateRecovery) {
+            VStack(alignment: .leading, spacing: 10) {
+                if let latest = store.hrRecoverySamples.last {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            Text(latest.dropBPM.formatted(.number.precision(.fractionLength(0))))
+                                .font(.system(size: 36, weight: .bold, design: .rounded).monospacedDigit())
+                                .foregroundStyle(Color.brand.accent)
+                            Text("bpm")
+                                .font(.subheadline)
+                                .foregroundStyle(Color.brand.textSecondary)
+                        }
+                        Text(hrrZoneLabel(latest.dropBPM))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(hrrZoneColor(latest.dropBPM).opacity(0.85), in: Capsule())
+                    }
+                }
+                if store.hrRecoverySamples.count < 2 {
+                    emptyState("HR recovery is recorded by Apple Watch at the end of each workout. Complete a few outdoor runs to see your trend.")
+                } else {
+                    let drops = store.hrRecoverySamples.map(\.dropBPM)
+                    let yMax = (drops.max() ?? 40) + 5
+                    Chart(store.hrRecoverySamples) { sample in
+                        BarMark(
+                            x: .value("Date", sample.recordedAt, unit: .day),
+                            y: .value("Drop", sample.dropBPM)
+                        )
+                        .foregroundStyle(hrrZoneColor(sample.dropBPM).opacity(0.8))
+                        .cornerRadius(3)
+                        .accessibilityLabel(sample.recordedAt.formatted(date: .abbreviated, time: .omitted))
+                        .accessibilityValue("\(sample.dropBPM.formatted(.number.precision(.fractionLength(0)))) bpm drop")
+                    }
+                    .chartYScale(domain: 0...yMax)
+                    .chartYAxisLabel("bpm drop")
+                    .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
+                    .frame(height: 140)
+
+                    Text("A 1-minute drop above 22 bpm is considered good. Elite runners often exceed 40 bpm. Consistently low values signal poor recovery or overtraining.")
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+            }
+        }
+    }
+
+    private func hrrZoneLabel(_ drop: Double) -> String {
+        switch drop {
+        case ..<12:  "Poor"
+        case 12..<22: "Below avg"
+        case 22..<40: "Good"
+        default:     "Excellent"
+        }
+    }
+
+    private func hrrZoneColor(_ drop: Double) -> Color {
+        switch drop {
+        case ..<12:  .red
+        case 12..<22: .orange
+        case 22..<40: Color.brand.success
+        default:     Color.brand.accent
+        }
+    }
+
     // MARK: - Running economy card
 
     @State private var selectedFormKind: RunningFormKind = .verticalOscillation
@@ -388,27 +470,41 @@ public struct InsightsView: View {
     @ViewBuilder
     private func runningFormChart(samples: [DatedValue], kind: RunningFormKind) -> some View {
         let values = samples.map(\.value)
-        let lo = (values.min() ?? 0) * 0.95
-        let hi = (values.max() ?? 1) * 1.05
-        // VO and GCT: lower is better, invert y-axis so "up" = improvement
-        let domain: ClosedRange<Double> = kind.lowerIsBetter ? hi...lo : lo...hi
+        let rawMin = values.min() ?? 0
+        let rawMax = values.max() ?? 1
+        // Negate y values when lower is better so "up" = improvement without
+        // creating an inverted ClosedRange (which crashes Swift's precondition).
+        let sign: Double = kind.lowerIsBetter ? -1.0 : 1.0
+        let domainLo = kind.lowerIsBetter ? -(rawMax * 1.05) : rawMin * 0.95
+        let domainHi = kind.lowerIsBetter ? -(rawMin * 0.95) : rawMax * 1.05
         Chart(samples) { point in
             LineMark(
                 x: .value("Date", point.date),
-                y: .value(kind.unit, point.value)
+                y: .value(kind.unit, sign * point.value)
             )
             .interpolationMethod(.monotone)
             .foregroundStyle(Color.brand.accent.opacity(0.7))
             PointMark(
                 x: .value("Date", point.date),
-                y: .value(kind.unit, point.value)
+                y: .value(kind.unit, sign * point.value)
             )
             .foregroundStyle(Color.brand.accent)
             .symbolSize(30)
             .accessibilityLabel(point.date.formatted(date: .abbreviated, time: .omitted))
             .accessibilityValue("\(kind.format(point.value)) \(kind.unit)")
         }
-        .chartYScale(domain: domain)
+        .chartYScale(domain: domainLo...domainHi)
+        .chartYAxis {
+            AxisMarks { value in
+                AxisGridLine()
+                AxisValueLabel {
+                    if let v = value.as(Double.self) {
+                        Text(kind.format(v * sign))
+                            .font(.caption.monospacedDigit())
+                    }
+                }
+            }
+        }
         .chartYAxisLabel(kind.unit)
         .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
         .frame(height: 140)
@@ -447,14 +543,14 @@ public struct InsightsView: View {
         Chart(series) { point in
             LineMark(
                 x: .value("Date", point.date),
-                y: .value("s/km", point.value)
+                y: .value("s/km", -point.value)
             )
             .interpolationMethod(.monotone)
             .foregroundStyle(Color.brand.accent)
 
             PointMark(
                 x: .value("Date", point.date),
-                y: .value("s/km", point.value)
+                y: .value("s/km", -point.value)
             )
             .foregroundStyle(Color.brand.accent)
             .symbol(.circle)
@@ -462,16 +558,15 @@ public struct InsightsView: View {
             .accessibilityLabel(point.date.formatted(date: .abbreviated, time: .omitted))
             .accessibilityValue(PaceFormatting.paceMinutesSeconds(secondsPerKm: point.value, unit: paceUnit))
         }
-        // Y-axis is inverted: a lower s/km value means a faster pace (better LT).
-        // Swift Charts doesn't support axis reversal directly, so we use
-        // chartYScale with reversed domain to flip it visually.
-        .chartYScale(domain: hi...lo)
+        // Negate y values so "up" = faster pace (lower s/km = better LT).
+        // Displaying -point.value keeps ClosedRange valid: -hi...-lo where -hi < -lo.
+        .chartYScale(domain: -hi...(-lo))
         .chartYAxis {
             AxisMarks { value in
                 AxisGridLine()
                 AxisValueLabel {
                     if let sec = value.as(Double.self) {
-                        Text(PaceFormatting.paceMinutesSeconds(secondsPerKm: sec, unit: paceUnit))
+                        Text(PaceFormatting.paceMinutesSeconds(secondsPerKm: -sec, unit: paceUnit))
                             .font(.caption.monospacedDigit())
                     }
                 }
@@ -570,6 +665,7 @@ public struct InsightsView: View {
     private func sectionCard<Content: View>(
         title: String,
         info: InsightInfo? = nil,
+        siblings: [InsightInfo] = [],
         @ViewBuilder content: () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -579,7 +675,7 @@ public struct InsightsView: View {
                     .foregroundStyle(Color.brand.textSecondary)
                 if let info {
                     Button {
-                        activeInfo = info
+                        activeInfoPresentation = InsightInfoPresentation(primary: info, siblings: siblings)
                     } label: {
                         Image(systemName: "info.circle")
                             .font(.subheadline)
@@ -703,22 +799,103 @@ enum RunningFormKind: String, CaseIterable {
 
 // MARK: - Insight info model
 
+/// Carries the primary `InsightInfo` shown when a sheet opens, plus an
+/// optional ordered group for step-through navigation inside the sheet.
+struct InsightInfoPresentation: Identifiable {
+    var id: String { primary.id }
+    let primary: InsightInfo
+    let siblings: [InsightInfo]
+
+    init(primary: InsightInfo, siblings: [InsightInfo] = []) {
+        self.primary = primary
+        self.siblings = siblings
+    }
+}
+
 struct InsightInfo: Identifiable {
     let id: String
     let title: String
     let body: String
 
-    static let fitnessTrend = InsightInfo(
-        id: "fitnessTrend",
-        title: "Fitness Trend",
+    static let vdot = InsightInfo(
+        id: "vdot",
+        title: "VDOT",
         body: """
-**VDOT** is Jack Daniels' measure of your current running fitness, derived from your best recent race time or training performance. It drives all pace zones and session targets in RunCraft.
+VDOT is Jack Daniels' measure of your current running fitness. Derived from your best race time or training performance, it represents the effective oxygen-utilisation rate at which you actually race.
 
-**VO₂max** is your Apple Watch's independent estimate of maximum oxygen uptake (mL/kg/min). The Watch derives this from heart rate and GPS speed during outdoor runs.
+**Why it drives your plan**
 
-**Δ (Delta)** is the difference between your VDOT and VO₂max. A positive Δ means your race performance suggests higher fitness than the Watch estimates — you may simply be more economical than average. A consistently negative Δ can indicate that training load is building aerobic capacity faster than race-derived data reflects.
+VDOT powers every pace zone and session target in RunCraft — Easy, Marathon, Threshold, Interval, and Repetition paces are all computed from this single number.
 
-**T-pace** shows how your lactate threshold pace (equivalent to the Daniels threshold zone) has changed over time as your VDOT improved. A chart moving upward means you're running faster at threshold.
+**What to look for**
+
+• A rising VDOT over a training block confirms real fitness gains.
+
+• A plateau for 6+ weeks despite consistent training often signals the need for a new race stimulus, more easy volume, or a recovery week.
+
+• A sudden drop usually means the race data was an anomaly (heat, illness, pacing error) — use Adjust VDOT to correct it manually.
+"""
+    )
+
+    static let vo2Max = InsightInfo(
+        id: "vo2Max",
+        title: "VO₂max",
+        body: """
+VO₂max is your Apple Watch's independent estimate of maximum oxygen uptake (mL/kg/min), derived from heart rate and GPS speed during outdoor runs.
+
+**How it differs from VDOT**
+
+Both use the same unit but come from different sources. VDOT is derived from actual race performances. Apple Watch VO₂max is a physiological estimate from training data — typically more conservative and updated more frequently.
+
+**What to look for**
+
+• A gradual upward trend over months confirms aerobic capacity is growing.
+
+• The Watch's estimate is most accurate during easy-to-moderate outdoor runs with clean GPS and stable heart rate.
+
+• Values typically lag VDOT by 4–8 weeks when fitness improves rapidly.
+"""
+    )
+
+    static let delta = InsightInfo(
+        id: "delta",
+        title: "Δ (VDOT − VO₂max)",
+        body: """
+Delta is the difference between your VDOT and your Apple Watch's VO₂max estimate. It shows how your race-derived fitness compares to the Watch's physiological reading.
+
+**Interpreting the value**
+
+• **Positive Δ** — race performance implies higher fitness than the Watch estimates. Common in economical runners, or when the Watch hasn't had enough outdoor runs to update.
+
+• **Near zero** — VDOT and Watch VO₂max are in agreement. A good sign that both data sources are consistent.
+
+• **Negative Δ** — training has built aerobic capacity faster than race-derived VDOT reflects, or your last race was an underperformance. A good prompt to attempt a time trial.
+
+**What to watch**
+
+A persistently widening positive gap suggests you would benefit from more race-specific work.
+"""
+    )
+
+    static let threshold = InsightInfo(
+        id: "threshold",
+        title: "T-pace (Lactate Threshold)",
+        body: """
+T-pace is your lactate threshold pace — the Daniels Threshold zone midpoint, derived from your VDOT score. It represents the fastest pace sustainable for approximately 60 minutes.
+
+**Why track it over time**
+
+As your VDOT improves, your T-pace becomes faster. This chart shows how your threshold has progressed across your training history — a long-term view of speed development at the most important training intensity.
+
+**Reading the chart**
+
+The y-axis is inverted so upward movement always means improvement: a rising line means you are running faster at threshold. Each point corresponds to one VDOT update.
+
+**What to look for**
+
+• Consistent upward steps after threshold-focused training blocks (tempo runs, cruise intervals).
+
+• A flat trend despite rising VDOT suggests your aerobic base is improving but race-specific speed work may be lagging.
 """
     )
 
@@ -726,12 +903,15 @@ struct InsightInfo: Identifiable {
         id: "hrv",
         title: "Heart Rate Variability (HRV)",
         body: """
-HRV measures the millisecond variation between consecutive heartbeats (SDNN metric). A higher, stable HRV indicates that your autonomic nervous system is well-recovered and ready for training stress.
+HRV measures the millisecond variation between consecutive heartbeats using the SDNN metric. A higher, stable HRV indicates that your autonomic nervous system is well-recovered and ready for training stress.
 
-**What to look for:**
-- A rising weekly trend over months means your aerobic base is adapting well.
-- A sudden drop of 10–15 ms below your personal baseline is a strong signal to reduce intensity for 1–2 days.
-- Day-to-day fluctuation is normal — only sustained trends matter.
+**What to look for**
+
+• A rising weekly trend over months means your aerobic base is adapting well.
+
+• A sudden drop of 10–15 ms below your personal baseline is a strong signal to reduce training intensity for 1–2 days.
+
+• Day-to-day fluctuation is normal — only sustained trends matter.
 
 Apple Watch records HRV automatically overnight using the heart rate sensor.
 """
@@ -741,32 +921,69 @@ Apple Watch records HRV automatically overnight using the heart rate sensor.
         id: "restingHR",
         title: "Resting Heart Rate",
         body: """
-Resting heart rate (RHR) is the number of times your heart beats per minute when you're fully at rest. As your cardiovascular fitness improves, your heart becomes more efficient — pumping more blood per beat, so it needs to beat less often.
+Resting heart rate (RHR) is the number of times your heart beats per minute at full rest. As cardiovascular fitness improves, the heart becomes more efficient — pumping more blood per beat, so it needs to beat less often.
 
-**What to look for:**
-- A gradual downward trend over weeks and months indicates improving aerobic fitness.
-- An RHR spike of 5+ bpm above your baseline after a hard training block often signals incomplete recovery, illness, or overtraining.
-- Elite endurance athletes typically have RHR in the 40–55 bpm range.
+**What to look for**
 
-Apple Watch records RHR daily, usually using overnight heart rate data.
+• A gradual downward trend over weeks and months indicates improving aerobic fitness.
+
+• A spike of 5+ bpm above your baseline after a hard training block often signals incomplete recovery, illness, or overtraining.
+
+• Elite endurance athletes typically have RHR in the 40–55 bpm range.
+
+Apple Watch records RHR daily using overnight heart rate data.
+"""
+    )
+
+    static let heartRateRecovery = InsightInfo(
+        id: "heartRateRecovery",
+        title: "Heart Rate Recovery",
+        body: """
+Heart Rate Recovery (HRR) is the drop in heart rate during the 60 seconds immediately after a workout ends. It is one of the strongest measurable markers of cardiovascular fitness and autonomic nervous-system health.
+
+Apple Watch measures HRR automatically after every workout and stores it as heartRateRecoveryOneMinute in HealthKit.
+
+**Interpretation**
+
+• **< 12 bpm** — Poor. Associated with reduced fitness and higher cardiovascular risk.
+
+• **12–22 bpm** — Below average for recreational runners.
+
+• **22–40 bpm** — Good. Typical of trained endurance athletes.
+
+• **> 40 bpm** — Excellent. Elite endurance range.
+
+**What to watch for**
+
+• An upward trend over a training block indicates improving aerobic fitness.
+
+• Unusually low HRR after a hard week is an early sign of overtraining or approaching illness — often appears 24–48 hours before other symptoms.
+
+• HRR improves with consistent aerobic base training and adequate recovery.
 """
     )
 
     static let runningEconomy = InsightInfo(
         id: "runningEconomy",
-        title: "Running Economy (Form Metrics)",
+        title: "Running Economy",
         body: """
-Running economy (RE) is the energy cost of running at a given speed. Better RE means you use less oxygen (and effort) to maintain the same pace — a key predictor of performance alongside VO₂max.
+Running economy (RE) is the energy cost of running at a given speed. Better RE means using less oxygen — and less effort — to maintain the same pace. It is a key performance predictor alongside VO₂max.
 
-Apple Watch measures three biomechanical proxies during outdoor runs:
+Apple Watch measures three biomechanical proxies during outdoor runs on watchOS 10+.
 
-**Vertical Oscillation** — how much your body bounces up and down per stride (cm). Lower is better: energy spent moving vertically doesn't propel you forward.
+**Vertical Oscillation (cm)**
 
-**Ground Contact Time (GCT)** — how long your foot stays on the ground per stride (ms). Shorter contact time indicates a more elastic, reactive stride. Elite runners: ~160–200 ms. Recreational runners: ~250–300 ms.
+How much your body bounces up and down per stride. Lower is better: energy spent moving vertically doesn't propel you forward. Typical range: 6–13 cm.
 
-**Stride Length** — the distance covered per stride (m). Longer strides at the same heart rate indicate improved leg power and RE over time.
+**Ground Contact Time (ms)**
 
-The charts invert VO and GCT axes so that upward movement always means improvement.
+How long your foot stays on the ground per stride. Shorter contact time indicates a more elastic, reactive stride. Elite runners: ~160–200 ms. Recreational runners: ~250–300 ms.
+
+**Stride Length (m)**
+
+The distance covered per stride. Longer strides at the same heart rate indicate improved leg power and RE over time.
+
+The Vertical Oscillation and GCT charts are inverted so upward movement always means improvement.
 """
     )
 
@@ -774,17 +991,27 @@ The charts invert VO and GCT axes so that upward movement always means improveme
         id: "trainingZones",
         title: "Training Zones",
         body: """
-These five zones come from Jack Daniels' Running Formula and are calculated directly from your VDOT score. Each zone targets a specific physiological adaptation.
+These five zones come from Jack Daniels' Running Formula and are calculated directly from your VDOT score. Each targets a specific physiological adaptation.
 
-**Easy (E)** — aerobic base building and recovery. Should feel comfortable enough to hold a conversation. The majority of your weekly volume belongs here.
+**Easy (E)**
 
-**Marathon (M)** — sustained aerobic effort at goal marathon race pace. Trains fat metabolism and running economy.
+Aerobic base building and recovery. Comfortable enough to hold a conversation. The majority of your weekly volume belongs here.
 
-**Threshold (T)** — lactate threshold pace, roughly your 60-minute race effort. Improves the speed at which your body clears lactate. Often done as tempo runs or cruise intervals.
+**Marathon (M)**
 
-**Interval (I)** — VO₂max pace, approximately your 10–15 min race effort. Done as short hard repeats (3–5 min) with recovery jogs between.
+Sustained aerobic effort at goal marathon race pace. Trains fat metabolism and running economy.
 
-**Repetition (R)** — speed and economy work. Very short fast reps (60–90 sec) at close to mile race pace, with full recovery.
+**Threshold (T)**
+
+Lactate threshold pace — roughly your 60-minute race effort. Improves the speed at which your body clears lactate. Done as tempo runs or cruise intervals.
+
+**Interval (I)**
+
+VO₂max pace, approximately your 10–15 min race effort. Done as short hard repeats (3–5 min) with recovery jogs between.
+
+**Repetition (R)**
+
+Speed and economy work. Very short fast reps (60–90 sec) at close to mile race pace, with full recovery.
 """
     )
 }
@@ -792,20 +1019,46 @@ These five zones come from Jack Daniels' Running Formula and are calculated dire
 // MARK: - Info sheet
 
 private struct InfoSheet: View {
-    let info: InsightInfo
+    @State private var currentInfo: InsightInfo
+    let siblings: [InsightInfo]
     @Environment(\.dismiss) private var dismiss
+
+    init(info: InsightInfo, siblings: [InsightInfo] = []) {
+        self._currentInfo = State(initialValue: info)
+        self.siblings = siblings
+    }
+
+    private var currentIndex: Int {
+        siblings.firstIndex(where: { $0.id == currentInfo.id }) ?? 0
+    }
+    private var hasSiblings: Bool { siblings.count > 1 }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                Text(try! AttributedString(markdown: info.body))
-                    .font(.body)
-                    .foregroundStyle(Color.brand.textPrimary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(20)
+                VStack(alignment: .leading, spacing: 0) {
+                    if hasSiblings {
+                        stepBar
+                            .padding(.bottom, 20)
+                    }
+
+                    Text(currentInfo.title)
+                        .font(.title2.bold())
+                        .foregroundStyle(Color.brand.textPrimary)
+                        .padding(.bottom, 20)
+                        .animation(.none, value: currentInfo.id)
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(paragraphs(from: currentInfo.body), id: \.self) { para in
+                            infoParagraph(para)
+                        }
+                    }
+                    .id(currentInfo.id)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(20)
+                .animation(.easeInOut(duration: 0.2), value: currentInfo.id)
             }
-            .navigationTitle(info.title)
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
@@ -814,6 +1067,72 @@ private struct InfoSheet: View {
             .background(Color.brand.background)
         }
         .presentationDetents([.medium, .large])
+    }
+
+    // Prev / label pills / next
+    private var stepBar: some View {
+        HStack(spacing: 8) {
+            Button {
+                guard currentIndex > 0 else { return }
+                currentInfo = siblings[currentIndex - 1]
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(currentIndex > 0 ? Color.brand.accent : Color.brand.textSecondary.opacity(0.3))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Previous")
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(siblings) { sibling in
+                        Button {
+                            currentInfo = sibling
+                        } label: {
+                            Text(sibling.title)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(sibling.id == currentInfo.id ? .black : Color.brand.textSecondary)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(
+                                    Capsule()
+                                        .fill(sibling.id == currentInfo.id ? Color.brand.accent : Color.brand.surface)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
+            Button {
+                guard currentIndex < siblings.count - 1 else { return }
+                currentInfo = siblings[currentIndex + 1]
+            } label: {
+                Image(systemName: "chevron.right")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(currentIndex < siblings.count - 1 ? Color.brand.accent : Color.brand.textSecondary.opacity(0.3))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Next")
+        }
+    }
+
+    private func paragraphs(from body: String) -> [String] {
+        body.components(separatedBy: "\n\n").filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+    }
+
+    @ViewBuilder
+    private func infoParagraph(_ para: String) -> some View {
+        let isBullet  = para.hasPrefix("•")
+        let isHeading = !isBullet && para.hasPrefix("**")
+        let attr = (try? AttributedString(markdown: para)) ?? AttributedString(para)
+
+        Text(attr)
+            .font(isHeading ? .subheadline.weight(.semibold) : .callout)
+            .foregroundStyle(isHeading ? Color.brand.textPrimary : Color.brand.textSecondary)
+            .padding(.leading, isBullet ? 4 : 0)
+            .padding(.top, isHeading ? 16 : 6)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -941,3 +1260,4 @@ private struct RecentRunRow: View {
         .accessibilityLabel("\(Self.dateFormatter.string(from: run.completedAt)), \(distanceText), \(durationText), pace \(paceText) \(paceUnit == .perKilometre ? "per kilometre" : "per mile")")
     }
 }
+#endif

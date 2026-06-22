@@ -17,6 +17,7 @@ import VDOTEngine
         public var selectedTrend: TrendKind = .vdot
         public var isLoading: Bool = false
         public var hrvSamples: [HRVSample] = []
+        public var hrRecoverySamples: [HRRecoverySample] = []
         public var restingHRSamples: [RestingHRSample] = []
         public var runningForm: RunningFormTrend = .empty
 
@@ -124,6 +125,7 @@ import VDOTEngine
             recentWorkouts: [CompletedWorkout],
             vo2MaxSamples: [VO2MaxSample],
             hrvSamples: [HRVSample],
+            hrRecoverySamples: [HRRecoverySample],
             restingHRSamples: [RestingHRSample],
             runningForm: RunningFormTrend
         )
@@ -168,12 +170,14 @@ import VDOTEngine
                     // has granted access. Failures here must not block the load.
                     async let vo2Load: [VO2MaxSample] = (try? await healthKitClient.recentVO2MaxSamples(180)) ?? []
                     async let hrvLoad: [HRVSample] = (try? await healthKitClient.recentHRVSamples(90)) ?? []
+                    async let hrrLoad: [HRRecoverySample] = (try? await healthKitClient.recentHRRecoverySamples(90)) ?? []
                     async let restingHRLoad: [RestingHRSample] = (try? await healthKitClient.recentRestingHRSamples(90)) ?? []
                     async let formLoad: RunningFormTrend = (try? await healthKitClient.recentRunningForm(90)) ?? .empty
 
                     let (vdot, snapshots, workouts) = try await dbLoad
                     let vo2 = await vo2Load
                     let hrv = await hrvLoad
+                    let hrr = await hrrLoad
                     let restingHR = await restingHRLoad
                     let form = await formLoad
 
@@ -183,18 +187,20 @@ import VDOTEngine
                         recentWorkouts: workouts,
                         vo2MaxSamples: vo2,
                         hrvSamples: hrv,
+                        hrRecoverySamples: hrr,
                         restingHRSamples: restingHR,
                         runningForm: form
                     ))
                 }
 
-            case let .dataLoaded(vdot, snapshots, workouts, vo2, hrv, restingHR, form):
+            case let .dataLoaded(vdot, snapshots, workouts, vo2, hrv, hrr, restingHR, form):
                 state.isLoading = false
                 state.currentVDOT = vdot
                 state.snapshots = snapshots
                 state.recentWorkouts = workouts
                 state.vo2MaxSamples = vo2
                 state.hrvSamples = hrv
+                state.hrRecoverySamples = hrr
                 state.restingHRSamples = restingHR
                 state.runningForm = form
                 return .none

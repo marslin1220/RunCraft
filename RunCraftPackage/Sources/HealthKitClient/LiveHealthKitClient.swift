@@ -13,6 +13,7 @@ enum LiveHealthKitClient {
         HKObjectType.quantityType(forIdentifier: .runningVerticalOscillation)!,
         HKObjectType.quantityType(forIdentifier: .runningGroundContactTime)!,
         HKObjectType.quantityType(forIdentifier: .runningStrideLength)!,
+        HKObjectType.quantityType(forIdentifier: .heartRateRecoveryOneMinute)!,
     ]
 
     static func make() -> HealthKitClient {
@@ -48,6 +49,9 @@ enum LiveHealthKitClient {
             },
             recentRunningForm: { daysBack in
                 try await recentRunningForm(daysBack: daysBack)
+            },
+            recentHRRecoverySamples: { daysBack in
+                try await recentHRRecoverySamples(daysBack: daysBack)
             }
         )
     }
@@ -244,6 +248,38 @@ enum LiveHealthKitClient {
                     )
                 } ?? []
                 continuation.resume(returning: points)
+            }
+            store.execute(query)
+        }
+    }
+
+    // MARK: - Heart rate recovery
+
+    private static func recentHRRecoverySamples(daysBack: Int) async throws -> [HRRecoverySample] {
+        guard HKHealthStore.isHealthDataAvailable() else { return [] }
+        let store = HKHealthStore()
+        guard let type = HKObjectType.quantityType(forIdentifier: .heartRateRecoveryOneMinute) else {
+            return []
+        }
+        let startDate = Calendar.current.date(byAdding: .day, value: -daysBack, to: Date())!
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(
+                sampleType: type,
+                predicate: predicate,
+                limit: HKObjectQueryNoLimit,
+                sortDescriptors: [sort]
+            ) { _, samples, error in
+                if let error { continuation.resume(throwing: error); return }
+                let mapped = (samples as? [HKQuantitySample])?.map { s in
+                    HRRecoverySample(
+                        id: s.uuid.uuidString,
+                        recordedAt: s.startDate,
+                        dropBPM: s.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+                    )
+                } ?? []
+                continuation.resume(returning: mapped)
             }
             store.execute(query)
         }

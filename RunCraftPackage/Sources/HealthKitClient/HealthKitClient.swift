@@ -28,6 +28,10 @@ public struct HealthKitClient: Sendable {
     /// time, stride length) for the last `daysBack` days. Days with no run are
     /// omitted. All three series are fetched concurrently in the live value.
     public var recentRunningForm: @Sendable (_ daysBack: Int) async throws -> RunningFormTrend
+    /// One-minute heart-rate-recovery readings in the last `daysBack` days,
+    /// oldest first. Apple Watch records these automatically after each workout.
+    /// Value is the HR drop (bpm) in the 60 s following workout end.
+    public var recentHRRecoverySamples: @Sendable (_ daysBack: Int) async throws -> [HRRecoverySample]
 
     public init(
         requestAuthorization: @Sendable @escaping () async throws -> Void,
@@ -39,7 +43,8 @@ public struct HealthKitClient: Sendable {
         authorizationRequestStatus: @Sendable @escaping () async -> HealthAuthorizationRequestStatus,
         recentHRVSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [HRVSample],
         recentRestingHRSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [RestingHRSample],
-        recentRunningForm: @Sendable @escaping (_ daysBack: Int) async throws -> RunningFormTrend
+        recentRunningForm: @Sendable @escaping (_ daysBack: Int) async throws -> RunningFormTrend,
+        recentHRRecoverySamples: @Sendable @escaping (_ daysBack: Int) async throws -> [HRRecoverySample]
     ) {
         self.requestAuthorization = requestAuthorization
         self.bestRaceTime = bestRaceTime
@@ -51,6 +56,7 @@ public struct HealthKitClient: Sendable {
         self.recentHRVSamples = recentHRVSamples
         self.recentRestingHRSamples = recentRestingHRSamples
         self.recentRunningForm = recentRunningForm
+        self.recentHRRecoverySamples = recentHRRecoverySamples
     }
 }
 
@@ -127,6 +133,22 @@ public struct RestingHRSample: Sendable, Equatable, Identifiable {
         self.id = id
         self.recordedAt = recordedAt
         self.bpm = bpm
+    }
+}
+
+/// Apple Watch automatically records one of these after each workout: the
+/// drop in heart rate (bpm) during the 60 seconds following the workout end.
+/// Larger drops indicate better autonomic nervous-system recovery capacity.
+/// Available on watchOS 9+ / iOS 16+ via `.heartRateRecoveryOneMinute`.
+public struct HRRecoverySample: Sendable, Equatable, Identifiable {
+    public let id: String
+    public let recordedAt: Date
+    public let dropBPM: Double
+
+    public init(id: String, recordedAt: Date, dropBPM: Double) {
+        self.id = id
+        self.recordedAt = recordedAt
+        self.dropBPM = dropBPM
     }
 }
 
@@ -211,7 +233,8 @@ extension HealthKitClient: DependencyKey {
             authorizationRequestStatus: { .authorized },
             recentHRVSamples: { _ in [] },
             recentRestingHRSamples: { _ in [] },
-            recentRunningForm: { _ in .empty }
+            recentRunningForm: { _ in .empty },
+            recentHRRecoverySamples: { _ in [] }
         )
     }
 
