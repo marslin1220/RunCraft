@@ -18,6 +18,7 @@ import VDOTEngine
         public var isLoading: Bool = false
         public var hrvSamples: [HRVSample] = []
         public var restingHRSamples: [RestingHRSample] = []
+        public var runningForm: RunningFormTrend = .empty
 
         public init() {}
 
@@ -123,7 +124,8 @@ import VDOTEngine
             recentWorkouts: [CompletedWorkout],
             vo2MaxSamples: [VO2MaxSample],
             hrvSamples: [HRVSample],
-            restingHRSamples: [RestingHRSample]
+            restingHRSamples: [RestingHRSample],
+            runningForm: RunningFormTrend
         )
         case setUpVDOTTapped
         case delegate(Delegate)
@@ -167,11 +169,13 @@ import VDOTEngine
                     async let vo2Load: [VO2MaxSample] = (try? await healthKitClient.recentVO2MaxSamples(180)) ?? []
                     async let hrvLoad: [HRVSample] = (try? await healthKitClient.recentHRVSamples(90)) ?? []
                     async let restingHRLoad: [RestingHRSample] = (try? await healthKitClient.recentRestingHRSamples(90)) ?? []
+                    async let formLoad: RunningFormTrend = (try? await healthKitClient.recentRunningForm(90)) ?? .empty
 
                     let (vdot, snapshots, workouts) = try await dbLoad
                     let vo2 = await vo2Load
                     let hrv = await hrvLoad
                     let restingHR = await restingHRLoad
+                    let form = await formLoad
 
                     await send(.dataLoaded(
                         currentVDOT: vdot,
@@ -179,11 +183,12 @@ import VDOTEngine
                         recentWorkouts: workouts,
                         vo2MaxSamples: vo2,
                         hrvSamples: hrv,
-                        restingHRSamples: restingHR
+                        restingHRSamples: restingHR,
+                        runningForm: form
                     ))
                 }
 
-            case let .dataLoaded(vdot, snapshots, workouts, vo2, hrv, restingHR):
+            case let .dataLoaded(vdot, snapshots, workouts, vo2, hrv, restingHR, form):
                 state.isLoading = false
                 state.currentVDOT = vdot
                 state.snapshots = snapshots
@@ -191,6 +196,7 @@ import VDOTEngine
                 state.vo2MaxSamples = vo2
                 state.hrvSamples = hrv
                 state.restingHRSamples = restingHR
+                state.runningForm = form
                 return .none
 
             case .setUpVDOTTapped:

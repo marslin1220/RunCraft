@@ -24,6 +24,10 @@ public struct HealthKitClient: Sendable {
     public var recentHRVSamples: @Sendable (_ daysBack: Int) async throws -> [HRVSample]
     /// Daily resting heart-rate readings in the last `daysBack` days, oldest first.
     public var recentRestingHRSamples: @Sendable (_ daysBack: Int) async throws -> [RestingHRSample]
+    /// Daily-averaged running-form metrics (vertical oscillation, ground contact
+    /// time, stride length) for the last `daysBack` days. Days with no run are
+    /// omitted. All three series are fetched concurrently in the live value.
+    public var recentRunningForm: @Sendable (_ daysBack: Int) async throws -> RunningFormTrend
 
     public init(
         requestAuthorization: @Sendable @escaping () async throws -> Void,
@@ -34,7 +38,8 @@ public struct HealthKitClient: Sendable {
         recentVO2MaxSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [VO2MaxSample],
         authorizationRequestStatus: @Sendable @escaping () async -> HealthAuthorizationRequestStatus,
         recentHRVSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [HRVSample],
-        recentRestingHRSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [RestingHRSample]
+        recentRestingHRSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [RestingHRSample],
+        recentRunningForm: @Sendable @escaping (_ daysBack: Int) async throws -> RunningFormTrend
     ) {
         self.requestAuthorization = requestAuthorization
         self.bestRaceTime = bestRaceTime
@@ -45,6 +50,7 @@ public struct HealthKitClient: Sendable {
         self.authorizationRequestStatus = authorizationRequestStatus
         self.recentHRVSamples = recentHRVSamples
         self.recentRestingHRSamples = recentRestingHRSamples
+        self.recentRunningForm = recentRunningForm
     }
 }
 
@@ -56,6 +62,44 @@ public enum HealthAuthorizationRequestStatus: Sendable, Equatable {
     case authorized
     case needsRequest
     case unknown
+}
+
+/// A single dated value used for generic trends (RE metrics, etc.).
+public struct DatedValue: Sendable, Equatable, Identifiable {
+    public let id: String   // ISO8601 date string of the bucket start
+    public let date: Date
+    public let value: Double
+
+    public init(id: String, date: Date, value: Double) {
+        self.id = id
+        self.date = date
+        self.value = value
+    }
+}
+
+/// Running-form trend data for the last N days. Each array contains one
+/// point per calendar day on which the Watch recorded samples. Days with
+/// no run produce no entry (no zero-padding).
+public struct RunningFormTrend: Sendable, Equatable {
+    public let verticalOscillationCm: [DatedValue]
+    public let groundContactTimeMs: [DatedValue]
+    public let strideLengthM: [DatedValue]
+
+    public init(
+        verticalOscillationCm: [DatedValue],
+        groundContactTimeMs: [DatedValue],
+        strideLengthM: [DatedValue]
+    ) {
+        self.verticalOscillationCm = verticalOscillationCm
+        self.groundContactTimeMs = groundContactTimeMs
+        self.strideLengthM = strideLengthM
+    }
+
+    public static let empty = RunningFormTrend(
+        verticalOscillationCm: [],
+        groundContactTimeMs: [],
+        strideLengthM: []
+    )
 }
 
 /// Individual HRV reading (SDNN in milliseconds). Apple Watch records one
@@ -166,7 +210,8 @@ extension HealthKitClient: DependencyKey {
             recentVO2MaxSamples: { _ in [] },
             authorizationRequestStatus: { .authorized },
             recentHRVSamples: { _ in [] },
-            recentRestingHRSamples: { _ in [] }
+            recentRestingHRSamples: { _ in [] },
+            recentRunningForm: { _ in .empty }
         )
     }
 

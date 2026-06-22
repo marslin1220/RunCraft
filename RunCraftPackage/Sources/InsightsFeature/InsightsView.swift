@@ -23,6 +23,7 @@ public struct InsightsView: View {
                     fitnessTrendCard
                     hrvTrendCard
                     restingHRTrendCard
+                    runningEconomyCard
                     trainingZonesCard
                     weeklyMileageCard
                     predictedRacesCard
@@ -35,6 +36,9 @@ public struct InsightsView: View {
             .background(Color.brand.background)
         }
         .task { await store.send(.onAppear).finish() }
+        .sheet(item: $activeInfo) { info in
+            InfoSheet(info: info)
+        }
     }
 
     // MARK: - Cards
@@ -71,7 +75,7 @@ public struct InsightsView: View {
     /// what's selected; chart below visualises the trend.
     @ViewBuilder
     private var fitnessTrendCard: some View {
-        sectionCard(title: "Fitness trend") {
+        sectionCard(title: "Fitness trend", info: .fitnessTrend) {
             VStack(alignment: .leading, spacing: 14) {
                 Picker("Series", selection: $store.selectedTrend) {
                     ForEach(InsightsFeature.TrendKind.allCases, id: \.self) { kind in
@@ -237,11 +241,15 @@ public struct InsightsView: View {
         .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
     }
 
+    // MARK: - Info state (shared across all cards)
+
+    @State private var activeInfo: InsightInfo? = nil
+
     // MARK: - HRV trend card
 
     @ViewBuilder
     private var hrvTrendCard: some View {
-        sectionCard(title: "Heart rate variability · 90 days") {
+        sectionCard(title: "Heart rate variability · 90 days", info: .hrv) {
             VStack(alignment: .leading, spacing: 10) {
                 if let latest = store.hrvSamples.last {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -289,7 +297,7 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var restingHRTrendCard: some View {
-        sectionCard(title: "Resting heart rate · 90 days") {
+        sectionCard(title: "Resting heart rate · 90 days", info: .restingHR) {
             VStack(alignment: .leading, spacing: 10) {
                 if let latest = store.restingHRSamples.last {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -337,11 +345,80 @@ public struct InsightsView: View {
         }
     }
 
+    // MARK: - Running economy card
+
+    @State private var selectedFormKind: RunningFormKind = .verticalOscillation
+
+    @ViewBuilder
+    private var runningEconomyCard: some View {
+        sectionCard(title: "Running economy · 90 days", info: .runningEconomy) {
+            VStack(alignment: .leading, spacing: 14) {
+                Picker("Metric", selection: $selectedFormKind) {
+                    ForEach(RunningFormKind.allCases, id: \.self) { kind in
+                        Text(kind.label).tag(kind)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                let samples = selectedFormKind.samples(from: store.runningForm)
+
+                if let latest = samples.last {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(selectedFormKind.format(latest.value))
+                            .font(.system(size: 36, weight: .bold, design: .rounded).monospacedDigit())
+                            .foregroundStyle(Color.brand.accent)
+                        Text(selectedFormKind.unit)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.brand.textSecondary)
+                    }
+                }
+
+                if samples.count < 2 {
+                    emptyState(selectedFormKind.emptyStateText)
+                } else {
+                    runningFormChart(samples: samples, kind: selectedFormKind)
+                    Text(selectedFormKind.interpretationText)
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func runningFormChart(samples: [DatedValue], kind: RunningFormKind) -> some View {
+        let values = samples.map(\.value)
+        let lo = (values.min() ?? 0) * 0.95
+        let hi = (values.max() ?? 1) * 1.05
+        // VO and GCT: lower is better, invert y-axis so "up" = improvement
+        let domain: ClosedRange<Double> = kind.lowerIsBetter ? hi...lo : lo...hi
+        Chart(samples) { point in
+            LineMark(
+                x: .value("Date", point.date),
+                y: .value(kind.unit, point.value)
+            )
+            .interpolationMethod(.monotone)
+            .foregroundStyle(Color.brand.accent.opacity(0.7))
+            PointMark(
+                x: .value("Date", point.date),
+                y: .value(kind.unit, point.value)
+            )
+            .foregroundStyle(Color.brand.accent)
+            .symbolSize(30)
+            .accessibilityLabel(point.date.formatted(date: .abbreviated, time: .omitted))
+            .accessibilityValue("\(kind.format(point.value)) \(kind.unit)")
+        }
+        .chartYScale(domain: domain)
+        .chartYAxisLabel(kind.unit)
+        .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
+        .frame(height: 140)
+    }
+
     // MARK: - Training zones card
 
     @ViewBuilder
     private var trainingZonesCard: some View {
-        sectionCard(title: "Training zones") {
+        sectionCard(title: "Training zones", info: .trainingZones) {
             if store.currentVDOT == 0 {
                 emptyState("Set a VDOT in the Plan tab to see your pace zones.")
             } else {
@@ -492,12 +569,26 @@ public struct InsightsView: View {
     @ViewBuilder
     private func sectionCard<Content: View>(
         title: String,
+        info: InsightInfo? = nil,
         @ViewBuilder content: () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Color.brand.textSecondary)
+            HStack(spacing: 6) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.brand.textSecondary)
+                if let info {
+                    Button {
+                        activeInfo = info
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.brand.textSecondary.opacity(0.7))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Learn more about \(title)")
+                }
+            }
             content()
         }
         .padding(16)
@@ -545,6 +636,184 @@ public struct InsightsView: View {
         case .threshold:
             return PaceFormatting.paceMinutesSeconds(secondsPerKm: value, unit: paceUnit)
         }
+    }
+}
+
+// MARK: - Running form kind
+
+enum RunningFormKind: String, CaseIterable {
+    case verticalOscillation
+    case groundContactTime
+    case strideLength
+
+    var label: String {
+        switch self {
+        case .verticalOscillation: "V. Osc"
+        case .groundContactTime:   "GCT"
+        case .strideLength:        "Stride"
+        }
+    }
+
+    var unit: String {
+        switch self {
+        case .verticalOscillation: "cm"
+        case .groundContactTime:   "ms"
+        case .strideLength:        "m"
+        }
+    }
+
+    var lowerIsBetter: Bool {
+        switch self {
+        case .verticalOscillation, .groundContactTime: true
+        case .strideLength: false
+        }
+    }
+
+    func format(_ value: Double) -> String {
+        switch self {
+        case .verticalOscillation: value.formatted(.number.precision(.fractionLength(1)))
+        case .groundContactTime:   value.formatted(.number.precision(.fractionLength(0)))
+        case .strideLength:        value.formatted(.number.precision(.fractionLength(2)))
+        }
+    }
+
+    func samples(from trend: RunningFormTrend) -> [DatedValue] {
+        switch self {
+        case .verticalOscillation: trend.verticalOscillationCm
+        case .groundContactTime:   trend.groundContactTimeMs
+        case .strideLength:        trend.strideLengthM
+        }
+    }
+
+    var emptyStateText: String {
+        "Run outdoors with your Apple Watch to record \(label) data. Appears after watchOS 10 workouts with GPS."
+    }
+
+    var interpretationText: String {
+        switch self {
+        case .verticalOscillation:
+            "Typical range: 6–13 cm. Lower means less energy wasted bouncing vertically — a hallmark of efficient running form."
+        case .groundContactTime:
+            "Typical range: 160–300 ms. Shorter contact time means quicker, more elastic strides and better energy return."
+        case .strideLength:
+            "Longer strides at the same effort indicate improved leg power and running economy over time."
+        }
+    }
+}
+
+// MARK: - Insight info model
+
+struct InsightInfo: Identifiable {
+    let id: String
+    let title: String
+    let body: String
+
+    static let fitnessTrend = InsightInfo(
+        id: "fitnessTrend",
+        title: "Fitness Trend",
+        body: """
+**VDOT** is Jack Daniels' measure of your current running fitness, derived from your best recent race time or training performance. It drives all pace zones and session targets in RunCraft.
+
+**VO₂max** is your Apple Watch's independent estimate of maximum oxygen uptake (mL/kg/min). The Watch derives this from heart rate and GPS speed during outdoor runs.
+
+**Δ (Delta)** is the difference between your VDOT and VO₂max. A positive Δ means your race performance suggests higher fitness than the Watch estimates — you may simply be more economical than average. A consistently negative Δ can indicate that training load is building aerobic capacity faster than race-derived data reflects.
+
+**T-pace** shows how your lactate threshold pace (equivalent to the Daniels threshold zone) has changed over time as your VDOT improved. A chart moving upward means you're running faster at threshold.
+"""
+    )
+
+    static let hrv = InsightInfo(
+        id: "hrv",
+        title: "Heart Rate Variability (HRV)",
+        body: """
+HRV measures the millisecond variation between consecutive heartbeats (SDNN metric). A higher, stable HRV indicates that your autonomic nervous system is well-recovered and ready for training stress.
+
+**What to look for:**
+- A rising weekly trend over months means your aerobic base is adapting well.
+- A sudden drop of 10–15 ms below your personal baseline is a strong signal to reduce intensity for 1–2 days.
+- Day-to-day fluctuation is normal — only sustained trends matter.
+
+Apple Watch records HRV automatically overnight using the heart rate sensor.
+"""
+    )
+
+    static let restingHR = InsightInfo(
+        id: "restingHR",
+        title: "Resting Heart Rate",
+        body: """
+Resting heart rate (RHR) is the number of times your heart beats per minute when you're fully at rest. As your cardiovascular fitness improves, your heart becomes more efficient — pumping more blood per beat, so it needs to beat less often.
+
+**What to look for:**
+- A gradual downward trend over weeks and months indicates improving aerobic fitness.
+- An RHR spike of 5+ bpm above your baseline after a hard training block often signals incomplete recovery, illness, or overtraining.
+- Elite endurance athletes typically have RHR in the 40–55 bpm range.
+
+Apple Watch records RHR daily, usually using overnight heart rate data.
+"""
+    )
+
+    static let runningEconomy = InsightInfo(
+        id: "runningEconomy",
+        title: "Running Economy (Form Metrics)",
+        body: """
+Running economy (RE) is the energy cost of running at a given speed. Better RE means you use less oxygen (and effort) to maintain the same pace — a key predictor of performance alongside VO₂max.
+
+Apple Watch measures three biomechanical proxies during outdoor runs:
+
+**Vertical Oscillation** — how much your body bounces up and down per stride (cm). Lower is better: energy spent moving vertically doesn't propel you forward.
+
+**Ground Contact Time (GCT)** — how long your foot stays on the ground per stride (ms). Shorter contact time indicates a more elastic, reactive stride. Elite runners: ~160–200 ms. Recreational runners: ~250–300 ms.
+
+**Stride Length** — the distance covered per stride (m). Longer strides at the same heart rate indicate improved leg power and RE over time.
+
+The charts invert VO and GCT axes so that upward movement always means improvement.
+"""
+    )
+
+    static let trainingZones = InsightInfo(
+        id: "trainingZones",
+        title: "Training Zones",
+        body: """
+These five zones come from Jack Daniels' Running Formula and are calculated directly from your VDOT score. Each zone targets a specific physiological adaptation.
+
+**Easy (E)** — aerobic base building and recovery. Should feel comfortable enough to hold a conversation. The majority of your weekly volume belongs here.
+
+**Marathon (M)** — sustained aerobic effort at goal marathon race pace. Trains fat metabolism and running economy.
+
+**Threshold (T)** — lactate threshold pace, roughly your 60-minute race effort. Improves the speed at which your body clears lactate. Often done as tempo runs or cruise intervals.
+
+**Interval (I)** — VO₂max pace, approximately your 10–15 min race effort. Done as short hard repeats (3–5 min) with recovery jogs between.
+
+**Repetition (R)** — speed and economy work. Very short fast reps (60–90 sec) at close to mile race pace, with full recovery.
+"""
+    )
+}
+
+// MARK: - Info sheet
+
+private struct InfoSheet: View {
+    let info: InsightInfo
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                Text(try! AttributedString(markdown: info.body))
+                    .font(.body)
+                    .foregroundStyle(Color.brand.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(20)
+            }
+            .navigationTitle(info.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+            .background(Color.brand.background)
+        }
+        .presentationDetents([.medium, .large])
     }
 }
 

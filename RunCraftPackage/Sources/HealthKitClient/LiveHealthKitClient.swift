@@ -10,6 +10,9 @@ enum LiveHealthKitClient {
         HKObjectType.quantityType(forIdentifier: .vo2Max)!,
         HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
         HKObjectType.quantityType(forIdentifier: .restingHeartRate)!,
+        HKObjectType.quantityType(forIdentifier: .runningVerticalOscillation)!,
+        HKObjectType.quantityType(forIdentifier: .runningGroundContactTime)!,
+        HKObjectType.quantityType(forIdentifier: .runningStrideLength)!,
     ]
 
     static func make() -> HealthKitClient {
@@ -42,6 +45,9 @@ enum LiveHealthKitClient {
             },
             recentRestingHRSamples: { daysBack in
                 try await recentRestingHRSamples(daysBack: daysBack)
+            },
+            recentRunningForm: { daysBack in
+                try await recentRunningForm(daysBack: daysBack)
             }
         )
     }
@@ -182,6 +188,62 @@ enum LiveHealthKitClient {
                                     bpm: s.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute())))
                 } ?? []
                 continuation.resume(returning: mapped)
+            }
+            store.execute(query)
+        }
+    }
+
+    // MARK: - Running form (RE proxies)
+
+    private static func recentRunningForm(daysBack: Int) async throws -> RunningFormTrend {
+        async let vo   = dailyAverages(for: .runningVerticalOscillation, unit: .meterUnit(with: .centi), daysBack: daysBack)
+        async let gct  = dailyAverages(for: .runningGroundContactTime,   unit: .secondUnit(with: .milli), daysBack: daysBack)
+        async let stride = dailyAverages(for: .runningStrideLength,       unit: .meter(), daysBack: daysBack)
+        return try await RunningFormTrend(
+            verticalOscillationCm: vo,
+            groundContactTimeMs: gct,
+            strideLengthM: stride
+        )
+    }
+
+    /// Queries a quantity type using `HKStatisticsCollectionQuery` with a
+    /// 1-day interval. Returns one `DatedValue` per day that has data.
+    private static func dailyAverages(
+        for identifier: HKQuantityTypeIdentifier,
+        unit: HKUnit,
+        daysBack: Int
+    ) async throws -> [DatedValue] {
+        guard HKHealthStore.isHealthDataAvailable() else { return [] }
+        let store = HKHealthStore()
+        guard let type = HKObjectType.quantityType(forIdentifier: identifier) else { return [] }
+
+        let calendar = Calendar.current
+        let now = Date()
+        let startDate = calendar.date(byAdding: .day, value: -daysBack, to: now)!
+        // Anchor on midnight so buckets align to calendar days.
+        let anchorDate = calendar.startOfDay(for: startDate)
+        let interval = DateComponents(day: 1)
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: now)
+
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKStatisticsCollectionQuery(
+                quantityType: type,
+                quantitySamplePredicate: predicate,
+                options: .discreteAverage,
+                anchorDate: anchorDate,
+                intervalComponents: interval
+            )
+            query.initialResultsHandler = { _, results, error in
+                if let error { continuation.resume(throwing: error); return }
+                let points = results?.statistics().compactMap { stats -> DatedValue? in
+                    guard let avg = stats.averageQuantity() else { return nil }
+                    return DatedValue(
+                        id: stats.startDate.ISO8601Format(),
+                        date: stats.startDate,
+                        value: avg.doubleValue(for: unit)
+                    )
+                } ?? []
+                continuation.resume(returning: points)
             }
             store.execute(query)
         }
