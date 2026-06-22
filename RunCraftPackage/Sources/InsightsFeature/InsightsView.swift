@@ -431,9 +431,18 @@ public struct InsightsView: View {
 
     @State private var selectedFormKind: RunningFormKind = .verticalOscillation
 
+    private var selectedFormKindInfo: InsightInfo {
+        switch selectedFormKind {
+        case .verticalOscillation: .verticalOscillation
+        case .groundContactTime:   .groundContactTime
+        case .strideLength:        .strideLength
+        }
+    }
+
     @ViewBuilder
     private var runningEconomyCard: some View {
-        sectionCard(title: "Running economy · 90 days", info: .runningEconomy) {
+        sectionCard(title: "Running economy · 90 days", info: selectedFormKindInfo,
+                    siblings: [.verticalOscillation, .groundContactTime, .strideLength]) {
             VStack(alignment: .leading, spacing: 14) {
                 Picker("Metric", selection: $selectedFormKind) {
                     ForEach(RunningFormKind.allCases, id: \.self) { kind in
@@ -963,27 +972,73 @@ Apple Watch measures HRR automatically after every workout and stores it as hear
 """
     )
 
-    static let runningEconomy = InsightInfo(
-        id: "runningEconomy",
-        title: "Running Economy",
+    static let verticalOscillation = InsightInfo(
+        id: "verticalOscillation",
+        title: "Vertical Oscillation",
         body: """
-Running economy (RE) is the energy cost of running at a given speed. Better RE means using less oxygen — and less effort — to maintain the same pace. It is a key performance predictor alongside VO₂max.
+Vertical oscillation (VO) measures how much your centre of mass bounces up and down with each stride, in centimetres. Energy spent moving vertically doesn't propel you forward — lower is better.
 
-Apple Watch measures three biomechanical proxies during outdoor runs on watchOS 10+.
+**Typical ranges**
 
-**Vertical Oscillation (cm)**
+• Elite runners: 6–8 cm
 
-How much your body bounces up and down per stride. Lower is better: energy spent moving vertically doesn't propel you forward. Typical range: 6–13 cm.
+• Recreational runners: 9–13 cm
 
-**Ground Contact Time (ms)**
+• Values above 13 cm suggest significant energy waste and often correlate with overstriding or weak hip stability.
 
-How long your foot stays on the ground per stride. Shorter contact time indicates a more elastic, reactive stride. Elite runners: ~160–200 ms. Recreational runners: ~250–300 ms.
+**What to look for**
 
-**Stride Length (m)**
+• A gradual downward trend over months indicates improving running economy and form.
 
-The distance covered per stride. Longer strides at the same heart rate indicate improved leg power and RE over time.
+• VO often decreases naturally as cadence increases — if GCT is also improving, the gains compound.
 
-The Vertical Oscillation and GCT charts are inverted so upward movement always means improvement.
+• The chart y-axis is inverted so upward movement always means improvement.
+"""
+    )
+
+    static let groundContactTime = InsightInfo(
+        id: "groundContactTime",
+        title: "Ground Contact Time",
+        body: """
+Ground contact time (GCT) is the duration your foot stays on the ground during each stride, in milliseconds. A shorter GCT indicates a more elastic, reactive stride — your muscles and tendons store and release energy efficiently rather than absorbing it passively.
+
+**Typical ranges**
+
+• Elite runners: 160–200 ms
+
+• Recreational runners: 250–300 ms
+
+• Values above 300 ms are common in beginners and often linked to low cadence or heel striking.
+
+**What to look for**
+
+• A downward trend reflects neuromuscular adaptation — your legs are getting quicker off the ground.
+
+• GCT drops most reliably after a period of consistent easy running, strides, and light plyometric work.
+
+• The chart y-axis is inverted so upward movement always means improvement.
+"""
+    )
+
+    static let strideLength = InsightInfo(
+        id: "strideLength",
+        title: "Stride Length",
+        body: """
+Stride length is the distance covered between two consecutive footfalls of the same foot, in metres. Longer strides at the same heart rate indicate that your legs are producing more power per step — a hallmark of improving running economy.
+
+**Typical ranges**
+
+• Highly depends on height, speed, and fitness. A 1.70 m runner at easy pace: ~1.2–1.5 m per stride.
+
+• At threshold pace, elite runners often exceed 2.0 m.
+
+**What to look for**
+
+• A rising trend over a training block at a consistent easy-pace heart rate confirms real economy gains.
+
+• Stride length naturally increases as GCT decreases and vertical oscillation drops — all three metrics are connected.
+
+• Artificially forcing a longer stride (overstriding) increases injury risk — let it grow as a consequence of fitness, not a target in itself.
 """
     )
 
