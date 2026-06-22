@@ -46,6 +46,7 @@ extension LiveWorkoutClient: DependencyKey {
                     coordinator.setContinuation(continuation)
 
                     let store = HKHealthStore()
+                    coordinator.retainStore(store)
                     store.workoutSessionMirroringStartHandler = { mirroredSession in
                         liveWorkoutLogger.log("mirrored session started")
                         coordinator.attachSession(mirroredSession, continuation: continuation)
@@ -86,9 +87,18 @@ extension DependencyValues {
 private final class MirroringCoordinator: NSObject, HKWorkoutSessionDelegate, @unchecked Sendable {
     private var session: HKWorkoutSession?
     private var continuation: AsyncStream<LiveWorkoutEvent>.Continuation?
+    // Retained here so workoutSessionMirroringStartHandler stays registered
+    // for the lifetime of the stream. Without this, the local `store` in the
+    // AsyncStream closure is released immediately after the closure returns,
+    // silently removing the handler before any session arrives.
+    private var healthStore: HKHealthStore?
 
     func setContinuation(_ continuation: AsyncStream<LiveWorkoutEvent>.Continuation) {
         self.continuation = continuation
+    }
+
+    func retainStore(_ store: HKHealthStore) {
+        self.healthStore = store
     }
 
     func attachSession(
@@ -103,6 +113,7 @@ private final class MirroringCoordinator: NSObject, HKWorkoutSessionDelegate, @u
     func detachSession() {
         session = nil
         continuation = nil
+        healthStore = nil
     }
 
     func send(command: WorkoutMirrorCommand) async {
