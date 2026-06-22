@@ -20,6 +20,10 @@ public struct HealthKitClient: Sendable {
     /// if it asked right now. `.needsRequest` after permission was already
     /// granted once means the runner revoked it via Settings.
     public var authorizationRequestStatus: @Sendable () async -> HealthAuthorizationRequestStatus
+    /// Individual HRV (SDNN, ms) readings in the last `daysBack` days, oldest first.
+    public var recentHRVSamples: @Sendable (_ daysBack: Int) async throws -> [HRVSample]
+    /// Daily resting heart-rate readings in the last `daysBack` days, oldest first.
+    public var recentRestingHRSamples: @Sendable (_ daysBack: Int) async throws -> [RestingHRSample]
 
     public init(
         requestAuthorization: @Sendable @escaping () async throws -> Void,
@@ -28,7 +32,9 @@ public struct HealthKitClient: Sendable {
         recentSleepHours: @Sendable @escaping (_ nights: Int) async throws -> Double,
         recentWorkouts: @Sendable @escaping (_ since: Date) async throws -> [HKWorkoutSummary],
         recentVO2MaxSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [VO2MaxSample],
-        authorizationRequestStatus: @Sendable @escaping () async -> HealthAuthorizationRequestStatus
+        authorizationRequestStatus: @Sendable @escaping () async -> HealthAuthorizationRequestStatus,
+        recentHRVSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [HRVSample],
+        recentRestingHRSamples: @Sendable @escaping (_ daysBack: Int) async throws -> [RestingHRSample]
     ) {
         self.requestAuthorization = requestAuthorization
         self.bestRaceTime = bestRaceTime
@@ -37,6 +43,8 @@ public struct HealthKitClient: Sendable {
         self.recentWorkouts = recentWorkouts
         self.recentVO2MaxSamples = recentVO2MaxSamples
         self.authorizationRequestStatus = authorizationRequestStatus
+        self.recentHRVSamples = recentHRVSamples
+        self.recentRestingHRSamples = recentRestingHRSamples
     }
 }
 
@@ -48,6 +56,34 @@ public enum HealthAuthorizationRequestStatus: Sendable, Equatable {
     case authorized
     case needsRequest
     case unknown
+}
+
+/// Individual HRV reading (SDNN in milliseconds). Apple Watch records one
+/// per significant daily activity; most runners get one per night.
+public struct HRVSample: Sendable, Equatable, Identifiable {
+    public let id: String
+    public let recordedAt: Date
+    public let sdnnMs: Double
+
+    public init(id: String, recordedAt: Date, sdnnMs: Double) {
+        self.id = id
+        self.recordedAt = recordedAt
+        self.sdnnMs = sdnnMs
+    }
+}
+
+/// Daily resting heart rate (bpm) recorded by Apple Watch.
+/// A declining trend over weeks indicates improving aerobic fitness.
+public struct RestingHRSample: Sendable, Equatable, Identifiable {
+    public let id: String
+    public let recordedAt: Date
+    public let bpm: Double
+
+    public init(id: String, recordedAt: Date, bpm: Double) {
+        self.id = id
+        self.recordedAt = recordedAt
+        self.bpm = bpm
+    }
 }
 
 /// Apple-Watch-derived VO2max reading. Same unit (mL/(kg·min)) as Daniels'
@@ -128,7 +164,9 @@ extension HealthKitClient: DependencyKey {
             recentSleepHours: { _ in 7.5 },
             recentWorkouts: { _ in [] },
             recentVO2MaxSamples: { _ in [] },
-            authorizationRequestStatus: { .authorized }
+            authorizationRequestStatus: { .authorized },
+            recentHRVSamples: { _ in [] },
+            recentRestingHRSamples: { _ in [] }
         )
     }
 

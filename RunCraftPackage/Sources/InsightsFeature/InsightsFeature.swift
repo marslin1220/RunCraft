@@ -16,6 +16,8 @@ import VDOTEngine
         public var recentWorkouts: [CompletedWorkout] = []
         public var selectedTrend: TrendKind = .vdot
         public var isLoading: Bool = false
+        public var hrvSamples: [HRVSample] = []
+        public var restingHRSamples: [RestingHRSample] = []
 
         public init() {}
 
@@ -103,7 +105,9 @@ import VDOTEngine
             currentVDOT: Double,
             snapshots: [VDOTSnapshot],
             recentWorkouts: [CompletedWorkout],
-            vo2MaxSamples: [VO2MaxSample]
+            vo2MaxSamples: [VO2MaxSample],
+            hrvSamples: [HRVSample],
+            restingHRSamples: [RestingHRSample]
         )
         case setUpVDOTTapped
         case delegate(Delegate)
@@ -142,28 +146,35 @@ import VDOTEngine
                             .fetchAll(db)
                         return (goal?.currentVDOT ?? 0, snaps, workouts)
                     }
-                    // VO2max is optional — Watch only emits sporadically and
-                    // not every runner has HealthKit access. Failing here
-                    // shouldn't block the rest of the Insights load.
+                    // HK queries are optional — not every runner has a Watch or
+                    // has granted access. Failures here must not block the load.
                     async let vo2Load: [VO2MaxSample] = (try? await healthKitClient.recentVO2MaxSamples(180)) ?? []
+                    async let hrvLoad: [HRVSample] = (try? await healthKitClient.recentHRVSamples(90)) ?? []
+                    async let restingHRLoad: [RestingHRSample] = (try? await healthKitClient.recentRestingHRSamples(90)) ?? []
 
                     let (vdot, snapshots, workouts) = try await dbLoad
                     let vo2 = await vo2Load
+                    let hrv = await hrvLoad
+                    let restingHR = await restingHRLoad
 
                     await send(.dataLoaded(
                         currentVDOT: vdot,
                         snapshots: snapshots,
                         recentWorkouts: workouts,
-                        vo2MaxSamples: vo2
+                        vo2MaxSamples: vo2,
+                        hrvSamples: hrv,
+                        restingHRSamples: restingHR
                     ))
                 }
 
-            case let .dataLoaded(vdot, snapshots, workouts, vo2):
+            case let .dataLoaded(vdot, snapshots, workouts, vo2, hrv, restingHR):
                 state.isLoading = false
                 state.currentVDOT = vdot
                 state.snapshots = snapshots
                 state.recentWorkouts = workouts
                 state.vo2MaxSamples = vo2
+                state.hrvSamples = hrv
+                state.restingHRSamples = restingHR
                 return .none
 
             case .setUpVDOTTapped:

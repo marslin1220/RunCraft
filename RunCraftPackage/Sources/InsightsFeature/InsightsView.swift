@@ -1,6 +1,7 @@
 import Charts
 import ComposableArchitecture
 import DesignSystem
+import HealthKitClient
 import RunCraftModels
 import SwiftUI
 import VDOTEngine
@@ -20,6 +21,9 @@ public struct InsightsView: View {
                         vdotSetupCard
                     }
                     fitnessTrendCard
+                    hrvTrendCard
+                    restingHRTrendCard
+                    trainingZonesCard
                     weeklyMileageCard
                     predictedRacesCard
                     recentRunsCard
@@ -227,6 +231,130 @@ public struct InsightsView: View {
         .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
     }
 
+    // MARK: - HRV trend card
+
+    @ViewBuilder
+    private var hrvTrendCard: some View {
+        sectionCard(title: "Heart rate variability · 90 days") {
+            VStack(alignment: .leading, spacing: 10) {
+                if let latest = store.hrvSamples.last {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(latest.sdnnMs.formatted(.number.precision(.fractionLength(0))))
+                            .font(.system(size: 36, weight: .bold, design: .rounded).monospacedDigit())
+                            .foregroundStyle(Color.brand.accent)
+                        Text("ms SDNN")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.brand.textSecondary)
+                    }
+                }
+                if store.hrvSamples.count < 2 {
+                    emptyState("HRV readings appear here after Apple Watch records overnight SDNN data. Wear your Watch to sleep for a few nights.")
+                } else {
+                    Chart(store.hrvSamples) { sample in
+                        LineMark(
+                            x: .value("Date", sample.recordedAt),
+                            y: .value("ms", sample.sdnnMs)
+                        )
+                        .interpolationMethod(.monotone)
+                        .foregroundStyle(Color.brand.accent.opacity(0.7))
+
+                        PointMark(
+                            x: .value("Date", sample.recordedAt),
+                            y: .value("ms", sample.sdnnMs)
+                        )
+                        .foregroundStyle(Color.brand.accent)
+                        .symbolSize(30)
+                        .accessibilityLabel(sample.recordedAt.formatted(date: .abbreviated, time: .omitted))
+                        .accessibilityValue("\(sample.sdnnMs.formatted(.number.precision(.fractionLength(0)))) ms SDNN")
+                    }
+                    .frame(height: 140)
+                    .chartYAxisLabel("ms")
+                    .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
+
+                    Text("Higher HRV indicates better recovery and aerobic adaptation. A rising trend over weeks means your training is building fitness without excess stress.")
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+            }
+        }
+    }
+
+    // MARK: - Resting HR trend card
+
+    @ViewBuilder
+    private var restingHRTrendCard: some View {
+        sectionCard(title: "Resting heart rate · 90 days") {
+            VStack(alignment: .leading, spacing: 10) {
+                if let latest = store.restingHRSamples.last {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(latest.bpm.formatted(.number.precision(.fractionLength(0))))
+                            .font(.system(size: 36, weight: .bold, design: .rounded).monospacedDigit())
+                            .foregroundStyle(Color.brand.accent)
+                        Text("bpm")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.brand.textSecondary)
+                    }
+                }
+                if store.restingHRSamples.count < 2 {
+                    emptyState("Resting heart rate appears after Apple Watch records several overnight readings.")
+                } else {
+                    let bpms = store.restingHRSamples.map(\.bpm)
+                    let minBPM = (bpms.min() ?? 40) - 3
+                    let maxBPM = (bpms.max() ?? 80) + 3
+                    Chart(store.restingHRSamples) { sample in
+                        LineMark(
+                            x: .value("Date", sample.recordedAt),
+                            y: .value("bpm", sample.bpm)
+                        )
+                        .interpolationMethod(.monotone)
+                        .foregroundStyle(Color.brand.caution.opacity(0.7))
+
+                        PointMark(
+                            x: .value("Date", sample.recordedAt),
+                            y: .value("bpm", sample.bpm)
+                        )
+                        .foregroundStyle(Color.brand.caution)
+                        .symbolSize(30)
+                        .accessibilityLabel(sample.recordedAt.formatted(date: .abbreviated, time: .omitted))
+                        .accessibilityValue("\(sample.bpm.formatted(.number.precision(.fractionLength(0)))) bpm")
+                    }
+                    .frame(height: 140)
+                    .chartYScale(domain: minBPM...maxBPM)
+                    .chartYAxisLabel("bpm")
+                    .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
+
+                    Text("A downward trend over months indicates improving cardiovascular efficiency. Spikes above your baseline often signal illness, overtraining, or poor sleep.")
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+            }
+        }
+    }
+
+    // MARK: - Training zones card
+
+    @ViewBuilder
+    private var trainingZonesCard: some View {
+        sectionCard(title: "Training zones") {
+            if store.currentVDOT == 0 {
+                emptyState("Set a VDOT in the Plan tab to see your pace zones.")
+            } else {
+                let zones = VDOTCalculator.paceZones(vdot: store.currentVDOT)
+                VStack(spacing: 8) {
+                    ZoneRow(name: "Easy", range: zones.easy,       color: .blue,            paceUnit: paceUnit)
+                    ZoneRow(name: "Marathon", range: zones.marathon, color: Color.brand.success, paceUnit: paceUnit)
+                    ZoneRow(name: "Threshold", range: zones.threshold, color: Color.brand.accent, paceUnit: paceUnit)
+                    ZoneRow(name: "Interval", range: zones.interval, color: .orange,           paceUnit: paceUnit)
+                    ZoneRow(name: "Repetition", range: zones.repetition, color: .red,          paceUnit: paceUnit)
+                }
+                Text("Zones based on Jack Daniels' Running Formula at VDOT \(Int(store.currentVDOT.rounded())).")
+                    .font(.caption)
+                    .foregroundStyle(Color.brand.textSecondary)
+                    .padding(.top, 4)
+            }
+        }
+    }
+
     @ViewBuilder
     private var weeklyMileageCard: some View {
         sectionCard(title: "Weekly mileage · last 8 weeks") {
@@ -366,6 +494,35 @@ public struct InsightsView: View {
             let prefix = value > 0 ? "+" : ""
             return "\(prefix)\(value.formatted(.number.precision(.fractionLength(1))))"
         }
+    }
+}
+
+// MARK: - Zone row
+
+private struct ZoneRow: View {
+    let name: String
+    let range: PaceZones.PaceRange
+    let color: Color
+    let paceUnit: PaceUnit
+
+    var body: some View {
+        HStack(spacing: 10) {
+            RoundedRectangle(cornerRadius: 3)
+                .fill(color)
+                .frame(width: 4, height: 32)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color.brand.textPrimary)
+                Text(range.formatted(unit: paceUnit))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(name) zone: \(range.formatted(unit: paceUnit))")
     }
 }
 

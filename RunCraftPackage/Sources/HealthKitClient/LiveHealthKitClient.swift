@@ -9,6 +9,7 @@ enum LiveHealthKitClient {
         HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!,
         HKObjectType.quantityType(forIdentifier: .vo2Max)!,
         HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+        HKObjectType.quantityType(forIdentifier: .restingHeartRate)!,
     ]
 
     static func make() -> HealthKitClient {
@@ -35,6 +36,12 @@ enum LiveHealthKitClient {
             },
             authorizationRequestStatus: {
                 await authorizationRequestStatus()
+            },
+            recentHRVSamples: { daysBack in
+                try await recentHRVSamples(daysBack: daysBack)
+            },
+            recentRestingHRSamples: { daysBack in
+                try await recentRestingHRSamples(daysBack: daysBack)
             }
         )
     }
@@ -134,7 +141,53 @@ enum LiveHealthKitClient {
         }
     }
 
-    // MARK: - HRV
+    // MARK: - HRV samples (time-series)
+
+    private static func recentHRVSamples(daysBack: Int) async throws -> [HRVSample] {
+        guard HKHealthStore.isHealthDataAvailable() else { return [] }
+        let store = HKHealthStore()
+        guard let type = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) else { return [] }
+        let startDate = Calendar.current.date(byAdding: .day, value: -daysBack, to: Date())!
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(sampleType: type, predicate: predicate,
+                                      limit: HKObjectQueryNoLimit, sortDescriptors: [sort]) { _, samples, error in
+                if let error { continuation.resume(throwing: error); return }
+                let mapped = (samples as? [HKQuantitySample])?.map { s in
+                    HRVSample(id: s.uuid.uuidString, recordedAt: s.startDate,
+                              sdnnMs: s.quantity.doubleValue(for: HKUnit.secondUnit(with: .milli)))
+                } ?? []
+                continuation.resume(returning: mapped)
+            }
+            store.execute(query)
+        }
+    }
+
+    // MARK: - Resting HR
+
+    private static func recentRestingHRSamples(daysBack: Int) async throws -> [RestingHRSample] {
+        guard HKHealthStore.isHealthDataAvailable() else { return [] }
+        let store = HKHealthStore()
+        guard let type = HKObjectType.quantityType(forIdentifier: .restingHeartRate) else { return [] }
+        let startDate = Calendar.current.date(byAdding: .day, value: -daysBack, to: Date())!
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date())
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(sampleType: type, predicate: predicate,
+                                      limit: HKObjectQueryNoLimit, sortDescriptors: [sort]) { _, samples, error in
+                if let error { continuation.resume(throwing: error); return }
+                let mapped = (samples as? [HKQuantitySample])?.map { s in
+                    RestingHRSample(id: s.uuid.uuidString, recordedAt: s.startDate,
+                                    bpm: s.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute())))
+                } ?? []
+                continuation.resume(returning: mapped)
+            }
+            store.execute(query)
+        }
+    }
+
+    // MARK: - HRV (single 7-day average — kept for backward compat)
 
     private static func latestHRV() async throws -> Double? {
         guard HKHealthStore.isHealthDataAvailable() else { return nil }
