@@ -38,8 +38,14 @@ private struct WorkoutAwareView: View {
 
     var body: some View {
         switch manager.phase {
-        case .running, .paused:
+        case .running, .openGoal, .paused:
             ActiveWorkoutView(manager: manager)
+        case .countdown(let n):
+            CountdownView(count: n)
+        case .summary(let data):
+            WorkoutSummaryView(data: data, manager: manager) {
+                manager.dismissSummary()
+            }
         case .failed(let message):
             VStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle")

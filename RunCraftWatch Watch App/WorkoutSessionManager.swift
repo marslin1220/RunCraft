@@ -19,10 +19,21 @@ private let sessionLogger = Logger(subsystem: "io.marstudio.RunCraft.watchkitapp
 @MainActor
 final class WorkoutSessionManager: NSObject, ObservableObject {
 
+    struct WorkoutSummaryData: Equatable {
+        let totalMetres: Double
+        let elapsedSeconds: Int
+        let avgPaceSecPerKm: Double
+        let avgHeartRate: Double
+        let calories: Double
+    }
+
     enum Phase: Equatable {
         case inactive
+        case countdown(Int)   // 3 → 2 → 1 before session.startActivity
         case running
+        case openGoal         // structured blocks done; keep recording until user stops
         case paused
+        case summary(WorkoutSummaryData)
         case failed(String)
     }
 
@@ -70,8 +81,20 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     private var stepStartMetres: Double = 0
     private var stepStartDate: Date = Date()
 
+    private var openGoalActive: Bool = false
+
     private var elapsedTimerTask: Task<Void, Never>?
     private var stepTimerTask: Task<Void, Never>?
+
+    /// Runs the 3-2-1 countdown, playing a click haptic on each beat.
+    /// Call this before `startWorkout` — it transitions phase through `.countdown(3/2/1)`.
+    func runCountdown() async {
+        for n in stride(from: 3, through: 1, by: -1) {
+            phase = .countdown(n)
+            WKInterfaceDevice.current().play(.click)
+            try? await Task.sleep(for: .seconds(1))
+        }
+    }
 
     func startWorkout(session: HKWorkoutSession, blocks: [WorkoutBlock], healthStore: HKHealthStore) async throws {
         self.session = session
@@ -106,7 +129,14 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     }
 
     func endWorkout() {
+        openGoalActive = false
         session?.end()
+    }
+
+    func dismissSummary() {
+        builder = nil
+        session = nil
+        phase = .inactive
     }
 
     func pauseWorkout() {
@@ -242,10 +272,26 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         currentStepIndex += 1
         if currentStepIndex >= flatSteps.count {
             announceWorkoutComplete()
-            endWorkout()
+            enterOpenGoal()
         } else {
             updateCurrentStep()
         }
+    }
+
+    private func enterOpenGoal() {
+        stepTimerTask?.cancel()
+        stepTimerTask = nil
+        stepName = "Free Run"
+        stepGoalText = ""
+        stepProgress = 1
+        stepKind = nil
+        stepRemainingText = ""
+        nextStepSummary = ""
+        targetPaceLo = nil
+        targetPaceHi = nil
+        openGoalActive = true
+        phase = .openGoal
+        sendMirrorMessage()
     }
 
     private func announceStep(name: String, goal: String, previous: String) {
@@ -367,6 +413,38 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         }
         return "\(Int(totalMetres)) m"
     }
+
+    /// Formats a distance value (metres) using the user's unit preference.
+    func formatDistance(_ metres: Double) -> String {
+        if isPerMile {
+            let miles = metres / 1609.34
+            return miles >= 0.1
+                ? String(format: "%.2f mi", miles)
+                : String(format: "%.0f ft", metres * 3.28084)
+        }
+        return metres >= 1000
+            ? String(format: "%.2f km", metres / 1000)
+            : "\(Int(metres)) m"
+    }
+
+    /// Formats elapsed seconds as h:mm:ss or m:ss.
+    func formatDuration(_ seconds: Int) -> String {
+        let h = seconds / 3600
+        let m = (seconds % 3600) / 60
+        let s = seconds % 60
+        return h > 0
+            ? String(format: "%d:%02d:%02d", h, m, s)
+            : String(format: "%d:%02d", m, s)
+    }
+
+    /// Formats a pace in sec/km (or sec/mi when preference is perMile).
+    func formatAvgPace(_ secPerKm: Double) -> String {
+        guard secPerKm > 0 else { return "--:--" }
+        let paceSeconds = isPerMile ? secPerKm * 1.60934 : secPerKm
+        let m = Int(paceSeconds) / 60
+        let s = Int(paceSeconds) % 60
+        return String(format: "%d:%02d", m, s)
+    }
 }
 
 // MARK: - HKWorkoutSessionDelegate
@@ -381,18 +459,41 @@ extension WorkoutSessionManager: HKWorkoutSessionDelegate {
         Task { @MainActor in
             switch toState {
             case .running:
-                self.phase = .running
+                // Don't override countdown (session reports running before startActivity in some states)
+                // or open-goal (resume after pause while in open-goal should restore open-goal).
+                if case .countdown = self.phase { break }
+                self.phase = self.openGoalActive ? .openGoal : .running
             case .paused:
                 self.phase = .paused
             case .ended:
                 self.stopAllTimers()
-                self.phase = .inactive
-                let builder = self.builder
+                // Snapshot live metrics now — they are cleared once builder is released.
+                let snapshotMetres  = self.totalMetres
+                let snapshotSeconds = self.elapsedSeconds
+                let snapshotAvgPace = self.avgPaceSecPerKm
+                let snapshotAvgHR   = self.avgHeartRate
+                let builder         = self.builder
                 Task {
                     do {
                         try await builder?.endCollection(at: Date())
                         try await builder?.finishWorkout()
                     } catch {}
+                    let calories = builder?
+                        .statistics(for: HKQuantityType(.activeEnergyBurned))?
+                        .sumQuantity()?
+                        .doubleValue(for: .kilocalorie()) ?? 0
+                    await MainActor.run {
+                        // Only transition if we have not already been dismissed manually.
+                        guard self.phase != .inactive else { return }
+                        let data = WorkoutSummaryData(
+                            totalMetres: snapshotMetres,
+                            elapsedSeconds: snapshotSeconds,
+                            avgPaceSecPerKm: snapshotAvgPace,
+                            avgHeartRate: snapshotAvgHR,
+                            calories: calories
+                        )
+                        self.phase = .summary(data)
+                    }
                 }
             default:
                 break

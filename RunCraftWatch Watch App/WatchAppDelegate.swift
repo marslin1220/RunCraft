@@ -138,6 +138,7 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate
                 healthStore: healthStore,
                 configuration: configuration
             )
+            await workoutManager.runCountdown()
             try await workoutManager.startWorkout(
                 session: session,
                 blocks: payload.blocks,
