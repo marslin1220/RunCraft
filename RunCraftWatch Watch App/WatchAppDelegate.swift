@@ -10,7 +10,7 @@ import WatchKit
 
 private nonisolated(unsafe) let watchLogger = Logger(subsystem: "io.marstudio.RunCraft.watchkitapp", category: "WatchAppDelegate")
 
-final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate, ObservableObject, @unchecked Sendable {
+final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate, CLLocationManagerDelegate, ObservableObject, @unchecked Sendable {
 
     let workoutManager = WorkoutSessionManager()
     @Published var schedule: WatchSchedulePayload? {
@@ -89,10 +89,15 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate
     nonisolated func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
         watchLogger.log("handle(_:HKWorkoutConfiguration) activityType=\(workoutConfiguration.activityType.rawValue, privacy: .public)")
         // Pre-warm GPS so the first location fix arrives before startActivity.
-        // Stored as a property so it isn't deallocated before the request fires.
-        let locationManager = CLLocationManager()
-        gpsPrewarmManager = locationManager
-        locationManager.requestLocation()
+        // Stored as a property (not a local) so ARC keeps it alive until the
+        // one-shot fix (or error) is delivered via CLLocationManagerDelegate.
+        Task { @MainActor in
+            let lm = CLLocationManager()
+            lm.delegate = self
+            gpsPrewarmManager = lm
+            lm.requestWhenInUseAuthorization()
+            lm.requestLocation()
+        }
         Task { @MainActor in
             let payload = await waitForPayload()
             guard let payload else {
@@ -190,5 +195,18 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate
                 schedule = payload
             }
         }
+    }
+
+    // MARK: - CLLocationManagerDelegate
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        watchLogger.log("GPS pre-warm fix received (\(locations.count, privacy: .public) location(s))")
+        // Release the manager; its purpose (warming the GPS chip) is fulfilled.
+        gpsPrewarmManager = nil
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        watchLogger.warning("GPS pre-warm failed (non-fatal): \(error.localizedDescription, privacy: .public)")
+        gpsPrewarmManager = nil
     }
 }
