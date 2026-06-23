@@ -2,6 +2,7 @@ import ComposableArchitecture
 import DesignSystem
 import RunCraftModels
 import SwiftUI
+import VDOTEngine
 
 public struct WorkoutEditorView: View {
     @Bindable public var store: StoreOf<WorkoutEditor>
@@ -336,39 +337,88 @@ private struct StepRow: View {
 
 private struct RepeatGroupRow: View {
     let group: RepeatGroup
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
+
+    /// Total metres covered by work steps across all iterations.
+    /// nil when any work step has a non-distance goal.
+    private var totalWorkMetres: Double? {
+        let workSteps = group.steps.filter { $0.kind == .work }
+        guard !workSteps.isEmpty else { return nil }
+        var total = 0.0
+        for step in workSteps {
+            guard case .distance(let m) = step.goal else { return nil }
+            total += m
+        }
+        return total * Double(group.iterations)
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
                 Image(systemName: "repeat")
+                    .font(.caption.bold())
                     .foregroundStyle(Color.brand.accent)
                 Text("Repeat \(group.iterations)×")
                     .font(.subheadline.bold())
                     .foregroundStyle(Color.brand.textPrimary)
                 Spacer()
-                Text("\(group.steps.count) step\(group.steps.count == 1 ? "" : "s")")
-                    .font(.caption)
-                    .foregroundStyle(Color.brand.textSecondary)
-            }
-
-            ForEach(group.steps) { step in
-                HStack(spacing: 8) {
-                    Image(systemName: step.kind.symbolName)
-                        .font(.caption)
+                if let total = totalWorkMetres {
+                    Text(StepGoal.distance(metres: total).displayText + " work")
+                        .font(.caption.monospacedDigit())
                         .foregroundStyle(Color.brand.textSecondary)
-                        .frame(width: 16)
-                    Text(step.kind.displayName)
-                        .font(.caption)
-                        .foregroundStyle(Color.brand.textPrimary.opacity(0.85))
-                    Spacer()
-                    Text(step.goal.displayText)
+                } else {
+                    Text("\(group.steps.count) step\(group.steps.count == 1 ? "" : "s")")
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
-                .padding(.leading, 24)
             }
+
+            VStack(spacing: 6) {
+                ForEach(group.steps) { step in
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: step.kind.symbolName)
+                            .font(.caption)
+                            .foregroundStyle(stepColor(step.kind))
+                            .frame(width: 16)
+
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(step.kind.displayName)
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(Color.brand.textPrimary)
+                            if let alert = step.alert {
+                                HStack(spacing: 3) {
+                                    Image(systemName: "arrow.right")
+                                        .font(.system(size: 8, weight: .semibold))
+                                    Text(alert.displayText(unit: paceUnit))
+                                        .font(.caption2.monospacedDigit())
+                                }
+                                .foregroundStyle(Color.brand.textSecondary)
+                            }
+                        }
+
+                        Spacer()
+
+                        Text(step.goal.displayText)
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(Color.brand.accent)
+                    }
+                    .padding(.leading, 24)
+                }
+            }
+            .padding(.vertical, 4)
+            .padding(.horizontal, 12)
+            .background(Color.brand.textSecondary.opacity(0.06), in: RoundedRectangle(cornerRadius: 8))
         }
         .padding(.vertical, 8)
+    }
+
+    private func stepColor(_ kind: StepKind) -> Color {
+        switch kind {
+        case .warmup:   Color(hex: "#FF9800")
+        case .work:     Color(hex: "#F44336")
+        case .recovery: Color(hex: "#4CAF50")
+        case .cooldown: Color(hex: "#2196F3")
+        }
     }
 }
 

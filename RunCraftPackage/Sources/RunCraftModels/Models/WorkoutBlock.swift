@@ -89,17 +89,17 @@ public enum StepAlert: Equatable, Sendable, Codable {
     /// Target a heart rate range (BPM).
     case heartRate(min: Int, max: Int)
 
-    public var displayText: String {
+    public var displayText: String { displayText(unit: .perKilometre) }
+
+    public func displayText(unit: PaceUnit) -> String {
         switch self {
         case let .paceRange(lo, hi):
-            "\(Self.formatPace(lo))–\(Self.formatPace(hi)) /km"
+            let loStr = PaceFormatting.paceMinutesSeconds(secondsPerKm: Double(lo), unit: unit)
+            let hiStr = PaceFormatting.paceMinutesSeconds(secondsPerKm: Double(hi), unit: unit)
+            return "\(loStr)–\(hiStr) \(unit.displayName)"
         case let .heartRate(lo, hi):
-            "\(lo)–\(hi) bpm"
+            return "\(lo)–\(hi) bpm"
         }
-    }
-
-    private static func formatPace(_ secPerKm: Int) -> String {
-        PaceFormatting.minutesSeconds(Double(secPerKm))
     }
 
     /// Build a pace range alert from a Jack Daniels zone for a given VDOT.
