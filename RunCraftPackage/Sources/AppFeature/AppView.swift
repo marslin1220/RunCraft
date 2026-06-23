@@ -3,6 +3,7 @@ import DesignSystem
 import InsightsFeature
 import SwiftUI
 import TrainingPlanFeature
+import VDOTEngine
 import WorkshopFeature
 
 public struct AppView: View {
@@ -11,7 +12,12 @@ public struct AppView: View {
     /// Plain `@AppStorage` (same pattern as the pace-unit picker in
     /// Settings) so the flag persists without going through TCA state.
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+    @AppStorage("appearanceOverride", store: .runCraftGroup) private var appearanceOverrideRaw: String = AppearanceOverride.auto.rawValue
     @Environment(\.scenePhase) private var scenePhase
+
+    private var resolvedColorScheme: ColorScheme? {
+        (AppearanceOverride(rawValue: appearanceOverrideRaw) ?? .auto).colorScheme
+    }
 
     public init(store: StoreOf<AppFeature>) {
         self.store = store
@@ -44,6 +50,7 @@ public struct AppView: View {
                 .tag(AppFeature.Tab.settings)
         }
         .tint(Color.brand.accent)
+        .preferredColorScheme(resolvedColorScheme)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 store.send(.plan(.watchScheduleSync))

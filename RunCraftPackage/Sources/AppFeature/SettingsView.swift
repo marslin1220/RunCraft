@@ -13,6 +13,7 @@ public struct SettingsView: View {
     /// sidesteps the BindingReducer + @Shared edge cases that were causing
     /// toggles to silently drop.
     @AppStorage("paceUnit", store: .runCraftGroup) private var paceUnitRaw: String = PaceUnit.perKilometre.rawValue
+    @AppStorage("appearanceOverride", store: .runCraftGroup) private var appearanceOverrideRaw: String = AppearanceOverride.auto.rawValue
 
     /// Daily training reminder. Persisted as three keys so the toggle and
     /// the time picker stay independent of each other — same @AppStorage
@@ -30,6 +31,13 @@ public struct SettingsView: View {
         Binding(
             get: { PaceUnit(rawValue: paceUnitRaw) ?? .perKilometre },
             set: { paceUnitRaw = $0.rawValue }
+        )
+    }
+
+    private var appearanceOverride: Binding<AppearanceOverride> {
+        Binding(
+            get: { AppearanceOverride(rawValue: appearanceOverrideRaw) ?? .auto },
+            set: { appearanceOverrideRaw = $0.rawValue }
         )
     }
 
@@ -67,6 +75,15 @@ public struct SettingsView: View {
                     Picker("Pace", selection: paceUnit) {
                         ForEach(PaceUnit.allCases, id: \.self) { unit in
                             Text(unit.displayName).tag(unit)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                Section("Appearance") {
+                    Picker("Theme", selection: appearanceOverride) {
+                        ForEach(AppearanceOverride.allCases, id: \.self) { option in
+                            Text(option.displayName).tag(option)
                         }
                     }
                     .pickerStyle(.segmented)
