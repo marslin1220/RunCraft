@@ -82,4 +82,84 @@ public enum SessionType: String, Sendable, Equatable, CaseIterable, Codable, Que
         case .mixed:      "square.stack.3d.up"
         }
     }
+
+    /// Session types the runner can substitute for this one, with a short
+    /// coaching rationale. Used to populate the context-menu "Swap" options
+    /// in the Plan and Full Schedule views.
+    public var alternatives: [SessionAlternative] {
+        switch self {
+        case .repetition:
+            [
+                SessionAlternative(id: "rep_hill", sessionType: .repetition, title: "Hill Repeats",
+                                   reason: "Builds power and form without the speed risk of flat reps.",
+                                   variantNote: "Hill repeats — run on 4–6% grade"),
+                SessionAlternative(id: "rep_fartlek", sessionType: .fartlek, title: "Fartlek",
+                                   reason: "Lower injury risk with a similar aerobic-speed stimulus.",
+                                   variantNote: nil),
+            ]
+        case .interval:
+            [
+                SessionAlternative(id: "int_hill", sessionType: .interval, title: "Hill Intervals",
+                                   reason: "Identical VO₂max benefit with lower ground-impact forces.",
+                                   variantNote: "Hill intervals — run on 4–6% grade"),
+                SessionAlternative(id: "int_tempo", sessionType: .tempo, title: "Tempo Run",
+                                   reason: "Similar lactate-threshold benefit at a more manageable effort.",
+                                   variantNote: nil),
+                SessionAlternative(id: "int_fartlek", sessionType: .fartlek, title: "Fartlek",
+                                   reason: "Unstructured speed play without strict splits.",
+                                   variantNote: nil),
+            ]
+        case .tempo:
+            [
+                SessionAlternative(id: "tempo_fartlek", sessionType: .fartlek, title: "Fartlek",
+                                   reason: "Similar effort profile, less mental pressure than holding steady pace.",
+                                   variantNote: nil),
+                SessionAlternative(id: "tempo_easy", sessionType: .easy, title: "Easy Run",
+                                   reason: "Drop the intensity and treat it as an active-recovery day instead.",
+                                   variantNote: "Swapped from Tempo — easy recovery run"),
+            ]
+        case .long:
+            [
+                SessionAlternative(id: "long_short", sessionType: .long, title: "Shorter Long Run",
+                                   reason: "Maintain the long-run stimulus at 70–80% of planned distance.",
+                                   variantNote: "Shorter long run — aim for 70–80% of planned distance"),
+                SessionAlternative(id: "long_easy", sessionType: .easy, title: "Easy Run",
+                                   reason: "Scale back fully if fatigue or life gets in the way.",
+                                   variantNote: "Swapped from Long Run — easy run"),
+            ]
+        case .easy:
+            [
+                SessionAlternative(id: "easy_rest", sessionType: .rest, title: "Rest",
+                                   reason: "Take the day fully off if you need more recovery.",
+                                   variantNote: nil),
+            ]
+        case .rest:
+            [
+                SessionAlternative(id: "rest_easy", sessionType: .easy, title: "Easy Run",
+                                   reason: "A light session instead of a full day off.",
+                                   variantNote: "Optional easy run on rest day"),
+            ]
+        case .fartlek, .mixed:
+            []
+        }
+    }
+}
+
+// MARK: - Session Alternative
+
+/// An alternative session type the runner can substitute for a planned session.
+public struct SessionAlternative: Identifiable, Sendable {
+    public let id: String
+    /// The session type this alternative maps to. May equal the original's
+    /// type (e.g. Hill Repeats keeps `.repetition`) — in that case only the
+    /// `variantNote` changes.
+    public let sessionType: SessionType
+    /// Short display name shown in the context menu, e.g. "Hill Repeats".
+    public let title: String
+    /// One-sentence coaching rationale — displayed in accessibility labels
+    /// and future detail views.
+    public let reason: String
+    /// Stored in `PlannedSession.notes` when this alternative is applied.
+    /// `nil` means the existing notes are cleared.
+    public let variantNote: String?
 }

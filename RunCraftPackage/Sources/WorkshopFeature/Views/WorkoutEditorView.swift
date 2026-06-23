@@ -392,7 +392,7 @@ private struct RepeatGroupRow: View {
                                     Text(alert.displayText(unit: paceUnit))
                                         .font(.caption2.monospacedDigit())
                                 }
-                                .foregroundStyle(Color.brand.textSecondary)
+                                .foregroundStyle(stepColor(step.kind).opacity(0.8))
                             }
                         }
 
@@ -440,6 +440,74 @@ private struct EmptyWorkshopPrompt: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+}
+
+// MARK: - Previews
+
+#Preview("Repeat — with pace targets") {
+    let group = RepeatGroup(
+        iterations: 8,
+        steps: [
+            WorkoutStep(kind: .work,     goal: .distance(metres: 200), alert: .paceRange(minSecPerKm: 270, maxSecPerKm: 300)),
+            WorkoutStep(kind: .recovery, goal: .distance(metres: 200), alert: .paceRange(minSecPerKm: 450, maxSecPerKm: 480)),
+        ]
+    )
+    return BlockCardView(block: .repeatGroup(group))
+        .padding()
+        .background(Color.brand.background)
+}
+
+#Preview("Repeat — with HR targets") {
+    let group = RepeatGroup(
+        iterations: 4,
+        steps: [
+            WorkoutStep(kind: .work,     goal: .time(seconds: 180), alert: .heartRate(min: 155, max: 170)),
+            WorkoutStep(kind: .recovery, goal: .time(seconds: 90)),
+        ]
+    )
+    return BlockCardView(block: .repeatGroup(group))
+        .padding()
+        .background(Color.brand.background)
+}
+
+#Preview("Repeat — time-based, no pace alert") {
+    let group = RepeatGroup(
+        iterations: 6,
+        steps: [
+            WorkoutStep(kind: .work,     goal: .time(seconds: 60)),
+            WorkoutStep(kind: .recovery, goal: .time(seconds: 60)),
+        ]
+    )
+    return BlockCardView(block: .repeatGroup(group))
+        .padding()
+        .background(Color.brand.background)
+}
+
+#Preview("Full workout — Repetition session") {
+    let blocks: [WorkoutBlock] = [
+        .step(WorkoutStep(kind: .warmup, goal: .distance(metres: 1500),
+                          alert: .paceRange(minSecPerKm: 384, maxSecPerKm: 450))),
+        .repeatGroup(RepeatGroup(
+            iterations: 8,
+            steps: [
+                WorkoutStep(kind: .work,     goal: .distance(metres: 200), alert: .paceRange(minSecPerKm: 270, maxSecPerKm: 300)),
+                WorkoutStep(kind: .recovery, goal: .distance(metres: 200)),
+            ]
+        )),
+        .step(WorkoutStep(kind: .cooldown, goal: .distance(metres: 1500),
+                          alert: .paceRange(minSecPerKm: 384, maxSecPerKm: 450))),
+    ]
+    return ScrollView {
+        VStack(spacing: 0) {
+            ForEach(blocks) { block in
+                BlockCardView(block: block)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 4)
+                Divider().padding(.leading, 16)
+            }
+        }
+    }
+    .background(Color.brand.background)
 }
 
 // MARK: - Color helpers

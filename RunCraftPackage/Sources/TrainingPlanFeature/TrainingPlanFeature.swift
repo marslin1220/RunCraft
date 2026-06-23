@@ -135,6 +135,9 @@ import WorkshopFeature
         case quickStartSession(PlannedSession)
         case quickStartResponse(sessionId: UUID, Result<Void, any Error>)
         case quickStartAlert(PresentationAction<QuickStartAlert>)
+        /// Substitute a planned session with an alternative type and optional
+        /// variant note. Writes straight to the DB and re-syncs the Watch schedule.
+        case swapSession(PlannedSession, to: SessionType, variantNote: String?)
         case path(StackActionOf<Path>)
         case destination(PresentationAction<Destination.Action>)
         case delegate(Delegate)
@@ -738,6 +741,23 @@ import WorkshopFeature
             case .quickStartAlert:
                 return .none
 
+            case let .swapSession(session, newType, variantNote):
+                let note = variantNote ?? ""
+                return .merge(
+                    .run { [database] _ in
+                        try await database.write { db in
+                            try PlannedSession
+                                .where { $0.id.eq(session.id) }
+                                .update {
+                                    $0.sessionType = #bind(newType)
+                                    $0.notes = #bind(note)
+                                }
+                                .execute(db)
+                        }
+                    },
+                    .send(.watchScheduleSync)
+                )
+
             case let .path(.element(_, .weekSchedule(.delegate(.openSession(session, isToday))))):
                 // Push the editor onto Plan's own stack — Back from there
                 // returns to Full Schedule, not the Workshop tab.
@@ -749,6 +769,9 @@ import WorkshopFeature
                     isTodaySession: isToday
                 )))
                 return .none
+
+            case let .path(.element(_, .weekSchedule(.delegate(.swapSession(session, to: newType, variantNote: variantNote))))):
+                return .send(.swapSession(session, to: newType, variantNote: variantNote))
 
             // Editor opened inside Plan still lets the user save a copy to
             // Yours — same delegate plumbing as the Workshop-side editor.
@@ -823,10 +846,14 @@ import WorkshopFeature
         /// re-schedule the workout.
         case quickStartStatusReset
         case alert(PresentationAction<Alert>)
+        /// Substitute a planned session with an alternative type chosen from
+        /// the context menu. Delegates the DB write up to `TrainingPlan`.
+        case swapSession(PlannedSession, to: SessionType, variantNote: String?)
         case delegate(Delegate)
         public enum Alert: Equatable {}
         public enum Delegate: Equatable {
             case openSession(PlannedSession, isToday: Bool)
+            case swapSession(PlannedSession, to: SessionType, variantNote: String?)
         }
     }
 
@@ -882,6 +909,9 @@ import WorkshopFeature
                     TextState(message)
                 }
                 return .none
+
+            case let .swapSession(session, to: newType, variantNote: variantNote):
+                return .send(.delegate(.swapSession(session, to: newType, variantNote: variantNote)))
 
             case .alert, .delegate:
                 return .none

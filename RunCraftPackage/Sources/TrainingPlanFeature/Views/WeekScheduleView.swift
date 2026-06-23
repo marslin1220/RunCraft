@@ -79,12 +79,9 @@ struct WeekScheduleView: View {
                         watchAvailable: store.watchAvailable,
                         quickStartStatus: store.quickStartStatus,
                         onToggle: { toggle(gapWeek.id) },
-                        onTap: { session in
-                            store.send(.sessionTapped(session))
-                        },
-                        onQuickStart: { session in
-                            store.send(.quickStartTapped(session, vdot: currentVDOT))
-                        }
+                        onTap: { session in store.send(.sessionTapped(session)) },
+                        onQuickStart: { session in store.send(.quickStartTapped(session, vdot: currentVDOT)) },
+                        onSwap: { session, newType, note in store.send(.swapSession(session, to: newType, variantNote: note)) }
                     )
                 }
                 ForEach(phaseGroups, id: \.phase) { group in
@@ -106,12 +103,9 @@ struct WeekScheduleView: View {
                                 watchAvailable: store.watchAvailable,
                                 quickStartStatus: store.quickStartStatus,
                                 onToggle: { toggle(week.id) },
-                                onTap: { session in
-                                    store.send(.sessionTapped(session))
-                                },
-                                onQuickStart: { session in
-                                    store.send(.quickStartTapped(session, vdot: currentVDOT))
-                                }
+                                onTap: { session in store.send(.sessionTapped(session)) },
+                                onQuickStart: { session in store.send(.quickStartTapped(session, vdot: currentVDOT)) },
+                                onSwap: { session, newType, note in store.send(.swapSession(session, to: newType, variantNote: note)) }
                             )
                         }
                     }
@@ -260,6 +254,7 @@ private struct WeekSection: View {
     let onToggle: () -> Void
     let onTap: (PlannedSession) -> Void
     let onQuickStart: (PlannedSession) -> Void
+    let onSwap: (PlannedSession, SessionType, String?) -> Void
     @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     private var completedIds: Set<UUID> { Set(completedBySessionId.keys) }
@@ -442,6 +437,18 @@ private struct WeekSection: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel(for: session, isToday: isToday, actuals: actuals))
+        .contextMenu {
+            let alternatives = session.sessionType.alternatives
+            if !alternatives.isEmpty && actuals == nil {
+                ForEach(alternatives) { alt in
+                    Button {
+                        onSwap(session, alt.sessionType, alt.variantNote)
+                    } label: {
+                        Label(alt.title, systemImage: alt.sessionType.symbolName)
+                    }
+                }
+            }
+        }
     }
 
     @ViewBuilder

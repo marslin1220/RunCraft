@@ -178,7 +178,8 @@ public struct PlanView: View {
                 watchAvailable: store.watchAvailable,
                 quickStartSendingSessionId: store.quickStartSendingSessionId,
                 onSessionTap: { store.send(.sessionTapped($0)) },
-                onQuickStart: { store.send(.quickStartSession($0)) }
+                onQuickStart: { store.send(.quickStartSession($0)) },
+                onSwap: { store.send(.swapSession($0, to: $1, variantNote: $2)) }
             )
         } else if let upcoming = firstUpcomingWeek {
             // No current week but the plan exists — runner is
@@ -399,6 +400,7 @@ private struct WeekSessionsSection: View {
     let quickStartSendingSessionId: UUID?
     let onSessionTap: (PlannedSession) -> Void
     let onQuickStart: (PlannedSession) -> Void
+    let onSwap: (PlannedSession, SessionType, String?) -> Void
     @FetchAll var allSessions: [PlannedSession]
     @FetchAll var completedThisWeek: [CompletedWorkout]
 
@@ -455,7 +457,8 @@ private struct WeekSessionsSection: View {
                         watchAvailable: watchAvailable,
                         isSending: quickStartSendingSessionId == session.id,
                         onTap: { onSessionTap(session) },
-                        onQuickStart: { onQuickStart(session) }
+                        onQuickStart: { onQuickStart(session) },
+                        onSwap: { newType, note in onSwap(session, newType, note) }
                     )
                 }
             }
@@ -660,6 +663,7 @@ private struct SessionCard: View {
     let isSending: Bool
     let onTap: () -> Void
     let onQuickStart: () -> Void
+    let onSwap: (SessionType, String?) -> Void
     @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     private var isCompleted: Bool { actuals != nil }
@@ -679,6 +683,18 @@ private struct SessionCard: View {
         .opacity(isCompleted ? 0.65 : 1.0)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
+        .contextMenu {
+            let alternatives = session.sessionType.alternatives
+            if !alternatives.isEmpty && !isCompleted {
+                ForEach(alternatives) { alt in
+                    Button {
+                        onSwap(alt.sessionType, alt.variantNote)
+                    } label: {
+                        Label(alt.title, systemImage: alt.sessionType.symbolName)
+                    }
+                }
+            }
+        }
     }
 
     private var cardTitle: String {
