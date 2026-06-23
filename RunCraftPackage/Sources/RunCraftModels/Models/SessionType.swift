@@ -90,52 +90,63 @@ public enum SessionType: String, Sendable, Equatable, CaseIterable, Codable, Que
         switch self {
         case .repetition:
             [
-                SessionAlternative(id: "rep_hill", sessionType: .repetition, title: "Hill Repeats",
+                SessionAlternative(id: "rep_hill", sessionType: .repetition,
+                                   title: String(localized: "Hill Repeats", bundle: .module),
                                    reason: "Builds power and form without the speed risk of flat reps.",
                                    variantNote: "Hill repeats — run on 4–6% grade"),
-                SessionAlternative(id: "rep_fartlek", sessionType: .fartlek, title: "Fartlek",
+                SessionAlternative(id: "rep_fartlek", sessionType: .fartlek,
+                                   title: String(localized: "Fartlek", bundle: .module),
                                    reason: "Lower injury risk with a similar aerobic-speed stimulus.",
                                    variantNote: nil),
             ]
         case .interval:
             [
-                SessionAlternative(id: "int_hill", sessionType: .interval, title: "Hill Intervals",
+                SessionAlternative(id: "int_hill", sessionType: .interval,
+                                   title: String(localized: "Hill Intervals", bundle: .module),
                                    reason: "Identical VO₂max benefit with lower ground-impact forces.",
                                    variantNote: "Hill intervals — run on 4–6% grade"),
-                SessionAlternative(id: "int_tempo", sessionType: .tempo, title: "Tempo Run",
+                SessionAlternative(id: "int_tempo", sessionType: .tempo,
+                                   title: String(localized: "Tempo Run", bundle: .module),
                                    reason: "Similar lactate-threshold benefit at a more manageable effort.",
                                    variantNote: nil),
-                SessionAlternative(id: "int_fartlek", sessionType: .fartlek, title: "Fartlek",
+                SessionAlternative(id: "int_fartlek", sessionType: .fartlek,
+                                   title: String(localized: "Fartlek", bundle: .module),
                                    reason: "Unstructured speed play without strict splits.",
                                    variantNote: nil),
             ]
         case .tempo:
             [
-                SessionAlternative(id: "tempo_fartlek", sessionType: .fartlek, title: "Fartlek",
+                SessionAlternative(id: "tempo_fartlek", sessionType: .fartlek,
+                                   title: String(localized: "Fartlek", bundle: .module),
                                    reason: "Similar effort profile, less mental pressure than holding steady pace.",
                                    variantNote: nil),
-                SessionAlternative(id: "tempo_easy", sessionType: .easy, title: "Easy Run",
+                SessionAlternative(id: "tempo_easy", sessionType: .easy,
+                                   title: String(localized: "Easy Run", bundle: .module),
                                    reason: "Drop the intensity and treat it as an active-recovery day instead.",
                                    variantNote: "Swapped from Tempo — easy recovery run"),
             ]
         case .long:
             [
-                SessionAlternative(id: "long_short", sessionType: .long, title: "Shorter Long Run",
+                SessionAlternative(id: "long_short", sessionType: .long,
+                                   title: String(localized: "Shorter Long Run", bundle: .module),
                                    reason: "Maintain the long-run stimulus at 70–80% of planned distance.",
                                    variantNote: "Shorter long run — aim for 70–80% of planned distance"),
-                SessionAlternative(id: "long_easy", sessionType: .easy, title: "Easy Run",
+                SessionAlternative(id: "long_easy", sessionType: .easy,
+                                   title: String(localized: "Easy Run", bundle: .module),
                                    reason: "Scale back fully if fatigue or life gets in the way.",
                                    variantNote: "Swapped from Long Run — easy run"),
             ]
         case .easy:
             [
-                SessionAlternative(id: "easy_rest", sessionType: .rest, title: "Rest",
+                SessionAlternative(id: "easy_rest", sessionType: .rest,
+                                   title: String(localized: "Rest", bundle: .module),
                                    reason: "Take the day fully off if you need more recovery.",
                                    variantNote: nil),
             ]
         case .rest:
             [
-                SessionAlternative(id: "rest_easy", sessionType: .easy, title: "Easy Run",
+                SessionAlternative(id: "rest_easy", sessionType: .easy,
+                                   title: String(localized: "Easy Run", bundle: .module),
                                    reason: "A light session instead of a full day off.",
                                    variantNote: "Optional easy run on rest day"),
             ]

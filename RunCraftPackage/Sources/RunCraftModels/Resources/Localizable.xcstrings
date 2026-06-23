@@ -64,6 +64,24 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "法特雷克跑" } }
       }
     },
+    "Hill Intervals" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ヒルインターバル" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "언덕 인터벌" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "山地间歇跑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "山坡間歇跑" } }
+      }
+    },
+    "Hill Repeats" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ヒルリピート" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "언덕 반복" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "山地反复跑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "山坡反覆跑" } }
+      }
+    },
     "Half Marathon" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -134,6 +152,15 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "휴식" } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "休息日" } },
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "休息日" } }
+      }
+    },
+    "Shorter Long Run" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "短めのロングラン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "단축 장거리" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "缩短版长跑" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "縮短版長跑" } }
       }
     },
     "Short, fast repeats at Repetition pace with full recovery. Sharpens speed and running form without heavy aerobic load." : {

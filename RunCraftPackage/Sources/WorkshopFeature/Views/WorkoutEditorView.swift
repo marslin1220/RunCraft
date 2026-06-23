@@ -76,6 +76,24 @@ public struct WorkoutEditorView: View {
 
                     Divider()
 
+                    if store.source == .planSession,
+                       let session = store.planSession,
+                       !session.sessionType.alternatives.isEmpty {
+                        Menu {
+                            ForEach(session.sessionType.alternatives) { alt in
+                                Button {
+                                    store.send(.swapSession(alt.sessionType, variantNote: alt.variantNote))
+                                } label: {
+                                    Label(alt.title, systemImage: alt.sessionType.symbolName)
+                                }
+                            }
+                        } label: {
+                            Label("Change Session Type", systemImage: "arrow.triangle.2.circlepath")
+                        }
+
+                        Divider()
+                    }
+
                     Button {
                         store.send(.duplicateTapped)
                     } label: {

@@ -447,7 +447,7 @@ private struct WeekSessionsSection: View {
             ForEach(sessions) { session in
                 let actuals = completedBySessionId[session.id].flatMap(SessionActuals.init)
                 if session.sessionType == .rest {
-                    RestSessionLine(session: session, actuals: actuals)
+                    RestSessionLine(session: session, actuals: actuals, onSwap: onSwap)
                 } else {
                     SessionCard(
                         session: session,
@@ -751,6 +751,7 @@ private struct SessionCard: View {
 private struct RestSessionLine: View {
     let session: PlannedSession
     let actuals: SessionActuals?
+    let onSwap: (PlannedSession, SessionType, String?) -> Void
     @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
 
     var body: some View {
@@ -781,6 +782,18 @@ private struct RestSessionLine: View {
         .opacity(actuals == nil ? 0.7 : 1.0)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
+        .contextMenu {
+            let alternatives = session.sessionType.alternatives
+            if !alternatives.isEmpty && actuals == nil {
+                ForEach(alternatives) { alt in
+                    Button {
+                        onSwap(session, alt.sessionType, alt.variantNote)
+                    } label: {
+                        Label(alt.title, systemImage: alt.sessionType.symbolName)
+                    }
+                }
+            }
+        }
     }
 
     private var accessibilityLabel: String {

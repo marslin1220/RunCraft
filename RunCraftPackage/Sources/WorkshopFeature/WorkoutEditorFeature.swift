@@ -18,6 +18,11 @@ import RunCraftModels
         /// different (past/future) session from here would get its
         /// completion misattributed. Always `true` for `.yours`/`.template`.
         public var isTodaySession: Bool = true
+        /// The original planned session when `source == .planSession`. Used
+        /// to populate the "Change Session Type" toolbar menu with curated
+        /// alternatives and to carry the session identity through the
+        /// swap delegate.
+        public var planSession: PlannedSession? = nil
         public var watchAvailable: Bool = true
         public var saveStatus: SaveStatus = .idle
         public var syncStatus: SyncStatus = .idle
@@ -62,13 +67,15 @@ import RunCraftModels
             loading template: WorkoutTemplate,
             asCopy: Bool,
             source: Source = .yours,
-            isTodaySession: Bool = true
+            isTodaySession: Bool = true,
+            planSession: PlannedSession? = nil
         ) {
             self.editingTemplateId = asCopy ? nil : template.id
             self.templateName = template.name
             self.blocks = IdentifiedArray(uniqueElements: template.blocks)
             self.source = source
             self.isTodaySession = isTodaySession
+            self.planSession = planSession
         }
 
         /// Whether "Start Workout" should be offered. Requires a paired Watch
@@ -137,6 +144,9 @@ import RunCraftModels
         // Duplicate — emits delegate; Workshop reducer does the DB insert
         case duplicateTapped
 
+        // Session substitution — only available when source == .planSession
+        case swapSession(SessionType, variantNote: String?)
+
         case alert(PresentationAction<Alert>)
         case destination(PresentationAction<Destination.Action>)
         case delegate(Delegate)
@@ -146,6 +156,8 @@ import RunCraftModels
             /// Carry the editor's current state up so Workshop can write a
             /// "Yours" copy without re-deriving anything.
             case requestDuplicate(WorkoutTemplate)
+            /// Substitute the planned session's type. Parent handles the DB write.
+            case swapSession(PlannedSession, to: SessionType, variantNote: String?)
         }
     }
 
@@ -305,6 +317,10 @@ import RunCraftModels
                     updatedAt: now
                 )
                 return .send(.delegate(.requestDuplicate(template)))
+
+            case let .swapSession(newType, variantNote):
+                guard let session = state.planSession else { return .none }
+                return .send(.delegate(.swapSession(session, to: newType, variantNote: variantNote)))
 
             case let .destination(.presented(.editStep(.delegate(.saved(step))))):
                 state.blocks[id: step.id] = .step(step)

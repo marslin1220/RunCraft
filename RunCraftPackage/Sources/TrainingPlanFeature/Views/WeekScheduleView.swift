@@ -555,6 +555,18 @@ private struct WeekSection: View {
         .opacity(actuals == nil ? 0.6 : 1.0)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(restAccessibilityLabel(for: session, actuals: actuals))
+        .contextMenu {
+            let alternatives = session.sessionType.alternatives
+            if !alternatives.isEmpty && actuals == nil {
+                ForEach(alternatives) { alt in
+                    Button {
+                        onSwap(session, alt.sessionType, alt.variantNote)
+                    } label: {
+                        Label(alt.title, systemImage: alt.sessionType.symbolName)
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Helpers

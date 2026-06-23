@@ -703,7 +703,8 @@ import WorkshopFeature
                     loading: template,
                     asCopy: true,
                     source: .planSession,
-                    isTodaySession: isToday
+                    isTodaySession: isToday,
+                    planSession: session
                 )))
                 return .none
 
@@ -766,11 +767,15 @@ import WorkshopFeature
                     loading: template,
                     asCopy: true,
                     source: .planSession,
-                    isTodaySession: isToday
+                    isTodaySession: isToday,
+                    planSession: session
                 )))
                 return .none
 
             case let .path(.element(_, .weekSchedule(.delegate(.swapSession(session, to: newType, variantNote: variantNote))))):
+                return .send(.swapSession(session, to: newType, variantNote: variantNote))
+
+            case let .path(.element(_, .editor(.delegate(.swapSession(session, to: newType, variantNote: variantNote))))):
                 return .send(.swapSession(session, to: newType, variantNote: variantNote))
 
             // Editor opened inside Plan still lets the user save a copy to
