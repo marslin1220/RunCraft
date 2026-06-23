@@ -56,6 +56,7 @@ public struct WorkshopView: View {
         switch store.selectedSegment {
         case .yours:     YoursSegment(store: store)
         case .templates: TemplatesSegment(store: store)
+        case .history:   HistorySegment()
         }
     }
 }
@@ -244,6 +245,148 @@ private struct EmptyYoursPrompt: View {
     }
 }
 
+
+// MARK: - History segment
+
+private struct HistorySegment: View {
+    @FetchAll(CompletedWorkout.order { $0.completedAt.desc() }) var runs: [CompletedWorkout]
+    @FetchAll var allSessions: [PlannedSession]
+    @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
+
+    private var sessionById: [PlannedSession.ID: PlannedSession] {
+        Dictionary(uniqueKeysWithValues: allSessions.map { ($0.id, $0) })
+    }
+
+    var body: some View {
+        if runs.isEmpty {
+            EmptyHistoryPrompt()
+        } else {
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(runs) { run in
+                        RunHistoryRow(
+                            run: run,
+                            session: run.plannedSessionId.flatMap { sessionById[$0] },
+                            paceUnit: paceUnit
+                        )
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.bottom, 24)
+            }
+        }
+    }
+}
+
+private struct RunHistoryRow: View {
+    let run: CompletedWorkout
+    let session: PlannedSession?
+    let paceUnit: PaceUnit
+
+    private var sessionType: SessionType { session?.sessionType ?? .easy }
+
+    private var title: String {
+        session != nil ? sessionType.displayName : String(localized: "Run", bundle: .module)
+    }
+
+    private var distanceText: String {
+        PaceFormatting.distance(metres: run.actualDistanceKm * 1_000, unit: paceUnit)
+    }
+
+    private var durationText: String {
+        let total = Int(run.actualDurationSec)
+        let h = total / 3600
+        let m = (total % 3600) / 60
+        let s = total % 60
+        return h > 0
+            ? String(format: "%d:%02d:%02d", h, m, s)
+            : String(format: "%d:%02d", m, s)
+    }
+
+    private var paceText: String {
+        run.avgPaceSecPerKm > 0
+            ? PaceFormatting.pace(secondsPerKm: run.avgPaceSecPerKm, unit: paceUnit)
+            : "--"
+    }
+
+    /// Only shown when the run is linked to a planned session.
+    /// < 0.97 = ran ahead of target (cyan), > 1.05 = behind target (orange),
+    /// in between = on target (green).
+    private var achievementColor: Color? {
+        guard session != nil, run.paceAchievementRatio > 0 else { return nil }
+        switch run.paceAchievementRatio {
+        case ..<0.97: return .cyan
+        case 1.05...: return .orange
+        default:      return .green
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(hex: sessionType.colorHex).opacity(0.15))
+                    .frame(width: 44, height: 44)
+                Image(systemName: sessionType.symbolName)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(Color(hex: sessionType.colorHex))
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.brand.textPrimary)
+                    Spacer()
+                    Text(run.completedAt, format: .dateTime.month(.abbreviated).day().weekday(.short))
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+                HStack(spacing: 0) {
+                    Text(distanceText)
+                    Text("  ·  ")
+                    Text(durationText)
+                    Text("  ·  ")
+                    Text(paceText)
+                    Spacer()
+                    if let color = achievementColor {
+                        Circle()
+                            .fill(color)
+                            .frame(width: 8, height: 8)
+                    }
+                }
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(Color.brand.textSecondary)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private struct EmptyHistoryPrompt: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "clock.arrow.circlepath")
+                .font(.system(size: 48))
+                .foregroundStyle(Color.brand.accent.opacity(0.5))
+            Text("No runs yet", bundle: .module)
+                .font(.title3.bold())
+                .foregroundStyle(Color.brand.textPrimary)
+            Text(
+                "Complete a workout via Apple Watch or log a run to see your history here.",
+                bundle: .module
+            )
+            .multilineTextAlignment(.center)
+            .foregroundStyle(Color.brand.textSecondary)
+            .padding(.horizontal, 40)
+        }
+        .padding(.top, 60)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+}
 
 #Preview {
     WorkshopView(store: .init(initialState: Workshop.State()) { Workshop() })

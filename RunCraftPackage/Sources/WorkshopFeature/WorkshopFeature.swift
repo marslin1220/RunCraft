@@ -24,11 +24,13 @@ import RunCraftModels
     public enum Segment: String, CaseIterable, Equatable {
         case yours
         case templates
+        case history
 
         public var label: String {
             switch self {
-            case .yours:     "Yours"
-            case .templates: "Templates"
+            case .yours:     String(localized: "Yours", bundle: .module)
+            case .templates: String(localized: "Templates", bundle: .module)
+            case .history:   String(localized: "History", bundle: .module)
             }
         }
     }
