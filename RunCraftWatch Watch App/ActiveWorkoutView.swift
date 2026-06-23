@@ -8,15 +8,24 @@ struct ActiveWorkoutView: View {
     @State private var showEndConfirmation = false
 
     var body: some View {
-        TabView {
-            MetricsTabView(manager: manager)
-            controlsPage
+        ZStack {
+            TabView {
+                MetricsTabView(manager: manager)
+                controlsPage
+            }
+            .tabViewStyle(.page)
+            .confirmationDialog("End this workout?", isPresented: $showEndConfirmation) {
+                Button("End", role: .destructive) { manager.endWorkout() }
+                Button("Cancel", role: .cancel) {}
+            }
+
+            if manager.showStepTransition {
+                StepTransitionOverlay(manager: manager)
+                    .transition(.opacity.animation(.easeInOut(duration: 0.25)))
+                    .zIndex(1)
+            }
         }
-        .tabViewStyle(.page)
-        .confirmationDialog("End Workout?", isPresented: $showEndConfirmation) {
-            Button("End", role: .destructive) { manager.endWorkout() }
-            Button("Cancel", role: .cancel) {}
-        }
+        .animation(.easeInOut(duration: 0.25), value: manager.showStepTransition)
     }
 
     private var controlsPage: some View {
@@ -121,18 +130,19 @@ private struct IntervalPageView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Step badge: icon + name + position
-            HStack(spacing: 4) {
+            HStack(spacing: 5) {
                 if let kind = manager.stepKind {
                     Image(systemName: kind.symbolName)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                 }
                 Text(manager.stepName.isEmpty ? "Workout" : manager.stepName)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.85)
                 Spacer(minLength: 0)
                 if manager.totalStepCount > 1 {
                     Text("\(manager.stepPosition)/\(manager.totalStepCount)")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
                 }
@@ -238,6 +248,46 @@ private struct IntervalPageView: View {
             }
 
             Spacer(minLength: 4)
+        }
+    }
+}
+
+// MARK: - Step transition overlay
+
+private struct StepTransitionOverlay: View {
+    @ObservedObject var manager: WorkoutSessionManager
+
+    private var stepColor: Color { manager.stepKind.watchColor }
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.92).ignoresSafeArea()
+            VStack(spacing: 10) {
+                if let kind = manager.stepKind {
+                    Image(systemName: kind.symbolName)
+                        .font(.system(size: 36, weight: .semibold))
+                        .foregroundStyle(stepColor)
+                }
+                Text(manager.stepName.isEmpty ? "Workout" : manager.stepName)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(stepColor)
+                    .minimumScaleFactor(0.8)
+                    .lineLimit(2)
+                if !manager.stepGoalText.isEmpty && manager.stepGoalText != "Open" {
+                    Text(manager.stepGoalText)
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.85))
+                }
+                if manager.totalStepCount > 1 {
+                    Text("\(manager.stepPosition) / \(manager.totalStepCount)")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                        .padding(.top, 2)
+                }
+            }
+            .padding(.horizontal, 12)
         }
     }
 }
@@ -356,9 +406,9 @@ private struct PacePageView: View {
     private var paceDeviationLabel: String? {
         guard let lo = manager.targetPaceLo, let hi = manager.targetPaceHi,
               manager.paceSecPerKm > 0 else { return nil }
-        if manager.paceSecPerKm < Double(lo) { return "↑ Ahead" }
-        if manager.paceSecPerKm > Double(hi) { return "↓ Behind" }
-        return "On Target"
+        if manager.paceSecPerKm < Double(lo) { return String(localized: "↑ Ahead") }
+        if manager.paceSecPerKm > Double(hi) { return String(localized: "↓ Behind") }
+        return String(localized: "On Target")
     }
 
     var body: some View {
@@ -590,7 +640,7 @@ struct WorkoutSummaryView: View {
 
 // Reusable label/value row for the summary.
 private struct SummaryRow: View {
-    let label: String
+    let label: LocalizedStringKey
     let value: String
 
     var body: some View {

@@ -70,8 +70,17 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         return 5
     }
 
+    @Published var showStepTransition: Bool = false
+
     private var previousStepDisplayName: String = ""
-    private let speechSynthesizer = AVSpeechSynthesizer()
+    private lazy var speechSynthesizer: AVSpeechSynthesizer = {
+        let s = AVSpeechSynthesizer()
+        s.delegate = self
+        return s
+    }()
+
+    private var isEnding = false
+    private var stepTransitionTask: Task<Void, Never>?
 
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
@@ -109,6 +118,7 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         dataSource.enableCollection(for: HKQuantityType(.runningSpeed), predicate: nil)
         builder.dataSource = dataSource
 
+        isEnding = false
         flatSteps = flattenBlocks(blocks)
         currentStepIndex = 0
         totalStepCount = flatSteps.count
@@ -139,6 +149,10 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     }
 
     func endWorkout() {
+        guard !isEnding,
+              phase == .running || phase == .paused || phase == .openGoal
+        else { return }
+        isEnding = true
         openGoalActive = false
         session?.end()
     }
@@ -146,6 +160,7 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     func dismissSummary() {
         builder = nil
         session = nil
+        isEnding = false
         phase = .inactive
     }
 
@@ -164,12 +179,21 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         for block in blocks {
             switch block {
             case .step(let s):
-                result.append((s, s.kind.displayName))
+                result.append((s, s.kind.localizedName))
             case .repeatGroup(let g):
                 let n = g.iterations
                 for i in 1...max(1, n) {
                     for s in g.steps {
-                        let label = n > 1 ? "Rep \(i)/\(n) · \(s.kind.displayName)" : s.kind.displayName
+                        let kindName = s.kind.localizedName
+                        let label: String
+                        if n > 1 {
+                            let template = NSLocalizedString(
+                                "rep_step_label", value: "Rep %1$lld/%2$lld · %3$@", comment: ""
+                            )
+                            label = String(format: template, i, n, kindName)
+                        } else {
+                            label = kindName
+                        }
                         result.append((s, label))
                     }
                 }
@@ -226,7 +250,8 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
             startStepTimer(duration: TimeInterval(seconds))
         }
 
-        // Voice + haptic announcement
+        // Show full-screen step transition overlay, then voice + haptic.
+        triggerStepTransition()
         announceStep(name: displayName, goal: stepGoalText, previous: previousStepDisplayName)
 
         // Build next-step summary
@@ -291,7 +316,7 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     private func enterOpenGoal() {
         stepTimerTask?.cancel()
         stepTimerTask = nil
-        stepName = "Free Run"
+        stepName = String(localized: "Free Run")
         stepGoalText = ""
         stepProgress = 1
         stepKind = nil
@@ -306,27 +331,54 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
 
     private func announceStep(name: String, goal: String, previous: String) {
         WKInterfaceDevice.current().play(.notification)
+
+        // Duck background audio (e.g. podcasts) while the announcement plays.
+        try? AVAudioSession.sharedInstance().setCategory(
+            .playback,
+            mode: .spokenAudio,
+            options: [.duckOthers]
+        )
+        try? AVAudioSession.sharedInstance().setActive(true)
+
         let voiceName = name.replacingOccurrences(of: " · ", with: " ")
         let text: String
         if previous.isEmpty {
-            text = "\(voiceName). Goal: \(goal)."
+            let template = NSLocalizedString("announce.first", value: "%1$@. Goal: %2$@.", comment: "")
+            text = String(format: template, voiceName, goal)
         } else {
             let voicePrev = previous.replacingOccurrences(of: " · ", with: " ")
-            text = "\(voicePrev) complete. \(voiceName). Goal: \(goal)."
+            let template = NSLocalizedString("announce.transition", value: "%1$@ complete. %2$@. Goal: %3$@.", comment: "")
+            text = String(format: template, voicePrev, voiceName, goal)
         }
         let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: Locale.preferredLanguages.first ?? "en")
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9
         speechSynthesizer.stopSpeaking(at: .immediate)
         speechSynthesizer.speak(utterance)
     }
 
+    private func triggerStepTransition() {
+        stepTransitionTask?.cancel()
+        showStepTransition = true
+        stepTransitionTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(2.5))
+            guard !Task.isCancelled, let self else { return }
+            await MainActor.run { self.showStepTransition = false }
+        }
+    }
+
     private func announceWorkoutComplete() {
         WKInterfaceDevice.current().play(.success)
         let voicePrev = previousStepDisplayName.replacingOccurrences(of: " · ", with: " ")
-        let text = voicePrev.isEmpty
-            ? "Workout complete!"
-            : "\(voicePrev) complete. Workout complete!"
+        let text: String
+        if voicePrev.isEmpty {
+            text = String(localized: "Workout complete!")
+        } else {
+            let template = NSLocalizedString("announce.workout_complete", value: "%@ complete. Workout complete!", comment: "")
+            text = String(format: template, voicePrev)
+        }
         let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: Locale.preferredLanguages.first ?? "en")
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9
         speechSynthesizer.speak(utterance)
     }
@@ -595,6 +647,28 @@ extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
             : "\(Int(remaining.rounded())) m"
         if done >= targetMetres {
             advanceStep()
+        }
+    }
+}
+
+// MARK: - AVSpeechSynthesizerDelegate
+
+extension WorkoutSessionManager: AVSpeechSynthesizerDelegate {
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        // Deactivate our audio session so background audio (podcast, music) resumes at full volume.
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+    }
+}
+
+// MARK: - StepKind localized names (Watch app bundle)
+
+private extension StepKind {
+    var localizedName: String {
+        switch self {
+        case .warmup:   String(localized: "Warm-up")
+        case .work:     String(localized: "Run")
+        case .recovery: String(localized: "Recovery")
+        case .cooldown: String(localized: "Cool-down")
         }
     }
 }

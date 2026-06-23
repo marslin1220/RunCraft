@@ -249,12 +249,12 @@ private struct PaceWheelCard: View {
     private var letter: String { template.zoneLetter ?? "?" }
     private var fullName: String {
         switch template.zoneLetter {
-        case "E": "EASY"
-        case "M": "MARATHON"
-        case "T": "THRESHOLD"
-        case "I": "INTERVAL"
-        case "R": "REPETITION"
-        default:  "PACE"
+        case "E": String(localized: "EASY")
+        case "M": String(localized: "MARATHON")
+        case "T": String(localized: "THRESHOLD")
+        case "I": String(localized: "INTERVAL")
+        case "R": String(localized: "REPETITION")
+        default:  String(localized: "PACE")
         }
     }
 

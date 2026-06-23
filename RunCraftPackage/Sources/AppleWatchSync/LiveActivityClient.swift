@@ -55,10 +55,6 @@ private actor LiveActivityManager {
     private var activity: Activity<WorkoutActivityAttributes>?
 
     func start(workoutName: String, message: WorkoutMirrorMessage) async {
-        guard ActivityAuthorizationInfo().areActivitiesEnabled else {
-            liveActivityLogger.info("Live Activities not enabled on this device")
-            return
-        }
         if let old = activity {
             await old.end(nil, dismissalPolicy: .immediate)
             activity = nil

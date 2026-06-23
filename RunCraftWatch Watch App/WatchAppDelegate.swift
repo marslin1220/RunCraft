@@ -144,6 +144,23 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate
 
     private func startWorkout(payload: WatchWorkoutPayload, configuration: HKWorkoutConfiguration) async {
         let healthStore = HKHealthStore()
+        // Ensure authorization is confirmed before starting the session.
+        // On a fresh install the system shows the HK prompt here; this awaits the result.
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            healthStore.requestAuthorization(
+                toShare: [
+                    HKObjectType.workoutType(),
+                    HKQuantityType(.activeEnergyBurned),
+                    HKQuantityType(.distanceWalkingRunning),
+                ],
+                read: [
+                    HKQuantityType(.heartRate),
+                    HKQuantityType(.distanceWalkingRunning),
+                    HKQuantityType(.runningSpeed),
+                    HKQuantityType(.activeEnergyBurned),
+                ]
+            ) { _, _ in continuation.resume() }
+        }
         do {
             watchLogger.log("creating HKWorkoutSession")
             let session = try HKWorkoutSession(
