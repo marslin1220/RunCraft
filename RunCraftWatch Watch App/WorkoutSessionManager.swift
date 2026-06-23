@@ -103,7 +103,11 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         let builder = session.associatedWorkoutBuilder()
         self.builder = builder
         builder.delegate = self
-        builder.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore, workoutConfiguration: session.workoutConfiguration)
+        let dataSource = HKLiveWorkoutDataSource(healthStore: healthStore, workoutConfiguration: session.workoutConfiguration)
+        // Explicitly enable runningSpeed so the builder starts collecting it
+        // immediately rather than waiting for automatic type detection.
+        dataSource.enableCollection(for: HKQuantityType(.runningSpeed), predicate: nil)
+        builder.dataSource = dataSource
 
         flatSteps = flattenBlocks(blocks)
         currentStepIndex = 0
@@ -122,6 +126,12 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         let startDate = Date()
         session.startActivity(with: startDate)
         try await builder.beginCollection(at: startDate)
+
+        // Adding a marker event immediately after beginCollection nudges
+        // HKLiveWorkoutBuilder into requesting data right away, which reduces
+        // the latency before the first HR/pace samples arrive from the sensor.
+        let markerEvent = HKWorkoutEvent(type: .marker, dateInterval: DateInterval(start: startDate, duration: 0), metadata: nil)
+        builder.addWorkoutEvents([markerEvent]) { _, _ in }
 
         phase = .running
         startElapsedTimer()

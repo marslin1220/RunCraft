@@ -1,5 +1,6 @@
 import AppleWatchSync
 import Combine
+import CoreLocation
 import Foundation
 import HealthKit
 import os
@@ -21,6 +22,7 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate
     // Set by handle(_:) when the payload hasn't arrived yet.
     // Resolved by didReceiveApplicationContext or a 5-second timeout Task.
     private var pendingPayloadContinuation: CheckedContinuation<WatchWorkoutPayload?, Never>?
+    private var gpsPrewarmManager: CLLocationManager?
 
     // MARK: - WKApplicationDelegate
 
@@ -86,6 +88,11 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate
     // nonisolated so the HealthKit daemon can call this from any thread.
     nonisolated func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
         watchLogger.log("handle(_:HKWorkoutConfiguration) activityType=\(workoutConfiguration.activityType.rawValue, privacy: .public)")
+        // Pre-warm GPS so the first location fix arrives before startActivity.
+        // Stored as a property so it isn't deallocated before the request fires.
+        let locationManager = CLLocationManager()
+        gpsPrewarmManager = locationManager
+        locationManager.requestLocation()
         Task { @MainActor in
             let payload = await waitForPayload()
             guard let payload else {
@@ -149,6 +156,7 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate, WCSessionDelegate
             watchLogger.error("failed to start workout: \(error.localizedDescription, privacy: .public)")
             workoutManager.phase = .failed(error.localizedDescription)
         }
+        gpsPrewarmManager = nil
     }
 
     // MARK: - WCSessionDelegate
