@@ -9,7 +9,15 @@ struct RunCraftApp: App {
 
     var body: some Scene {
         WindowGroup {
+            #if DEBUG
+            if CommandLine.arguments.contains("--screenshots") {
+                ScreenshotHost()
+            } else {
+                AppView(store: makeAppStore())
+            }
+            #else
             AppView(store: makeAppStore())
+            #endif
         }
     }
 }
