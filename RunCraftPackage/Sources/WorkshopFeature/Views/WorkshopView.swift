@@ -19,7 +19,7 @@ public struct WorkshopView: View {
                 content
             }
             .background(Color.brand.background)
-            .navigationTitle("Workouts")
+            .navigationTitle(Text("Workouts", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -211,17 +211,17 @@ private struct EmptyYoursPrompt: View {
             Image(systemName: "figure.run.circle")
                 .font(.system(size: 56))
                 .foregroundStyle(Color.brand.accent.opacity(0.6))
-            Text("No workouts yet")
+            Text("No workouts yet", bundle: .module)
                 .font(.title3.bold())
                 .foregroundStyle(Color.brand.textPrimary)
-            Text("Start from a template or build one from scratch.")
+            Text("Start from a template or build one from scratch.", bundle: .module)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.brand.textSecondary)
                 .padding(.horizontal, 40)
 
             VStack(spacing: 10) {
                 Button(action: onBrowseTemplates) {
-                    Text("Browse Templates")
+                    Text("Browse Templates", bundle: .module)
                         .bold()
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -230,7 +230,7 @@ private struct EmptyYoursPrompt: View {
                         .clipShape(Capsule())
                 }
                 Button(action: onNew) {
-                    Text("+ New workout")
+                    Text("+ New workout", bundle: .module)
                         .bold()
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -252,9 +252,21 @@ private struct HistorySegment: View {
     @FetchAll(CompletedWorkout.order { $0.completedAt.desc() }) var runs: [CompletedWorkout]
     @FetchAll var allSessions: [PlannedSession]
     @Shared(.appStorage("paceUnit", store: .runCraftGroup)) private var paceUnit: PaceUnit = .perKilometre
+    @State private var selectedRun: CompletedWorkout?
 
     private var sessionById: [PlannedSession.ID: PlannedSession] {
         Dictionary(uniqueKeysWithValues: allSessions.map { ($0.id, $0) })
+    }
+
+    /// Runs grouped by calendar month, newest month first.
+    private var groupedByMonth: [(monthStart: Date, runs: [CompletedWorkout])] {
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: runs) { run -> Date in
+            calendar.dateInterval(of: .month, for: run.completedAt)?.start ?? run.completedAt
+        }
+        return grouped
+            .map { (monthStart: $0.key, runs: $0.value.sorted { $0.completedAt > $1.completedAt }) }
+            .sorted { $0.monthStart > $1.monthStart }
     }
 
     var body: some View {
@@ -262,22 +274,77 @@ private struct HistorySegment: View {
             EmptyHistoryPrompt()
         } else {
             ScrollView {
-                LazyVStack(spacing: 10) {
-                    ForEach(runs) { run in
-                        RunHistoryRow(
-                            run: run,
-                            session: run.plannedSessionId.flatMap { sessionById[$0] },
-                            paceUnit: paceUnit
-                        )
+                LazyVStack(alignment: .leading, spacing: 0, pinnedViews: .sectionHeaders) {
+                    ForEach(groupedByMonth, id: \.monthStart) { group in
+                        Section {
+                            VStack(spacing: 0) {
+                                ForEach(group.runs) { run in
+                                    let session = run.plannedSessionId.flatMap { sessionById[$0] }
+                                    Button {
+                                        selectedRun = run
+                                    } label: {
+                                        RunHistoryRow(
+                                            run: run,
+                                            session: session,
+                                            paceUnit: paceUnit
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+
+                                    if run.id != group.runs.last?.id {
+                                        Divider()
+                                            .padding(.leading, 74)
+                                            .opacity(0.2)
+                                    }
+                                }
+                            }
+                            .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 16))
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 16)
+                        } header: {
+                            MonthHeader(monthStart: group.monthStart, runs: group.runs)
+                        }
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
+                .padding(.top, 4)
                 .padding(.bottom, 24)
+            }
+            .sheet(item: $selectedRun) { run in
+                RunDetailView(
+                    run: run,
+                    session: run.plannedSessionId.flatMap { sessionById[$0] },
+                    paceUnit: paceUnit
+                )
             }
         }
     }
 }
+
+// MARK: - Month section header
+
+private struct MonthHeader: View {
+    let monthStart: Date
+    let runs: [CompletedWorkout]
+
+    private var totalKm: Double { runs.reduce(0) { $0 + $1.actualDistanceKm } }
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(monthStart, format: .dateTime.year().month(.wide))
+                .font(.headline)
+                .foregroundStyle(Color.brand.textPrimary)
+            Spacer()
+            Text(String(format: "%d 次 · %.1f km", runs.count, totalKm))
+                .font(.caption.weight(.medium))
+                .foregroundStyle(Color.brand.textSecondary)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 8)
+        .background(Color.brand.background)
+    }
+}
+
+// MARK: - Run row (Apple Fitness–inspired)
 
 private struct RunHistoryRow: View {
     let run: CompletedWorkout
@@ -285,20 +352,21 @@ private struct RunHistoryRow: View {
     let paceUnit: PaceUnit
 
     private var sessionType: SessionType { session?.sessionType ?? .easy }
+    private var accentColor: Color { Color(hex: sessionType.colorHex) }
 
     private var title: String {
-        session != nil ? sessionType.displayName : String(localized: "Run", bundle: .module)
+        sessionType.displayName
     }
 
-    private var distanceText: String {
-        PaceFormatting.distance(metres: run.actualDistanceKm * 1_000, unit: paceUnit)
+    private var distanceKm: Double { run.actualDistanceKm }
+    private var distanceValue: String {
+        String(format: "%.2f", paceUnit == .perKilometre ? distanceKm : distanceKm * 0.621371)
     }
+    private var distanceUnit: String { paceUnit == .perKilometre ? "km" : "mi" }
 
     private var durationText: String {
         let total = Int(run.actualDurationSec)
-        let h = total / 3600
-        let m = (total % 3600) / 60
-        let s = total % 60
+        let h = total / 3600, m = (total % 3600) / 60, s = total % 60
         return h > 0
             ? String(format: "%d:%02d:%02d", h, m, s)
             : String(format: "%d:%02d", m, s)
@@ -306,62 +374,203 @@ private struct RunHistoryRow: View {
 
     private var paceText: String {
         run.avgPaceSecPerKm > 0
-            ? PaceFormatting.pace(secondsPerKm: run.avgPaceSecPerKm, unit: paceUnit)
+            ? PaceFormatting.paceMinutesSeconds(secondsPerKm: run.avgPaceSecPerKm, unit: paceUnit)
             : "--"
-    }
-
-    /// Only shown when the run is linked to a planned session.
-    /// < 0.97 = ran ahead of target (cyan), > 1.05 = behind target (orange),
-    /// in between = on target (green).
-    private var achievementColor: Color? {
-        guard session != nil, run.paceAchievementRatio > 0 else { return nil }
-        switch run.paceAchievementRatio {
-        case ..<0.97: return .cyan
-        case 1.05...: return .orange
-        default:      return .green
-        }
     }
 
     var body: some View {
         HStack(spacing: 12) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(hex: sessionType.colorHex).opacity(0.15))
-                    .frame(width: 44, height: 44)
+                Circle()
+                    .fill(accentColor.opacity(0.15))
+                    .frame(width: 46, height: 46)
                 Image(systemName: sessionType.symbolName)
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(Color(hex: sessionType.colorHex))
+                    .foregroundStyle(accentColor)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(alignment: .firstTextBaseline) {
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color.brand.textPrimary)
+                        .lineLimit(1)
                     Spacer()
-                    Text(run.completedAt, format: .dateTime.month(.abbreviated).day().weekday(.short))
+                    Text(run.completedAt, format: .dateTime.weekday(.abbreviated))
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
-                HStack(spacing: 0) {
-                    Text(distanceText)
-                    Text("  ·  ")
-                    Text(durationText)
-                    Text("  ·  ")
-                    Text(paceText)
+
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
+                    Text(distanceValue)
+                        .font(.title3.weight(.bold).monospacedDigit())
+                        .foregroundStyle(Color.brand.textPrimary)
+                    Text(distanceUnit)
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(Color.brand.textSecondary)
                     Spacer()
-                    if let color = achievementColor {
-                        Circle()
-                            .fill(color)
-                            .frame(width: 8, height: 8)
-                    }
+                    Text(durationText)
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(Color.brand.textSecondary)
                 }
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(Color.brand.textSecondary)
+
+                Text(paceText + " / " + distanceUnit)
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(Color.brand.textSecondary)
             }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.vertical, 12)
+    }
+}
+
+// MARK: - Run detail sheet
+
+private struct RunDetailView: View {
+    let run: CompletedWorkout
+    let session: PlannedSession?
+    let paceUnit: PaceUnit
+    @Environment(\.dismiss) private var dismiss
+
+    private var sessionType: SessionType { session?.sessionType ?? .easy }
+    private var accentColor: Color { Color(hex: sessionType.colorHex) }
+    private var title: String { sessionType.displayName }
+
+    private var distanceKm: Double { run.actualDistanceKm }
+    private var distanceValue: String {
+        String(format: "%.2f", paceUnit == .perKilometre ? distanceKm : distanceKm * 0.621371)
+    }
+    private var distanceUnit: String { paceUnit == .perKilometre ? "km" : "mi" }
+
+    private var durationText: String {
+        let total = Int(run.actualDurationSec)
+        let h = total / 3600, m = (total % 3600) / 60, s = total % 60
+        return h > 0
+            ? String(format: "%d:%02d:%02d", h, m, s)
+            : String(format: "%d:%02d", m, s)
+    }
+
+    private var paceText: String {
+        run.avgPaceSecPerKm > 0
+            ? PaceFormatting.paceMinutesSeconds(secondsPerKm: run.avgPaceSecPerKm, unit: paceUnit)
+            : "--"
+    }
+
+    private var achievementLabel: String {
+        guard run.plannedSessionId != nil, run.paceAchievementRatio > 0 else {
+            return String(localized: "—", bundle: .module)
+        }
+        switch run.paceAchievementRatio {
+        case ..<0.97: return String(localized: "Ahead", bundle: .module)
+        case 1.05...: return String(localized: "Behind", bundle: .module)
+        default:      return String(localized: "On pace", bundle: .module)
+        }
+    }
+
+    private var achievementColor: Color {
+        guard run.plannedSessionId != nil, run.paceAchievementRatio > 0 else { return Color.brand.textSecondary }
+        switch run.paceAchievementRatio {
+        case ..<0.97: return .cyan
+        case 1.05...: return .orange
+        default:      return Color.brand.success
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Type + date header
+                    HStack(spacing: 12) {
+                        ZStack {
+                            Circle().fill(accentColor.opacity(0.15)).frame(width: 52, height: 52)
+                            Image(systemName: sessionType.symbolName)
+                                .font(.title3.weight(.semibold))
+                                .foregroundStyle(accentColor)
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(title)
+                                .font(.title3.weight(.bold))
+                                .foregroundStyle(Color.brand.textPrimary)
+                            Text(run.completedAt, format: .dateTime.year().month(.abbreviated).day().weekday(.short).hour().minute())
+                                .font(.subheadline)
+                                .foregroundStyle(Color.brand.textSecondary)
+                        }
+                        Spacer()
+                    }
+
+                    // 2×2 metric grid
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                        MetricTile(
+                            label: String(localized: "Distance", bundle: .module),
+                            value: distanceValue,
+                            unit: distanceUnit,
+                            color: accentColor
+                        )
+                        MetricTile(
+                            label: String(localized: "Duration", bundle: .module),
+                            value: durationText,
+                            unit: nil,
+                            color: nil
+                        )
+                        MetricTile(
+                            label: String(localized: "Avg Pace", bundle: .module),
+                            value: paceText,
+                            unit: "/ " + distanceUnit,
+                            color: accentColor
+                        )
+                        MetricTile(
+                            label: String(localized: "Pace Score", bundle: .module),
+                            value: achievementLabel,
+                            unit: nil,
+                            color: run.paceAchievementRatio > 0 && run.plannedSessionId != nil ? achievementColor : nil
+                        )
+                    }
+                }
+                .padding(20)
+            }
+            .navigationTitle(run.completedAt.formatted(.dateTime.month(.abbreviated).day()))
+            .navigationBarTitleDisplayMode(.inline)
+            .background(Color.brand.background)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button { dismiss() } label: { Text("Done", bundle: .module) }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+    }
+}
+
+// MARK: - Metric tile (used in RunDetailView)
+
+private struct MetricTile: View {
+    let label: String
+    let value: String
+    let unit: String?
+    let color: Color?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(Color.brand.textSecondary)
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(.title2.weight(.bold).monospacedDigit())
+                    .foregroundStyle(color ?? Color.brand.textPrimary)
+                if let unit {
+                    Text(unit)
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+            }
+            .minimumScaleFactor(0.7)
+            .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
         .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
     }
 }

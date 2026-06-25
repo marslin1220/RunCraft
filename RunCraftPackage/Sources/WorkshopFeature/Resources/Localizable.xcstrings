@@ -1823,6 +1823,134 @@
           }
         }
       }
+    },
+    "Your workout": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マイワークアウト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내 운동"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的训练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的訓練"
+          }
+        }
+      }
+    },
+    "Ahead": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Ahead" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "速い" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "빠름" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "超前" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "超前" } }
+      }
+    },
+    "Avg Pace": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Avg Pace" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "平均ペース" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "평균 페이스" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "平均配速" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "平均配速" } }
+      }
+    },
+    "Behind": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Behind" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "遅い" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "느림" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "落后" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "落後" } }
+      }
+    },
+    "Distance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Distance" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "距離" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "거리" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "距离" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "距離" } }
+      }
+    },
+    "Duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Duration" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "時間" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "시간" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "时长" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "時長" } }
+      }
+    },
+    "From your plan — Save creates a copy": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プランから — 保存するとコピーが作成されます"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "플랜에서 — 저장 시 사본이 생성됩니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来自你的计划——保存将创建副本"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "來自你的計畫——儲存將建立副本"
+          }
+        }
+      }
+    },
+    "On pace": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "On pace" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "目標通り" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "목표 페이스" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "配速达标" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "配速達標" } }
+      }
+    },
+    "Pace Score": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Pace Score" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "ペース評価" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "페이스 점수" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "配速评分" } },
+        "zh-Hant": { "stringUnit": { "state": "translated", "value": "配速評分" } }
+      }
     }
   },
   "version": "1.0"

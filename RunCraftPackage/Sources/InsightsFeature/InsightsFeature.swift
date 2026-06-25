@@ -76,6 +76,34 @@ import VDOTEngine
             WeeklyMileage.bucket(workouts: recentWorkouts, weekCount: 8)
         }
 
+        public var thisWeekKm: Double {
+            let calendar = Calendar.current
+            guard let weekStart = calendar.dateInterval(of: .weekOfYear, for: Date())?.start else { return 0 }
+            return recentWorkouts
+                .filter { $0.completedAt >= weekStart }
+                .reduce(0) { $0 + $1.actualDistanceKm }
+        }
+
+        public var thisWeekCount: Int {
+            let calendar = Calendar.current
+            guard let weekStart = calendar.dateInterval(of: .weekOfYear, for: Date())?.start else { return 0 }
+            return recentWorkouts.filter { $0.completedAt >= weekStart }.count
+        }
+
+        public var thisMonthKm: Double {
+            let calendar = Calendar.current
+            guard let monthStart = calendar.dateInterval(of: .month, for: Date())?.start else { return 0 }
+            return recentWorkouts
+                .filter { $0.completedAt >= monthStart }
+                .reduce(0) { $0 + $1.actualDistanceKm }
+        }
+
+        public var thisMonthCount: Int {
+            let calendar = Calendar.current
+            guard let monthStart = calendar.dateInterval(of: .month, for: Date())?.start else { return 0 }
+            return recentWorkouts.filter { $0.completedAt >= monthStart }.count
+        }
+
         public var predictedTimes: [PredictedRace] {
             guard currentVDOT > 0 else { return [] }
             let distances: [RaceDistance] = [.fiveK, .tenK, .halfMarathon, .custom(42.195)]
@@ -130,6 +158,7 @@ import VDOTEngine
             runningForm: RunningFormTrend
         )
         case setUpVDOTTapped
+        case switchToHistoryTapped
         case delegate(Delegate)
 
         public enum Delegate {
@@ -137,6 +166,8 @@ import VDOTEngine
             /// "Set Up VDOT" — there's no race goal yet, so nothing here
             /// (pace zones, predictions) can be computed.
             case setUpVDOTTapped
+            /// Parent (AppFeature) should switch to the Workouts tab, History segment.
+            case switchToWorkoutsHistory
         }
     }
 
@@ -207,6 +238,9 @@ import VDOTEngine
 
             case .setUpVDOTTapped:
                 return .send(.delegate(.setUpVDOTTapped))
+
+            case .switchToHistoryTapped:
+                return .send(.delegate(.switchToWorkoutsHistory))
 
             case .delegate:
                 return .none

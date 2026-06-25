@@ -177,6 +177,11 @@ import WorkshopFeature
                 state.selectedTab = .plan
                 return .send(.plan(.setupVDOTButtonTapped))
 
+            case .insights(.delegate(.switchToWorkoutsHistory)):
+                state.selectedTab = .workouts
+                state.workouts.selectedSegment = .history
+                return .none
+
             case .settings(.delegate(.openTrainingDays)):
                 state.selectedTab = .plan
                 return .send(.plan(.adjustTrainingDaysFromSettings))

@@ -30,12 +30,12 @@ public struct InsightsView: View {
                     weeklyMileageCard
                     predictedRacesCard
                     ltThresholdsCard
-                    recentRunsCard
+                    runningHistoryCard
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
             }
-            .navigationTitle("Insights")
+            .navigationTitle(Text("Insights", bundle: .module))
             .background(Color.brand.background)
         }
         .task { await store.send(.onAppear).finish() }
@@ -51,16 +51,16 @@ public struct InsightsView: View {
     /// the one actionable thing the runner can do here.
     @ViewBuilder
     private var vdotSetupCard: some View {
-        sectionCard(title: "Set up your fitness baseline") {
+        sectionCard(title: String(localized: "Set up your fitness baseline", bundle: .module)) {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Set up your VDOT to unlock pace zones, training paces, and race predictions. We can detect it from Apple Health, or you can enter a recent race time.")
+                Text("Set up your VDOT to unlock pace zones, training paces, and race predictions. We can detect it from Apple Health, or you can enter a recent race time.", bundle: .module)
                     .font(.footnote)
                     .foregroundStyle(Color.brand.textSecondary)
 
                 Button {
                     store.send(.setUpVDOTTapped)
                 } label: {
-                    Text("Set Up VDOT")
+                    Text("Set Up VDOT", bundle: .module)
                         .bold()
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
@@ -87,7 +87,7 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var fitnessTrendCard: some View {
-        sectionCard(title: "Fitness trend", info: selectedTrendInfo,
+        sectionCard(title: String(localized: "Fitness trend", bundle: .module), info: selectedTrendInfo,
                     siblings: [.vdot, .vo2Max, .delta, .threshold]) {
             VStack(alignment: .leading, spacing: 14) {
                 Picker("Series", selection: $store.selectedTrend) {
@@ -131,25 +131,25 @@ public struct InsightsView: View {
         switch store.selectedTrend {
         case .vdot:
             if store.snapshots.count < 2 {
-                emptyState("Not enough history yet — log a race or finish a few hard sessions.")
+                emptyState(String(localized: "Not enough history yet — log a race or finish a few hard sessions.", bundle: .module))
             } else {
                 vdotChart
             }
         case .vo2Max:
             if store.vo2MaxSamples.count < 2 {
-                emptyState("Apple Watch hasn't recorded enough VO₂max samples yet. They appear after outdoor runs with strong GPS + heart-rate signal.")
+                emptyState(String(localized: "Apple Watch hasn't recorded enough VO₂max samples yet. They appear after outdoor runs with strong GPS + heart-rate signal.", bundle: .module))
             } else {
                 vo2MaxChart
             }
         case .delta:
             if store.deltaSeries.count < 2 {
-                emptyState("Need both VDOT history and VO₂max samples to compute the gap.")
+                emptyState(String(localized: "Need both VDOT history and VO₂max samples to compute the gap.", bundle: .module))
             } else {
                 deltaChart
             }
         case .threshold:
             if store.thresholdSeries.count < 2 {
-                emptyState("Not enough VDOT history yet — log a race or finish a hard session to build your trend.")
+                emptyState(String(localized: "Not enough VDOT history yet — log a race or finish a hard session to build your trend.", bundle: .module))
             } else {
                 thresholdChart
             }
@@ -262,7 +262,7 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var hrvTrendCard: some View {
-        sectionCard(title: "Heart rate variability · 90 days", info: .hrv) {
+        sectionCard(title: String(localized: "Heart rate variability · 90 days", bundle: .module), info: .hrv) {
             VStack(alignment: .leading, spacing: 10) {
                 if let latest = store.hrvSamples.last {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -275,7 +275,7 @@ public struct InsightsView: View {
                     }
                 }
                 if store.hrvSamples.count < 2 {
-                    emptyState("HRV readings appear here after Apple Watch records overnight SDNN data. Wear your Watch to sleep for a few nights.")
+                    emptyState(String(localized: "HRV readings appear here after Apple Watch records overnight SDNN data. Wear your Watch to sleep for a few nights.", bundle: .module))
                 } else {
                     Chart(store.hrvSamples) { sample in
                         LineMark(
@@ -298,7 +298,7 @@ public struct InsightsView: View {
                     .chartYAxisLabel("ms")
                     .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
 
-                    Text("Higher HRV indicates better recovery and aerobic adaptation. A rising trend over weeks means your training is building fitness without excess stress.")
+                    Text("Higher HRV indicates better recovery and aerobic adaptation. A rising trend over weeks means your training is building fitness without excess stress.", bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
@@ -310,7 +310,7 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var restingHRTrendCard: some View {
-        sectionCard(title: "Resting heart rate · 90 days", info: .restingHR) {
+        sectionCard(title: String(localized: "Resting heart rate · 90 days", bundle: .module), info: .restingHR) {
             VStack(alignment: .leading, spacing: 10) {
                 if let latest = store.restingHRSamples.last {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -323,7 +323,7 @@ public struct InsightsView: View {
                     }
                 }
                 if store.restingHRSamples.count < 2 {
-                    emptyState("Resting heart rate appears after Apple Watch records several overnight readings.")
+                    emptyState(String(localized: "Resting heart rate appears after Apple Watch records several overnight readings.", bundle: .module))
                 } else {
                     let bpms = store.restingHRSamples.map(\.bpm)
                     let minBPM = (bpms.min() ?? 40) - 3
@@ -350,7 +350,7 @@ public struct InsightsView: View {
                     .chartYAxisLabel("bpm")
                     .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
 
-                    Text("A downward trend over months indicates improving cardiovascular efficiency. Spikes above your baseline often signal illness, overtraining, or poor sleep.")
+                    Text("A downward trend over months indicates improving cardiovascular efficiency. Spikes above your baseline often signal illness, overtraining, or poor sleep.", bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
@@ -362,7 +362,7 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var heartRateRecoveryCard: some View {
-        sectionCard(title: "HR recovery · 90 days", info: .heartRateRecovery) {
+        sectionCard(title: String(localized: "HR recovery · 90 days", bundle: .module), info: .heartRateRecovery) {
             VStack(alignment: .leading, spacing: 10) {
                 if let latest = store.hrRecoverySamples.last {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -383,7 +383,7 @@ public struct InsightsView: View {
                     }
                 }
                 if store.hrRecoverySamples.count < 2 {
-                    emptyState("HR recovery is recorded by Apple Watch at the end of each workout. Complete a few outdoor runs to see your trend.")
+                    emptyState(String(localized: "HR recovery is recorded by Apple Watch at the end of each workout. Complete a few outdoor runs to see your trend.", bundle: .module))
                 } else {
                     let drops = store.hrRecoverySamples.map(\.dropBPM)
                     let yMax = (drops.max() ?? 40) + 5
@@ -402,7 +402,7 @@ public struct InsightsView: View {
                     .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
                     .frame(height: 140)
 
-                    Text("A 1-minute drop above 22 bpm is considered good. Elite runners often exceed 40 bpm. Consistently low values signal poor recovery or overtraining.")
+                    Text("A 1-minute drop above 22 bpm is considered good. Elite runners often exceed 40 bpm. Consistently low values signal poor recovery or overtraining.", bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
@@ -412,10 +412,10 @@ public struct InsightsView: View {
 
     private func hrrZoneLabel(_ drop: Double) -> String {
         switch drop {
-        case ..<12:  "Poor"
-        case 12..<22: "Below avg"
-        case 22..<40: "Good"
-        default:     "Excellent"
+        case ..<12:  String(localized: "Poor", bundle: .module)
+        case 12..<22: String(localized: "Below avg", bundle: .module)
+        case 22..<40: String(localized: "Good", bundle: .module)
+        default:     String(localized: "Excellent", bundle: .module)
         }
     }
 
@@ -442,7 +442,7 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var runningEconomyCard: some View {
-        sectionCard(title: "Running economy · 90 days", info: selectedFormKindInfo,
+        sectionCard(title: String(localized: "Running economy · 90 days", bundle: .module), info: selectedFormKindInfo,
                     siblings: [.verticalOscillation, .groundContactTime, .strideLength]) {
             VStack(alignment: .leading, spacing: 14) {
                 Picker("Metric", selection: $selectedFormKind) {
@@ -524,19 +524,19 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var trainingZonesCard: some View {
-        sectionCard(title: "Training zones", info: .trainingZones) {
+        sectionCard(title: String(localized: "Training zones", bundle: .module), info: .trainingZones) {
             if store.currentVDOT == 0 {
-                emptyState("Set a VDOT in the Plan tab to see your pace zones.")
+                emptyState(String(localized: "Set a VDOT in the Plan tab to see your pace zones.", bundle: .module))
             } else {
                 let zones = VDOTCalculator.paceZones(vdot: store.currentVDOT)
                 VStack(spacing: 8) {
-                    ZoneRow(name: "Easy", range: zones.easy,       color: .blue,            paceUnit: paceUnit)
-                    ZoneRow(name: "Marathon", range: zones.marathon, color: Color.brand.success, paceUnit: paceUnit)
-                    ZoneRow(name: "Threshold", range: zones.threshold, color: Color.brand.accent, paceUnit: paceUnit)
-                    ZoneRow(name: "Interval", range: zones.interval, color: .orange,           paceUnit: paceUnit)
-                    ZoneRow(name: "Repetition", range: zones.repetition, color: .red,          paceUnit: paceUnit)
+                    ZoneRow(name: String(localized: "Easy", bundle: .module), range: zones.easy,       color: .blue,            paceUnit: paceUnit)
+                    ZoneRow(name: String(localized: "Marathon", bundle: .module), range: zones.marathon, color: Color.brand.success, paceUnit: paceUnit)
+                    ZoneRow(name: String(localized: "Threshold", bundle: .module), range: zones.threshold, color: Color.brand.accent, paceUnit: paceUnit)
+                    ZoneRow(name: String(localized: "Interval", bundle: .module), range: zones.interval, color: .orange,           paceUnit: paceUnit)
+                    ZoneRow(name: String(localized: "Repetition", bundle: .module), range: zones.repetition, color: .red,          paceUnit: paceUnit)
                 }
-                Text("Zones based on Jack Daniels' Running Formula at VDOT \(Int(store.currentVDOT.rounded())).")
+                Text("Zones based on Jack Daniels' Running Formula at VDOT \(Int(store.currentVDOT.rounded())).", bundle: .module)
                     .font(.caption)
                     .foregroundStyle(Color.brand.textSecondary)
                     .padding(.top, 4)
@@ -588,10 +588,10 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var weeklyMileageCard: some View {
-        sectionCard(title: "Weekly mileage · last 8 weeks") {
+        sectionCard(title: String(localized: "Weekly mileage · last 8 weeks", bundle: .module)) {
             let bars = store.weeklyMileage
             if bars.allSatisfy({ $0.totalKm == 0 }) {
-                emptyState("No completed runs yet. They'll appear here after HealthKit syncs.")
+                emptyState(String(localized: "No completed runs yet. They'll appear here after HealthKit syncs.", bundle: .module))
             } else {
                 Chart(bars) { week in
                     BarMark(
@@ -616,9 +616,9 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var predictedRacesCard: some View {
-        sectionCard(title: "Predicted race times") {
+        sectionCard(title: String(localized: "Predicted race times", bundle: .module)) {
             if store.predictedTimes.isEmpty {
-                emptyState("Set a VDOT in the Plan tab to see predictions.")
+                emptyState(String(localized: "Set a VDOT in the Plan tab to see predictions.", bundle: .module))
             } else {
                 VStack(spacing: 8) {
                     ForEach(store.predictedTimes) { race in
@@ -645,9 +645,9 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var ltThresholdsCard: some View {
-        sectionCard(title: "Lactate thresholds", info: .ltThresholds) {
+        sectionCard(title: String(localized: "Lactate thresholds", bundle: .module), info: .ltThresholds) {
             if store.currentVDOT == 0 {
-                emptyState("Set a VDOT in the Plan tab to see your threshold paces.")
+                emptyState(String(localized: "Set a VDOT in the Plan tab to see your threshold paces.", bundle: .module))
             } else {
                 let zones = VDOTCalculator.paceZones(vdot: store.currentVDOT)
                 let lt1SecPerKm = zones.easy.lower
@@ -655,7 +655,7 @@ public struct InsightsView: View {
                 VStack(spacing: 12) {
                     HStack(alignment: .top, spacing: 16) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("LT1 · Aerobic")
+                            Text("LT1 · Aerobic", bundle: .module)
                                 .font(.caption)
                                 .foregroundStyle(Color.brand.textSecondary)
                             Text(
@@ -667,7 +667,7 @@ public struct InsightsView: View {
                         }
                         Spacer()
                         VStack(alignment: .trailing, spacing: 2) {
-                            Text("LT2 · Anaerobic")
+                            Text("LT2 · Anaerobic", bundle: .module)
                                 .font(.caption)
                                 .foregroundStyle(Color.brand.textSecondary)
                             Text(
@@ -678,7 +678,7 @@ public struct InsightsView: View {
                             .foregroundStyle(Color.brand.accent)
                         }
                     }
-                    Text("LT1 is the top of your aerobic zone — the pace at which lactate begins to rise above baseline. LT2 is your anaerobic threshold, approximately your 60-minute race pace.")
+                    Text("LT1 is the top of your aerobic zone — the pace at which lactate begins to rise above baseline. LT2 is your anaerobic threshold, approximately your 60-minute race pace.", bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
@@ -686,27 +686,90 @@ public struct InsightsView: View {
         }
     }
 
-    /// Last ten completed runs. Each row reads as a single sentence —
-    /// date, distance, duration, average pace — so the runner can scan
-    /// the column. A small arrow ↑/↓ next to the pace flags whether the
-    /// run beat or missed the target session pace (when linked to one).
+    /// Running history card: week + month volume totals, 3 most-recent
+    /// compact run rows, and a "View all" button that hands off to the
+    /// Workouts / History segment.
     @ViewBuilder
-    private var recentRunsCard: some View {
-        sectionCard(title: "Recent runs") {
-            let runs = Array(store.recentWorkouts.prefix(10))
-            if runs.isEmpty {
-                emptyState("No completed runs yet. They'll appear here after HealthKit syncs or after you log a run by voice.")
-            } else {
-                VStack(spacing: 10) {
-                    ForEach(runs) { run in
-                        RecentRunRow(run: run, paceUnit: paceUnit)
-                        if run.id != runs.last?.id {
-                            Divider().opacity(0.25)
+    private var runningHistoryCard: some View {
+        sectionCard(title: String(localized: "Running history", bundle: .module)) {
+            VStack(spacing: 0) {
+                // Week / month volume totals
+                HStack(spacing: 0) {
+                    volumeColumn(
+                        label: String(localized: "This week", bundle: .module),
+                        km: store.thisWeekKm,
+                        count: store.thisWeekCount
+                    )
+                    Divider().frame(height: 44).padding(.horizontal, 4)
+                    volumeColumn(
+                        label: String(localized: "This month", bundle: .module),
+                        km: store.thisMonthKm,
+                        count: store.thisMonthCount
+                    )
+                }
+                .padding(.bottom, 12)
+
+                Divider().opacity(0.2)
+
+                // 3 most-recent runs
+                let recent = Array(store.recentWorkouts.prefix(3))
+                if recent.isEmpty {
+                    Text("No completed runs yet. They'll appear here after HealthKit syncs or after you log a run by voice.", bundle: .module)
+                        .font(.footnote)
+                        .foregroundStyle(Color.brand.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.vertical, 12)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(recent) { run in
+                            InsightsRunRow(run: run, paceUnit: paceUnit)
+                            if run.id != recent.last?.id {
+                                Divider().opacity(0.2).padding(.leading, 52)
+                            }
                         }
                     }
                 }
+
+                Divider().opacity(0.2)
+
+                // "View all runs" action
+                Button {
+                    store.send(.switchToHistoryTapped)
+                } label: {
+                    HStack(spacing: 4) {
+                        Spacer()
+                        Text("View all runs", bundle: .module)
+                            .font(.footnote.weight(.semibold))
+                        Image(systemName: "chevron.right")
+                            .font(.footnote.weight(.semibold))
+                    }
+                    .foregroundStyle(Color.brand.accent)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 10)
             }
         }
+    }
+
+    @ViewBuilder
+    private func volumeColumn(label: String, km: Double, count: Int) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(Color.brand.textSecondary)
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(String(format: "%.1f", km))
+                    .font(.title2.weight(.bold).monospacedDigit())
+                    .foregroundStyle(Color.brand.textPrimary)
+                Text("km")
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+            Text(String(format: String(localized: "%lld runs", bundle: .module), count))
+                .font(.caption)
+                .foregroundStyle(Color.brand.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     /// Pace-unit preference written by Settings. Reading at view scope
@@ -869,275 +932,79 @@ struct InsightInfoPresentation: Identifiable {
 
 struct InsightInfo: Identifiable {
     let id: String
-    let title: String
-    let body: String
+    let title: LocalizedStringResource
+    let body: LocalizedStringResource
 
     static let vdot = InsightInfo(
         id: "vdot",
-        title: "VDOT",
-        body: """
-VDOT is Jack Daniels' measure of your current running fitness. Derived from your best race time or training performance, it represents the effective oxygen-utilisation rate at which you actually race.
-
-**Why it drives your plan**
-
-VDOT powers every pace zone and session target in RunCraft — Easy, Marathon, Threshold, Interval, and Repetition paces are all computed from this single number.
-
-**What to look for**
-
-• A rising VDOT over a training block confirms real fitness gains.
-
-• A plateau for 6+ weeks despite consistent training often signals the need for a new race stimulus, more easy volume, or a recovery week.
-
-• A sudden drop usually means the race data was an anomaly (heat, illness, pacing error) — use Adjust VDOT to correct it manually.
-"""
+        title: LocalizedStringResource("InsightInfo.vdot.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.vdot.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let vo2Max = InsightInfo(
         id: "vo2Max",
-        title: "VO₂max",
-        body: """
-VO₂max is your Apple Watch's independent estimate of maximum oxygen uptake (mL/kg/min), derived from heart rate and GPS speed during outdoor runs.
-
-**How it differs from VDOT**
-
-Both use the same unit but come from different sources. VDOT is derived from actual race performances. Apple Watch VO₂max is a physiological estimate from training data — typically more conservative and updated more frequently.
-
-**What to look for**
-
-• A gradual upward trend over months confirms aerobic capacity is growing.
-
-• The Watch's estimate is most accurate during easy-to-moderate outdoor runs with clean GPS and stable heart rate.
-
-• Values typically lag VDOT by 4–8 weeks when fitness improves rapidly.
-"""
+        title: LocalizedStringResource("InsightInfo.vo2Max.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.vo2Max.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let delta = InsightInfo(
         id: "delta",
-        title: "Δ (VDOT − VO₂max)",
-        body: """
-Delta is the difference between your VDOT and your Apple Watch's VO₂max estimate. It shows how your race-derived fitness compares to the Watch's physiological reading.
-
-**Interpreting the value**
-
-• **Positive Δ** — race performance implies higher fitness than the Watch estimates. Common in economical runners, or when the Watch hasn't had enough outdoor runs to update.
-
-• **Near zero** — VDOT and Watch VO₂max are in agreement. A good sign that both data sources are consistent.
-
-• **Negative Δ** — training has built aerobic capacity faster than race-derived VDOT reflects, or your last race was an underperformance. A good prompt to attempt a time trial.
-
-**What to watch**
-
-A persistently widening positive gap suggests you would benefit from more race-specific work.
-"""
+        title: LocalizedStringResource("InsightInfo.delta.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.delta.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let threshold = InsightInfo(
         id: "threshold",
-        title: "T-pace (Lactate Threshold)",
-        body: """
-T-pace is your lactate threshold pace — the Daniels Threshold zone midpoint, derived from your VDOT score. It represents the fastest pace sustainable for approximately 60 minutes.
-
-**Why track it over time**
-
-As your VDOT improves, your T-pace becomes faster. This chart shows how your threshold has progressed across your training history — a long-term view of speed development at the most important training intensity.
-
-**Reading the chart**
-
-The y-axis is inverted so upward movement always means improvement: a rising line means you are running faster at threshold. Each point corresponds to one VDOT update.
-
-**What to look for**
-
-• Consistent upward steps after threshold-focused training blocks (tempo runs, cruise intervals).
-
-• A flat trend despite rising VDOT suggests your aerobic base is improving but race-specific speed work may be lagging.
-"""
+        title: LocalizedStringResource("InsightInfo.threshold.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.threshold.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let hrv = InsightInfo(
         id: "hrv",
-        title: "Heart Rate Variability (HRV)",
-        body: """
-HRV measures the millisecond variation between consecutive heartbeats using the SDNN metric. A higher, stable HRV indicates that your autonomic nervous system is well-recovered and ready for training stress.
-
-**What to look for**
-
-• A rising weekly trend over months means your aerobic base is adapting well.
-
-• A sudden drop of 10–15 ms below your personal baseline is a strong signal to reduce training intensity for 1–2 days.
-
-• Day-to-day fluctuation is normal — only sustained trends matter.
-
-Apple Watch records HRV automatically overnight using the heart rate sensor.
-"""
+        title: LocalizedStringResource("InsightInfo.hrv.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.hrv.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let restingHR = InsightInfo(
         id: "restingHR",
-        title: "Resting Heart Rate",
-        body: """
-Resting heart rate (RHR) is the number of times your heart beats per minute at full rest. As cardiovascular fitness improves, the heart becomes more efficient — pumping more blood per beat, so it needs to beat less often.
-
-**What to look for**
-
-• A gradual downward trend over weeks and months indicates improving aerobic fitness.
-
-• A spike of 5+ bpm above your baseline after a hard training block often signals incomplete recovery, illness, or overtraining.
-
-• Elite endurance athletes typically have RHR in the 40–55 bpm range.
-
-Apple Watch records RHR daily using overnight heart rate data.
-"""
+        title: LocalizedStringResource("InsightInfo.restingHR.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.restingHR.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let heartRateRecovery = InsightInfo(
         id: "heartRateRecovery",
-        title: "Heart Rate Recovery",
-        body: """
-Heart Rate Recovery (HRR) is the drop in heart rate during the 60 seconds immediately after a workout ends. It is one of the strongest measurable markers of cardiovascular fitness and autonomic nervous-system health.
-
-Apple Watch measures HRR automatically after every workout and stores it as heartRateRecoveryOneMinute in HealthKit.
-
-**Interpretation**
-
-• **< 12 bpm** — Poor. Associated with reduced fitness and higher cardiovascular risk.
-
-• **12–22 bpm** — Below average for recreational runners.
-
-• **22–40 bpm** — Good. Typical of trained endurance athletes.
-
-• **> 40 bpm** — Excellent. Elite endurance range.
-
-**What to watch for**
-
-• An upward trend over a training block indicates improving aerobic fitness.
-
-• Unusually low HRR after a hard week is an early sign of overtraining or approaching illness — often appears 24–48 hours before other symptoms.
-
-• HRR improves with consistent aerobic base training and adequate recovery.
-"""
+        title: LocalizedStringResource("InsightInfo.heartRateRecovery.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.heartRateRecovery.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let verticalOscillation = InsightInfo(
         id: "verticalOscillation",
-        title: "Vertical Oscillation",
-        body: """
-Vertical oscillation (VO) measures how much your centre of mass bounces up and down with each stride, in centimetres. Energy spent moving vertically doesn't propel you forward — lower is better.
-
-**Typical ranges**
-
-• Elite runners: 6–8 cm
-
-• Recreational runners: 9–13 cm
-
-• Values above 13 cm suggest significant energy waste and often correlate with overstriding or weak hip stability.
-
-**What to look for**
-
-• A gradual downward trend over months indicates improving running economy and form.
-
-• VO often decreases naturally as cadence increases — if GCT is also improving, the gains compound.
-
-• The chart y-axis is inverted so upward movement always means improvement.
-"""
+        title: LocalizedStringResource("InsightInfo.verticalOscillation.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.verticalOscillation.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let groundContactTime = InsightInfo(
         id: "groundContactTime",
-        title: "Ground Contact Time",
-        body: """
-Ground contact time (GCT) is the duration your foot stays on the ground during each stride, in milliseconds. A shorter GCT indicates a more elastic, reactive stride — your muscles and tendons store and release energy efficiently rather than absorbing it passively.
-
-**Typical ranges**
-
-• Elite runners: 160–200 ms
-
-• Recreational runners: 250–300 ms
-
-• Values above 300 ms are common in beginners and often linked to low cadence or heel striking.
-
-**What to look for**
-
-• A downward trend reflects neuromuscular adaptation — your legs are getting quicker off the ground.
-
-• GCT drops most reliably after a period of consistent easy running, strides, and light plyometric work.
-
-• The chart y-axis is inverted so upward movement always means improvement.
-"""
+        title: LocalizedStringResource("InsightInfo.groundContactTime.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.groundContactTime.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let strideLength = InsightInfo(
         id: "strideLength",
-        title: "Stride Length",
-        body: """
-Stride length is the distance covered between two consecutive footfalls of the same foot, in metres. Longer strides at the same heart rate indicate that your legs are producing more power per step — a hallmark of improving running economy.
-
-**Typical ranges**
-
-• Highly depends on height, speed, and fitness. A 1.70 m runner at easy pace: ~1.2–1.5 m per stride.
-
-• At threshold pace, elite runners often exceed 2.0 m.
-
-**What to look for**
-
-• A rising trend over a training block at a consistent easy-pace heart rate confirms real economy gains.
-
-• Stride length naturally increases as GCT decreases and vertical oscillation drops — all three metrics are connected.
-
-• Artificially forcing a longer stride (overstriding) increases injury risk — let it grow as a consequence of fitness, not a target in itself.
-"""
+        title: LocalizedStringResource("InsightInfo.strideLength.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.strideLength.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let ltThresholds = InsightInfo(
         id: "ltThresholds",
-        title: "Lactate Thresholds",
-        body: """
-Lactate thresholds are the two key intensity boundaries that separate aerobic from anaerobic running. Both are derived from your VDOT score using Jack Daniels' pace-zone formula.
-
-**LT1 — Aerobic threshold**
-
-The pace at which blood lactate first begins to rise above resting levels. Below LT1 your body clears lactate as fast as it produces it. In Daniels' system this corresponds to the upper boundary of the Easy zone — your fastest comfortable aerobic pace, sustainable for hours.
-
-**LT2 — Anaerobic threshold (MLSS)**
-
-The Maximal Lactate Steady State — the fastest pace at which lactate production and clearance remain in balance. Above LT2 lactate accumulates and fatigue accelerates. LT2 corresponds to T-pace (Threshold zone midpoint) and represents roughly your 60-minute race effort.
-
-**How to use them**
-
-• Easy runs and long runs should stay below LT1 — if your pace drifts above, you are borrowing from tomorrow.
-
-• Tempo runs and cruise intervals target the LT1–LT2 corridor, pushing the threshold upward over time.
-
-• Race efforts above LT2 (5 K, 10 K) are only sustainable because they are short — not because lactate has stopped accumulating.
-"""
+        title: LocalizedStringResource("InsightInfo.ltThresholds.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.ltThresholds.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 
     static let trainingZones = InsightInfo(
         id: "trainingZones",
-        title: "Training Zones",
-        body: """
-These five zones come from Jack Daniels' Running Formula and are calculated directly from your VDOT score. Each targets a specific physiological adaptation.
-
-**Easy (E)**
-
-Aerobic base building and recovery. Comfortable enough to hold a conversation. The majority of your weekly volume belongs here.
-
-**Marathon (M)**
-
-Sustained aerobic effort at goal marathon race pace. Trains fat metabolism and running economy.
-
-**Threshold (T)**
-
-Lactate threshold pace — roughly your 60-minute race effort. Improves the speed at which your body clears lactate. Done as tempo runs or cruise intervals.
-
-**Interval (I)**
-
-VO₂max pace, approximately your 10–15 min race effort. Done as short hard repeats (3–5 min) with recovery jogs between.
-
-**Repetition (R)**
-
-Speed and economy work. Very short fast reps (60–90 sec) at close to mile race pace, with full recovery.
-"""
+        title: LocalizedStringResource("InsightInfo.trainingZones.title", bundle: .atURL(Bundle.module.bundleURL)),
+        body: LocalizedStringResource("InsightInfo.trainingZones.body", bundle: .atURL(Bundle.module.bundleURL))
     )
 }
 
@@ -1174,7 +1041,7 @@ private struct InfoSheet: View {
                         .animation(.none, value: currentInfo.id)
 
                     VStack(alignment: .leading, spacing: 0) {
-                        ForEach(paragraphs(from: currentInfo.body), id: \.self) { para in
+                        ForEach(paragraphs(from: String(localized: currentInfo.body)), id: \.self) { para in
                             infoParagraph(para)
                         }
                     }
@@ -1186,7 +1053,7 @@ private struct InfoSheet: View {
             }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button { dismiss() } label: { Text("Done", bundle: .module) }
                 }
             }
             .background(Color.brand.background)
@@ -1383,6 +1250,55 @@ private struct RecentRunRow: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(Self.dateFormatter.string(from: run.completedAt)), \(distanceText), \(durationText), pace \(paceText) \(paceUnit == .perKilometre ? "per kilometre" : "per mile")")
+    }
+}
+
+/// Compact run row used in the Insights running-history card.
+/// Shows session-type icon, session name, date, and the big distance number.
+private struct InsightsRunRow: View {
+    let run: CompletedWorkout
+    let paceUnit: PaceUnit
+
+    private var distanceKm: Double { run.actualDistanceKm }
+
+    private var distanceFormatted: String {
+        String(format: "%.2f", paceUnit == .perKilometre ? distanceKm : distanceKm * 0.621371)
+    }
+
+    private var distanceUnit: String { paceUnit == .perKilometre ? "km" : "mi" }
+
+    private var paceText: String {
+        PaceFormatting.paceMinutesSeconds(secondsPerKm: run.avgPaceSecPerKm, unit: paceUnit)
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "figure.run")
+                .font(.body)
+                .foregroundStyle(Color.brand.accent)
+                .frame(width: 32)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(run.completedAt, format: .dateTime.month(.abbreviated).day().weekday(.abbreviated))
+                    .font(.caption)
+                    .foregroundStyle(Color.brand.textSecondary)
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
+                    Text(distanceFormatted)
+                        .font(.subheadline.weight(.bold).monospacedDigit())
+                        .foregroundStyle(Color.brand.textPrimary)
+                    Text(distanceUnit)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            Text(paceText)
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(Color.brand.textSecondary)
+        }
+        .padding(.vertical, 8)
     }
 }
 #endif
