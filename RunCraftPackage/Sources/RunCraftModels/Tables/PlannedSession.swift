@@ -19,6 +19,10 @@ import VDOTEngine
     /// live here but it lied about future weeks — use `targetPaceZone`
     /// instead.
     public var notes: String
+    /// Whether this session should be performed on a treadmill / indoor track.
+    /// Affects the Watch workout's `HKWorkoutConfiguration.locationType`
+    /// (indoor uses wrist accelerometer for distance; outdoor uses GPS).
+    public var isIndoor: Bool
 
     public init(
         id: UUID = UUID(),
@@ -28,7 +32,8 @@ import VDOTEngine
         targetDistanceKm: Double? = nil,
         targetDurationMin: Int? = nil,
         targetPaceZone: PaceZoneName? = nil,
-        notes: String = ""
+        notes: String = "",
+        isIndoor: Bool = false
     ) {
         self.id = id
         self.weekId = weekId
@@ -38,6 +43,7 @@ import VDOTEngine
         self.targetDurationMin = targetDurationMin
         self.targetPaceZone = targetPaceZone
         self.notes = notes
+        self.isIndoor = isIndoor
     }
 
     /// Converts a date to the schema's day-of-week numbering (Mon=1 ... Sun=7),

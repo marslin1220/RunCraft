@@ -133,6 +133,13 @@ extension DependencyValues {
                 .execute(db)
         }
 
+        migrator.registerMigration("v5 – indoor sessions") { db in
+            try #sql("""
+                ALTER TABLE "plannedSessions" ADD COLUMN "isIndoor" INTEGER NOT NULL DEFAULT 0
+                """)
+                .execute(db)
+        }
+
         try migrator.migrate(database)
     }
 

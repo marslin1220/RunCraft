@@ -42,7 +42,7 @@ public struct StartTodaysSessionIntent: AppIntent {
         let template = PlanSessionAdapter.makeTemplate(from: today.session, vdot: today.vdot)
         do {
             try await hkWatchTriggerClient.startWatchSession(
-                WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+                WatchWorkoutPayload(name: template.name, blocks: template.blocks, isIndoor: today.session.isIndoor)
             )
         } catch {
             return .result(dialog: IntentDialog(stringLiteral: error.localizedDescription))

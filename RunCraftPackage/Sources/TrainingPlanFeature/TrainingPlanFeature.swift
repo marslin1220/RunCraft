@@ -668,7 +668,7 @@ import WorkshopFeature
                                     title: s.sessionType.displayName,
                                     sessionType: s.sessionType,
                                     dayOfWeek: s.dayOfWeek,
-                                    payload: WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+                                    payload: WatchWorkoutPayload(name: template.name, blocks: template.blocks, isIndoor: s.isIndoor)
                                 )
                             }
                         let paceZones = VDOTCalculator.paceZones(vdot: vdot)
@@ -715,7 +715,7 @@ import WorkshopFeature
                 return .run { [hkWatchTriggerClient] send in
                     await send(.quickStartResponse(sessionId: id, Result {
                         try await hkWatchTriggerClient.startWatchSession(
-                            WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+                            WatchWorkoutPayload(name: template.name, blocks: template.blocks, isIndoor: session.isIndoor)
                         )
                     }))
                 }
@@ -886,7 +886,7 @@ import WorkshopFeature
                 return .run { [hkWatchTriggerClient] send in
                     await send(.quickStartResponse(Result {
                         try await hkWatchTriggerClient.startWatchSession(
-                            WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+                            WatchWorkoutPayload(name: template.name, blocks: template.blocks, isIndoor: session.isIndoor)
                         )
                     }))
                 }

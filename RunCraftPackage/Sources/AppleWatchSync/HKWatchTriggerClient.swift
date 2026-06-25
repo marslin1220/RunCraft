@@ -58,7 +58,7 @@ extension HKWatchTriggerClient: DependencyKey {
             // 2. Launch / wake Watch app via HealthKit.
             let config = HKWorkoutConfiguration()
             config.activityType = .running
-            config.locationType = .outdoor
+            config.locationType = payload.isIndoor ? .indoor : .outdoor
 
             let store = HKHealthStore()
             hkWatchTriggerLogger.log(

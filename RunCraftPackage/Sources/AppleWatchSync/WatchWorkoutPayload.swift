@@ -16,11 +16,22 @@ public struct WatchWorkoutPayload: Codable, Sendable, Equatable {
     /// Nil for regular workout payloads. Decodes as nil from older JSON.
     public var zoneLetter: String?
     public var blocks: [WorkoutBlock]
+    /// When true, the Watch starts an indoor running session (accelerometer-based
+    /// distance) instead of the default outdoor GPS session.
+    /// Decodes as false from older JSON that predates this field.
+    public var isIndoor: Bool
 
-    public init(name: String, subtitle: String? = nil, zoneLetter: String? = nil, blocks: [WorkoutBlock]) {
+    public init(
+        name: String,
+        subtitle: String? = nil,
+        zoneLetter: String? = nil,
+        blocks: [WorkoutBlock],
+        isIndoor: Bool = false
+    ) {
         self.name = name
         self.subtitle = subtitle
         self.zoneLetter = zoneLetter
         self.blocks = blocks
+        self.isIndoor = isIndoor
     }
 }
