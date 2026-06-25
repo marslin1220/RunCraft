@@ -72,7 +72,9 @@ private struct MetricsTabView: View {
 
             PageDotsIndicator(currentPage: page ?? 0, pageCount: 3)
                 .padding(.trailing, 2)
+                .allowsHitTesting(false)
         }
+        .clipped()
     }
 }
 
@@ -123,9 +125,46 @@ private struct PageDotsIndicator: View {
 
 private struct IntervalPageView: View {
     @ObservedObject var manager: WorkoutSessionManager
+    @State private var flashOpacity: Double = 1.0
 
     private var stepColor: Color { manager.stepKind.watchColor }
     private var hrZoneColor: Color { manager.hrZoneNumber.hrZoneColor }
+
+    // Hero text: pace for work, countdown for recovery, elapsed for warmup/cooldown
+    private var heroText: String {
+        guard let kind = manager.stepKind else { return manager.elapsedTimeText }
+        switch kind {
+        case .work:     return manager.paceText
+        case .recovery: return manager.stepRemainingText.isEmpty ? "--:--" : manager.stepRemainingText
+        case .warmup, .cooldown: return manager.elapsedTimeText
+        }
+    }
+
+    // Hero color: deviation-aware for work, step color otherwise
+    private var heroColor: Color {
+        guard manager.stepKind == .work, manager.paceSecPerKm > 0 else { return stepColor }
+        guard let lo = manager.targetPaceLo, let hi = manager.targetPaceHi else { return stepColor }
+        if manager.paceSecPerKm < Double(lo) { return .cyan }
+        if manager.paceSecPerKm > Double(hi) { return .orange }
+        return stepColor
+    }
+
+    // Left secondary: elapsed when pace is hero (work), otherwise pace
+    private var leftSecondaryValue: String {
+        manager.stepKind == .work ? manager.elapsedTimeText : manager.paceText
+    }
+    private var leftSecondaryLabel: String {
+        manager.stepKind == .work ? "elapsed" : manager.paceUnitLabel
+    }
+    // Right secondary: elapsed when remaining is hero (recovery), otherwise remaining
+    private var rightSecondaryValue: String {
+        manager.stepKind == .recovery
+            ? manager.elapsedTimeText
+            : (manager.stepRemainingText.isEmpty ? "--" : manager.stepRemainingText)
+    }
+    private var rightSecondaryLabel: String {
+        manager.stepKind == .recovery ? "elapsed" : "left"
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -153,23 +192,45 @@ private struct IntervalPageView: View {
 
             Spacer()
 
-            // Hero: elapsed time
-            Text(manager.elapsedTimeText)
-                .font(.system(size: 40, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(stepColor)
+            // Hero metric
+            VStack(spacing: 1) {
+                Text(heroText)
+                    .font(.system(size: 44, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .minimumScaleFactor(0.75)
+                    .lineLimit(1)
+                    .foregroundStyle(heroColor)
+                    .opacity(flashOpacity)
+                    .task(id: manager.paceAlertActive) {
+                        guard manager.paceAlertActive, manager.stepKind == .work else {
+                            withAnimation(.easeInOut(duration: 0.2)) { flashOpacity = 1.0 }
+                            return
+                        }
+                        for _ in 0..<3 {
+                            withAnimation(.easeInOut(duration: 0.22)) { flashOpacity = 0.15 }
+                            try? await Task.sleep(for: .milliseconds(220))
+                            withAnimation(.easeInOut(duration: 0.22)) { flashOpacity = 1.0 }
+                            try? await Task.sleep(for: .milliseconds(220))
+                        }
+                    }
+                if manager.stepKind == .work {
+                    Text(manager.paceUnitLabel)
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                }
+            }
 
             Spacer()
 
-            // Three metrics: Pace | HR+zone | Remaining
+            // Three secondary metrics: left | HR+zone | right
             HStack(alignment: .top, spacing: 0) {
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(manager.paceText)
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                    Text(leftSecondaryValue)
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .minimumScaleFactor(0.8)
                         .lineLimit(1)
-                    Text(manager.paceUnitLabel)
+                    Text(leftSecondaryLabel)
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
                 }
@@ -185,7 +246,6 @@ private struct IntervalPageView: View {
                             .font(.system(size: 11))
                             .foregroundStyle(.secondary)
                     }
-                    // Zone dots
                     HStack(spacing: 3) {
                         ForEach(1...5, id: \.self) { z in
                             Circle()
@@ -197,12 +257,12 @@ private struct IntervalPageView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
 
                 VStack(alignment: .trailing, spacing: 1) {
-                    Text(manager.stepRemainingText.isEmpty ? "--" : manager.stepRemainingText)
+                    Text(rightSecondaryValue)
                         .font(.system(size: 22, weight: .semibold, design: .rounded))
                         .monospacedDigit()
                         .minimumScaleFactor(0.75)
                         .lineLimit(1)
-                    Text("left")
+                    Text(rightSecondaryLabel)
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
                 }
@@ -254,7 +314,7 @@ private struct IntervalPageView: View {
 
 // MARK: - Step transition overlay
 
-private struct StepTransitionOverlay: View {
+struct StepTransitionOverlay: View {
     @ObservedObject var manager: WorkoutSessionManager
 
     private var stepColor: Color { manager.stepKind.watchColor }
@@ -262,23 +322,42 @@ private struct StepTransitionOverlay: View {
     var body: some View {
         ZStack {
             Color.black.opacity(0.92).ignoresSafeArea()
-            VStack(spacing: 10) {
-                if let kind = manager.stepKind {
-                    Image(systemName: kind.symbolName)
-                        .font(.system(size: 36, weight: .semibold))
-                        .foregroundStyle(stepColor)
+            VStack(spacing: 6) {
+                // Step type badge — context, not hero
+                HStack(spacing: 5) {
+                    if let kind = manager.stepKind {
+                        Image(systemName: kind.symbolName)
+                            .font(.system(size: 18, weight: .semibold))
+                    }
+                    Text(manager.stepName.isEmpty ? "Workout" : manager.stepName)
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
-                Text(manager.stepName.isEmpty ? "Workout" : manager.stepName)
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(stepColor)
-                    .minimumScaleFactor(0.8)
-                    .lineLimit(2)
+                .foregroundStyle(stepColor)
+
+                // HERO: goal (distance or time) — largest element
                 if !manager.stepGoalText.isEmpty && manager.stepGoalText != "Open" {
                     Text(manager.stepGoalText)
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.85))
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
+                        .padding(.vertical, 4)
                 }
+
+                // Pace target — prominently sized for work steps
+                if let lo = manager.targetPaceLo, let hi = manager.targetPaceHi {
+                    HStack(spacing: 4) {
+                        Image(systemName: "speedometer")
+                            .font(.system(size: 12))
+                        Text("\(manager.targetPaceText(lo))–\(manager.targetPaceText(hi)) \(manager.paceUnitLabel)")
+                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(stepColor)
+                }
+
+                // Step position — least important
                 if manager.totalStepCount > 1 {
                     Text("\(manager.stepPosition) / \(manager.totalStepCount)")
                         .font(.system(size: 13, weight: .medium, design: .rounded))
@@ -313,19 +392,19 @@ private struct HRZonePageView: View {
             Spacer()
 
             // Large HR
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text(manager.heartRate > 0 ? "\(Int(manager.heartRate))" : "--")
-                    .font(.system(size: 46, weight: .bold, design: .rounded))
-                    .foregroundStyle(hrZoneColor)
-                    .monospacedDigit()
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("bpm")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
+            VStack(spacing: 2) {
+                HStack(alignment: .center, spacing: 6) {
+                    Text(manager.heartRate > 0 ? "\(Int(manager.heartRate))" : "--")
+                        .font(.system(size: 46, weight: .bold, design: .rounded))
+                        .foregroundStyle(hrZoneColor)
+                        .monospacedDigit()
                     Image(systemName: "heart.fill")
-                        .font(.system(size: 9))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(hrZoneColor)
                 }
+                Text("bpm")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
             }
 
             // Zone badge
@@ -424,22 +503,21 @@ private struct PacePageView: View {
 
             Spacer()
 
-            // Current pace (large) + deviation badge
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(manager.paceText)
-                    .font(.system(size: 40, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(paceDeviationColor)
-
-                VStack(alignment: .leading, spacing: 2) {
+            // Current pace (large) + unit + deviation badge
+            VStack(spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 5) {
+                    Text(manager.paceText)
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(paceDeviationColor)
                     Text(manager.paceUnitLabel)
-                        .font(.system(size: 11))
+                        .font(.system(size: 13))
                         .foregroundStyle(.secondary)
-                    if let label = paceDeviationLabel {
-                        Text(label)
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(paceDeviationColor)
-                    }
+                }
+                if let label = paceDeviationLabel {
+                    Text(label)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(paceDeviationColor)
                 }
             }
 
@@ -881,4 +959,45 @@ private struct SummaryRow: View {
         ),
         manager: m
     ) {}
+}
+
+#Preview("Step Transition — work") {
+    StepTransitionOverlay(manager: {
+        let m = WorkoutSessionManager()
+        m.phase = .running
+        m.stepName = "Rep 2/5 · Run"
+        m.stepGoalText = "1000 m"
+        m.stepKind = .work
+        m.stepPosition = 4
+        m.totalStepCount = 12
+        m.targetPaceLo = 285   // 4:45
+        m.targetPaceHi = 315   // 5:15
+        return m
+    }())
+}
+
+#Preview("Step Transition — warmup") {
+    StepTransitionOverlay(manager: {
+        let m = WorkoutSessionManager()
+        m.phase = .running
+        m.stepName = "Warm-up"
+        m.stepGoalText = "5 min"
+        m.stepKind = .warmup
+        m.stepPosition = 1
+        m.totalStepCount = 12
+        return m
+    }())
+}
+
+#Preview("Step Transition — cooldown") {
+    StepTransitionOverlay(manager: {
+        let m = WorkoutSessionManager()
+        m.phase = .running
+        m.stepName = "Cool-down"
+        m.stepGoalText = "5 min"
+        m.stepKind = .cooldown
+        m.stepPosition = 12
+        m.totalStepCount = 12
+        return m
+    }())
 }

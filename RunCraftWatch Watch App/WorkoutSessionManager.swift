@@ -27,6 +27,8 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         let calories: Double
     }
 
+    enum PaceAlertDirection { case tooSlow, tooFast }
+
     enum Phase: Equatable {
         case inactive
         case countdown(Int)   // 3 → 2 → 1 before session.startActivity
@@ -59,6 +61,9 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     /// 1-based position for display, e.g. "3 / 12".
     @Published var stepPosition: Int = 0
     @Published var totalStepCount: Int = 0
+    /// True for 2.5 s when a pace deviation alert fires (triggers visual flash + haptic).
+    @Published var paceAlertActive: Bool = false
+    @Published var paceAlertDirection: PaceAlertDirection? = nil
 
     /// Current HR zone (1–5). 0 when heart rate is unavailable.
     var hrZoneNumber: Int {
@@ -81,6 +86,11 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
 
     private var isEnding = false
     private var stepTransitionTask: Task<Void, Never>?
+
+    private var recentPaceSamples: [(pace: Double, date: Date)] = []
+    private var paceAlertCooldownDate: Date = Date.distantPast
+    private var paceAlertsThisStep: Int = 0
+    private var paceAlertTask: Task<Void, Never>?
 
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
@@ -205,6 +215,12 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
     private func updateCurrentStep() {
         stepTimerTask?.cancel()
         stepTimerTask = nil
+
+        paceAlertsThisStep = 0
+        recentPaceSamples = []
+        paceAlertTask?.cancel()
+        paceAlertActive = false
+        paceAlertDirection = nil
 
         guard currentStepIndex < flatSteps.count else {
             stepName = ""
@@ -423,6 +439,47 @@ final class WorkoutSessionManager: NSObject, ObservableObject {
         stepTimerTask = nil
     }
 
+    private func checkPaceDeviation() {
+        // Layer 1: work steps with a pace target, within 15%–88% of step progress
+        guard stepKind == .work,
+              let lo = targetPaceLo, let hi = targetPaceHi,
+              stepProgress >= 0.15, stepProgress <= 0.88,
+              paceSecPerKm > 0
+        else { return }
+
+        // Rolling 8-second window
+        let now = Date()
+        recentPaceSamples.append((pace: paceSecPerKm, date: now))
+        recentPaceSamples = recentPaceSamples.filter { now.timeIntervalSince($0.date) <= 8 }
+        guard recentPaceSamples.count >= 3 else { return }
+
+        // Layer 2: ±5% threshold on the rolling average
+        let avgPace = recentPaceSamples.map(\.pace).reduce(0, +) / Double(recentPaceSamples.count)
+        let isTooSlow = avgPace > Double(hi) * 1.05
+        let isTooFast = avgPace < Double(lo) * 0.95
+        guard isTooSlow || isTooFast else { return }
+
+        // Layer 3: 30-second cooldown + max 2 alerts per step
+        guard paceAlertsThisStep < 2, now >= paceAlertCooldownDate else { return }
+
+        firePaceDeviationAlert(direction: isTooSlow ? .tooSlow : .tooFast)
+    }
+
+    private func firePaceDeviationAlert(direction: PaceAlertDirection) {
+        paceAlertsThisStep += 1
+        paceAlertCooldownDate = Date().addingTimeInterval(30)
+        paceAlertActive = true
+        paceAlertDirection = direction
+        WKInterfaceDevice.current().play(direction == .tooSlow ? .directionUp : .directionDown)
+
+        paceAlertTask?.cancel()
+        paceAlertTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(2.5))
+            guard !Task.isCancelled, let self else { return }
+            await MainActor.run { self.paceAlertActive = false }
+        }
+    }
+
     // MARK: - Formatted display helpers
 
     private var isPerMile: Bool {
@@ -625,6 +682,7 @@ extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
                         let mps = q.doubleValue(for: HKUnit.meter().unitDivided(by: .second()))
                         self.avgPaceSecPerKm = mps > 0 ? 1000.0 / mps : 0
                     }
+                    self.checkPaceDeviation()
 
                 default:
                     break
