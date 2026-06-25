@@ -334,8 +334,7 @@ private struct PaceZonesSummaryCard: View {
             }
         }
         .padding()
-        .background(Color.brand.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .glassCard(cornerRadius: 16)
     }
 
     private func tappableChip(_ zone: PaceZoneName) -> some View {
@@ -524,7 +523,7 @@ private struct PrePlanPreviewSection: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+        .glassCard(cornerRadius: 14)
         .overlay(
             RoundedRectangle(cornerRadius: 14)
                 .stroke(Color.brand.caution.opacity(0.3), lineWidth: 1)
@@ -599,7 +598,7 @@ private struct PlanGapBanner: View {
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+            .glassCard(cornerRadius: 14)
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
                     .stroke(Color.brand.caution.opacity(0.3), lineWidth: 1)
@@ -655,7 +654,7 @@ private struct PreviewSessionRow: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 12))
+        .glassCard(cornerRadius: 12)
     }
 }
 
@@ -864,7 +863,7 @@ private struct AddRaceGoalLink: View {
             }
             .foregroundStyle(Color.brand.accent)
             .padding()
-            .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+            .glassCard(cornerRadius: 14)
         }
         .buttonStyle(.plain)
     }
