@@ -116,7 +116,7 @@ struct WeekScheduleView: View {
             .padding(.bottom, 24)
         }
         .background(Color.brand.background)
-        .navigationTitle("Full Schedule")
+        .navigationTitle(Text("Full Schedule", bundle: .module))
         .navigationBarTitleDisplayMode(.inline)
         .alert($store.scope(state: \.alert, action: \.alert))
         .onAppear(perform: seedExpansionIfNeeded)
@@ -147,9 +147,9 @@ struct WeekScheduleView: View {
     private func weekRangeLabel(_ weeks: [TrainingWeek]) -> String {
         guard let first = weeks.first, let last = weeks.last else { return "" }
         if first.weekNumber == last.weekNumber {
-            return "Week \(first.weekNumber)"
+            return String(localized: "Week \(first.weekNumber)", bundle: .module)
         }
-        return "Weeks \(first.weekNumber)–\(last.weekNumber)"
+        return String(localized: "Weeks \(first.weekNumber)–\(last.weekNumber)", bundle: .module)
     }
 }
 
@@ -191,19 +191,19 @@ private struct FoundationDivider: View {
             RoundedRectangle(cornerRadius: 1.5)
                 .fill(TrainingPhase.base.tint)
                 .frame(width: 3, height: 16)
-            Text("FOUNDATION")
+            Text("FOUNDATION", bundle: .module)
                 .font(.caption.bold())
                 .foregroundStyle(TrainingPhase.base.tint)
                 .tracking(1.2)
             Text("·")
                 .foregroundStyle(Color.brand.textSecondary)
-            Text("Ongoing")
+            Text("Ongoing", bundle: .module)
                 .font(.caption)
                 .foregroundStyle(Color.brand.textSecondary)
             Spacer()
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Foundation training, ongoing")
+        .accessibilityLabel(String(localized: "Foundation training, ongoing", bundle: .module))
         .accessibilityAddTraits(.isHeader)
     }
 }
@@ -307,15 +307,15 @@ private struct WeekSection: View {
                             // The gap-filler week is always "now" — its
                             // title already says so, so the "THIS WEEK"
                             // badge below would just repeat it.
-                            Text("This Week")
+                            Text("This Week", bundle: .module)
                                 .font(.subheadline.bold())
                                 .foregroundStyle(Color.brand.accent)
                         } else {
-                            Text("Week \(week.weekNumber)")
+                            Text("Week \(week.weekNumber)", bundle: .module)
                                 .font(.subheadline.bold())
                                 .foregroundStyle(isCurrent ? Color.brand.accent : Color.brand.textPrimary)
                             if isCurrent {
-                                Text("THIS WEEK")
+                                Text("THIS WEEK", bundle: .module)
                                     .font(.caption2.bold())
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
@@ -325,7 +325,7 @@ private struct WeekSection: View {
                             }
                         }
                     }
-                    Text("\(completedCount) of \(sessionCount) done")
+                    Text("\(completedCount) of \(sessionCount) done", bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
@@ -395,6 +395,11 @@ private struct WeekSection: View {
                         Text(session.sessionType.displayName)
                             .font(.subheadline.bold())
                             .foregroundStyle(Color.brand.textPrimary)
+                        if session.isIndoor {
+                            Image(systemName: "figure.indoor.run")
+                                .font(.caption)
+                                .foregroundStyle(Color.brand.textSecondary)
+                        }
                     }
                     if let subtitle = paceSubtitle(for: session) {
                         Text(subtitle)
@@ -403,7 +408,7 @@ private struct WeekSection: View {
                             .lineLimit(1)
                     }
                     if let actuals {
-                        Text("Actual: \(actuals.displayText(unit: paceUnit))")
+                        Text("Actual: \(actuals.displayText(unit: paceUnit))", bundle: .module)
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(Color.brand.accent)
                             .lineLimit(1)
@@ -484,7 +489,7 @@ private struct WeekSection: View {
                         Image(systemName: "play.fill")
                             .font(.caption.bold())
                     }
-                    Text(isSending ? "Sending" : (isSent ? "Sent" : "Start"))
+                    Text(isSending ? String(localized: "Sending", bundle: .module) : (isSent ? String(localized: "Sent", bundle: .module) : String(localized: "Start", bundle: .module)))
                         .font(.caption.bold())
                 }
                 .foregroundStyle(.black)
@@ -534,11 +539,11 @@ private struct WeekSection: View {
                 .frame(width: 28, height: 28)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(dayLabel(session.dayOfWeek)) · Rest")
+                Text("\(dayLabel(session.dayOfWeek)) · Rest", bundle: .module)
                     .font(.subheadline)
                     .foregroundStyle(Color.brand.textSecondary)
                 if let actuals {
-                    Text("Logged: \(actuals.displayText(unit: paceUnit))")
+                    Text("Logged: \(actuals.displayText(unit: paceUnit))", bundle: .module)
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(Color.brand.accent)
                 }

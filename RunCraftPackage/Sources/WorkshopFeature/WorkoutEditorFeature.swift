@@ -3,6 +3,7 @@ import ComposableArchitecture
 import Foundation
 import IdentifiedCollections
 import RunCraftModels
+import SQLiteData
 
 @Reducer public struct WorkoutEditor {
     @ObservableState public struct State: Equatable {
@@ -23,6 +24,9 @@ import RunCraftModels
         /// alternatives and to carry the session identity through the
         /// swap delegate.
         public var planSession: PlannedSession? = nil
+        /// Mirrors `planSession.isIndoor` and kept in sync on toggle.
+        /// Ignored when source != .planSession.
+        public var isIndoor: Bool = false
         public var watchAvailable: Bool = true
         public var saveStatus: SaveStatus = .idle
         public var syncStatus: SyncStatus = .idle
@@ -76,6 +80,7 @@ import RunCraftModels
             self.source = source
             self.isTodaySession = isTodaySession
             self.planSession = planSession
+            self.isIndoor = planSession?.isIndoor ?? false
         }
 
         /// Whether "Start Workout" should be offered. Requires a paired Watch
@@ -135,6 +140,7 @@ import RunCraftModels
 
         // Apple Watch handoff
         case startTapped
+        case toggleIndoor
         case syncResponse(Result<Void, any Error>)
         /// Clears the brief "Sent" confirmation back to idle — debounces
         /// the button so an accidental second tap doesn't immediately
@@ -167,6 +173,7 @@ import RunCraftModels
     @Dependency(\.workoutTemplateRepository) var repository
     @Dependency(\.watchConnectivityClient) var watchConnectivityClient
     @Dependency(\.hkWatchTriggerClient) var hkWatchTriggerClient
+    @Dependency(\.defaultDatabase) var database
 
     /// How long the "Sent" confirmation stays up before the button reverts
     /// to "Start Workout" — long enough to read, short enough that a
@@ -276,12 +283,27 @@ import RunCraftModels
                     createdAt: now,
                     updatedAt: now
                 )
+                let isIndoor = state.isIndoor
                 return .run { [hkWatchTriggerClient] send in
                     await send(.syncResponse(Result {
                         try await hkWatchTriggerClient.startWatchSession(
-                            WatchWorkoutPayload(name: template.name, blocks: template.blocks)
+                            WatchWorkoutPayload(name: template.name, blocks: template.blocks, isIndoor: isIndoor)
                         )
                     }))
+                }
+
+            case .toggleIndoor:
+                guard state.source == .planSession, let sessionId = state.planSession?.id else { return .none }
+                let newValue = !state.isIndoor
+                state.isIndoor = newValue
+                state.planSession?.isIndoor = newValue
+                return .run { [database] _ in
+                    try? await database.write { db in
+                        try PlannedSession
+                            .where { $0.id.eq(sessionId) }
+                            .update { $0.isIndoor = newValue }
+                            .execute(db)
+                    }
                 }
 
             case .syncResponse(.success):

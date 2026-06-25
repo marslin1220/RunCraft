@@ -18,6 +18,11 @@ public struct WorkoutEditorView: View {
                 status: store.saveStatus,
                 source: store.source
             )
+            if store.source == .planSession {
+                IndoorOutdoorBar(isIndoor: store.isIndoor) {
+                    store.send(.toggleIndoor)
+                }
+            }
             if store.blocks.isEmpty {
                 EmptyWorkshopPrompt()
             } else {
@@ -111,7 +116,7 @@ public struct WorkoutEditorView: View {
                     if store.saveStatus == .saving {
                         ProgressView().tint(Color.brand.accent)
                     } else {
-                        Text("Save").bold()
+                        Text("Save", bundle: .module).bold()
                     }
                 }
                 .foregroundStyle(Color.brand.accent)
@@ -192,7 +197,7 @@ public struct WorkoutEditorView: View {
     private var previewOnlyNotice: some View {
         HStack(spacing: 8) {
             Image(systemName: "eye")
-            Text("Preview only — start this from the Plan tab on its scheduled day.")
+            Text("Preview only — start this from the Plan tab on its scheduled day.", bundle: .module)
         }
         .font(.footnote)
         .foregroundStyle(Color.brand.textSecondary)
@@ -210,9 +215,9 @@ public struct WorkoutEditorView: View {
 
     private var sendLabel: Text {
         switch store.syncStatus {
-        case .sending: Text("Starting…")
-        case .sent:    Text("Starting on your Apple Watch…")
-        default:       Text("Start Workout")
+        case .sending: Text("Starting…", bundle: .module)
+        case .sent:    Text("Starting on your Apple Watch…", bundle: .module)
+        default:       Text("Start Workout", bundle: .module)
         }
     }
 }
@@ -227,7 +232,7 @@ private struct TemplateNameBar: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 10) {
-                TextField("Workout name", text: $name)
+                TextField(text: $name) { Text("Workout name", bundle: .module) }
                     .textFieldStyle(.plain)
                     .font(.headline)
                     .foregroundStyle(Color.brand.textPrimary)
@@ -264,9 +269,9 @@ private struct TemplateNameBar: View {
 
     private var sourceLabel: String {
         switch source {
-        case .yours:       "Your workout"
-        case .template:    "From template — Save creates a copy"
-        case .planSession: "From your plan — Save creates a copy"
+        case .yours:       String(localized: "Your workout", bundle: .module)
+        case .template:    String(localized: "From template — Save creates a copy", bundle: .module)
+        case .planSession: String(localized: "From your plan — Save creates a copy", bundle: .module)
         }
     }
 
@@ -278,19 +283,49 @@ private struct TemplateNameBar: View {
         case .saving:
             HStack(spacing: 4) {
                 ProgressView().controlSize(.small)
-                Text("Saving").font(.caption).foregroundStyle(Color.brand.textSecondary)
+                Text("Saving", bundle: .module).font(.caption).foregroundStyle(Color.brand.textSecondary)
             }
         case .saved:
             HStack(spacing: 4) {
                 Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.brand.accent)
-                Text("Saved").font(.caption).foregroundStyle(Color.brand.textSecondary)
+                Text("Saved", bundle: .module).font(.caption).foregroundStyle(Color.brand.textSecondary)
             }
         case .failed:
             HStack(spacing: 4) {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                Text("Failed").font(.caption).foregroundStyle(Color.brand.textSecondary)
+                Text("Failed", bundle: .module).font(.caption).foregroundStyle(Color.brand.textSecondary)
             }
         }
+    }
+}
+
+// MARK: - Indoor / Outdoor bar
+
+private struct IndoorOutdoorBar: View {
+    let isIndoor: Bool
+    let onToggle: () -> Void
+
+    var body: some View {
+        Button(action: onToggle) {
+            HStack(spacing: 8) {
+                Image(systemName: isIndoor ? "figure.indoor.run" : "figure.run")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.brand.accent)
+                Text(isIndoor
+                     ? String(localized: "Indoor · Treadmill", bundle: .module)
+                     : String(localized: "Outdoor", bundle: .module))
+                    .font(.subheadline)
+                    .foregroundStyle(Color.brand.textPrimary)
+                Spacer()
+                Image(systemName: "arrow.2.squarepath")
+                    .font(.caption)
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+        }
+        .buttonStyle(.plain)
+        .background(Color.brand.surface)
     }
 }
 
@@ -376,7 +411,7 @@ private struct RepeatGroupRow: View {
                 Image(systemName: "repeat")
                     .font(.caption.bold())
                     .foregroundStyle(Color.brand.accent)
-                Text("Repeat \(group.iterations)×")
+                Text("Repeat \(group.iterations)×", bundle: .module)
                     .font(.subheadline.bold())
                     .foregroundStyle(Color.brand.textPrimary)
                 Spacer()
@@ -385,7 +420,7 @@ private struct RepeatGroupRow: View {
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(Color.brand.textSecondary)
                 } else {
-                    Text("\(group.steps.count) step\(group.steps.count == 1 ? "" : "s")")
+                    Text("\(group.steps.count) step\(group.steps.count == 1 ? "" : "s")", bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
@@ -448,10 +483,10 @@ private struct EmptyWorkshopPrompt: View {
             Image(systemName: "wrench.and.screwdriver.fill")
                 .font(.system(size: 56))
                 .foregroundStyle(Color.brand.accent.opacity(0.6))
-            Text("Build a workout")
+            Text("Build a workout", bundle: .module)
                 .font(.title3.bold())
                 .foregroundStyle(Color.brand.textPrimary)
-            Text("Tap ⋯ to add a Step or a Repeat group.")
+            Text("Tap ⋯ to add a Step or a Repeat group.", bundle: .module)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.brand.textSecondary)
                 .padding(.horizontal, 40)
