@@ -56,27 +56,24 @@ private struct SmallSessionView: View {
         Group {
             if let session, session.sessionType != .rest {
                 Button(intent: StartTodaysSessionIntent()) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(alignment: .top) {
-                            Image(systemName: session.sessionType.symbolName)
-                                .font(.title2)
-                                .foregroundStyle(Color.brand.accent)
-                            Spacer(minLength: 0)
-                            Image(systemName: "play.circle.fill")
-                                .font(.callout)
-                                .foregroundStyle(Color.brand.accent.opacity(0.7))
-                        }
+                    VStack(alignment: .leading, spacing: 0) {
+                        Image(systemName: session.sessionType.symbolName)
+                            .font(.title2)
+                            .foregroundStyle(Color.brand.accent)
+                        Spacer(minLength: 0)
                         Text(session.sessionTitle)
-                            .font(.headline)
+                            .font(.title3.weight(.bold))
                             .foregroundStyle(Color.brand.textPrimary)
                             .lineLimit(2)
-                        Spacer(minLength: 0)
+                            .padding(.top, 4)
                         if let line = SessionDisplay.metricsLine(for: session) {
                             Text(line)
-                                .font(.subheadline.monospacedDigit())
+                                .font(.callout.monospacedDigit())
                                 .foregroundStyle(Color.brand.textSecondary)
+                                .padding(.top, 2)
                         }
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 }
                 .buttonStyle(.plain)
             } else if let session {
@@ -99,43 +96,55 @@ private struct MediumSessionView: View {
     var body: some View {
         Group {
             if let session, session.sessionType != .rest {
-                HStack(alignment: .top, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 8) {
-                            Image(systemName: session.sessionType.symbolName)
-                                .font(.title3)
-                                .foregroundStyle(Color.brand.accent)
-                            Text(session.sessionTitle)
-                                .font(.headline)
-                                .foregroundStyle(Color.brand.textPrimary)
-                        }
-                        if let line = SessionDisplay.metricsLine(for: session) {
-                            Text(line)
-                                .font(.title3.weight(.semibold).monospacedDigit())
-                                .foregroundStyle(Color.brand.textPrimary)
-                        }
-                        if let line = SessionDisplay.paceLine(for: session) {
-                            Text(line)
-                                .font(.caption.monospacedDigit())
-                                .foregroundStyle(Color.brand.textSecondary)
-                        }
-                        Spacer(minLength: 0)
-                        WeekProgressBar(progress: weekProgress)
-                    }
-                    Button(intent: StartTodaysSessionIntent()) {
-                        Label("Start", systemImage: "play.circle.fill")
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color.brand.accent)
+                Button(intent: StartTodaysSessionIntent()) {
+                    MediumWorkoutDayContent(session: session, weekProgress: weekProgress)
                 }
+                .buttonStyle(.plain)
             } else if let session {
                 MediumRestDayView(session: session, weekProgress: weekProgress, weather: weather)
             } else {
-                HStack {
-                    EmptyStateView()
-                    Spacer(minLength: 0)
+                EmptyStateView()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    }
+}
+
+private struct MediumWorkoutDayContent: View {
+    let session: TodaySessionEntity
+    let weekProgress: WeekProgressData
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 5) {
+                Image(systemName: session.sessionType.symbolName)
+                    .font(.caption.weight(.semibold))
+                Text(session.sessionType.displayName.uppercased())
+                    .font(.caption.weight(.semibold))
+            }
+            .foregroundStyle(Color.brand.accent)
+
+            Text(session.sessionTitle)
+                .font(.title2.weight(.bold))
+                .foregroundStyle(Color.brand.textPrimary)
+                .lineLimit(2)
+                .padding(.top, 4)
+
+            HStack(spacing: 6) {
+                if let dist = SessionDisplay.metricsLine(for: session) {
+                    Text(dist)
+                }
+                if let pace = SessionDisplay.paceLine(for: session) {
+                    Text("·").opacity(0.4)
+                    Text(pace)
                 }
             }
+            .font(.subheadline.monospacedDigit())
+            .foregroundStyle(Color.brand.textSecondary)
+            .padding(.top, 2)
+
+            Spacer(minLength: 0)
+            WeekProgressBar(progress: weekProgress)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
@@ -182,31 +191,33 @@ private struct MediumRestDayView: View {
     let weather: WeatherSnapshot?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 5) {
                 Image(systemName: session.sessionType.symbolName)
-                    .font(.title3)
-                    .foregroundStyle(Color.brand.accent)
-                Text("Rest day")
-                    .font(.headline)
-                    .foregroundStyle(Color.brand.textPrimary)
+                    .font(.caption.weight(.semibold))
+                Text("REST DAY")
+                    .font(.caption.weight(.semibold))
             }
-            if let weather {
-                HStack(alignment: .top, spacing: 6) {
-                    Image(systemName: weather.condition.sfSymbol)
-                        .font(.subheadline)
-                        .foregroundStyle(Color.brand.accent)
-                    Text(LocalizedStringKey(weather.condition.tipKey))
-                        .font(.caption)
-                        .foregroundStyle(Color.brand.textSecondary)
-                        .lineLimit(2)
+            .foregroundStyle(Color.brand.accent)
+
+            Group {
+                if let weather {
+                    HStack(alignment: .top, spacing: 6) {
+                        Image(systemName: weather.condition.sfSymbol)
+                            .font(.title3)
+                            .foregroundStyle(Color.brand.accent)
+                        Text(LocalizedStringKey(weather.condition.tipKey))
+                            .lineLimit(3)
+                    }
+                } else {
+                    Text(LocalizedStringKey("rest.recovery.fallback"))
+                        .lineLimit(3)
                 }
-            } else {
-                Text(LocalizedStringKey("rest.recovery.fallback"))
-                    .font(.caption)
-                    .foregroundStyle(Color.brand.textSecondary)
-                    .lineLimit(2)
             }
+            .font(.callout)
+            .foregroundStyle(Color.brand.textPrimary)
+            .padding(.top, 6)
+
             Spacer(minLength: 0)
             WeekProgressBar(progress: weekProgress)
         }
