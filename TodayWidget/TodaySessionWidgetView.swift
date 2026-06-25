@@ -41,7 +41,11 @@ struct TodaySessionWidgetView: View {
         case .accessoryRectangular, .accessoryCircular:
             Color.clear
         default:
-            Color.brand.surface
+            LinearGradient(
+                colors: [Color.brand.accent.opacity(0.10), Color.brand.background],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         }
     }
 }
