@@ -4,8 +4,8 @@
 
 iOS training planner for serious runners following Jack Daniels' VDOT
 methodology. RunCraft turns a single race goal into a 16-week periodised
-plan and dispatches structured workouts to Apple Watch via WorkoutKit —
-all reachable by voice through Siri and Apple Intelligence.
+plan and dispatches structured workouts to Apple Watch via HealthKit
+Mirroring — all reachable by voice through Siri and Apple Intelligence.
 
 > **Status:** active development. Not yet shipped to the App Store.
 > The paired Apple Watch runs a dedicated `RunCraftWatch` companion app that
@@ -20,33 +20,48 @@ all reachable by voice through Siri and Apple Intelligence.
 - **One-tap workout dispatch.** Today's session card on the Plan tab has
   a play button — taps auto-launch the `RunCraftWatch` companion app and
   start the structured workout directly on the wrist via HealthKit Mirroring.
-  Live HR, pace, and interval progress stream back to the iPhone in real time.
-- **Voice-first control.** Four App Intents drive Siri / Spotlight /
+  Live HR, pace, and interval progress stream back to the iPhone in real time,
+  with a Live Activity on the iPhone lock screen for at-a-glance metrics.
+- **Watch-side workout UI.** `RunCraftWatch` shows a multi-page workout
+  interface (metrics ring, interval progress, controls), announces each
+  interval step via Taptic + audio, and presents a post-workout summary
+  before returning to idle.
+- **Session substitution.** Long-press any session card in the Plan tab or
+  Full Schedule to swap it for a curated equivalent (e.g. Interval → Hill
+  Intervals / Tempo / Fartlek). Also available from the toolbar inside the
+  workout editor. Rest days can optionally be swapped to an easy run.
+- **Today widget.** Home Screen and Lock Screen widget shows today's
+  planned session at a glance with a one-tap start action that dispatches
+  the workout directly to Apple Watch without opening the app.
+- **Voice-first control.** Five App Intents drive Siri / Spotlight /
   Apple Intelligence:
   - "What's today's training in RunCraft" — reads the session out loud
-  - "Start Mona Fartlek in RunCraft" — dispatches the template to your Watch
+  - "Start today's session in RunCraft" — dispatches today's plan session to Watch
+  - "Start Mona Fartlek in RunCraft" — dispatches a named template to Watch
   - "Set my VDOT to 52 in RunCraft" — manual recalibration
   - "Log a run in RunCraft" — conversational entry for off-Watch runs
 - **HRV-aware recovery.** When morning HRV or sleep falls below threshold,
   the Plan tab surfaces a banner suggesting a downgrade for today's hard
   session.
-- **Insights.** Fitness-trend card with a segmented picker (VDOT /
-  VO₂max / Δ), weekly mileage bar chart, and predicted race times for
-  5K / 10K / HM / Marathon.
+- **Insights.** Fitness-trend card with a segmented picker (VDOT / VO₂max /
+  T-pace / Δ); HRV trend, resting HR trend, training zones, Running Economy,
+  Heart Rate Recovery, and LT1/LT2 lactate threshold cards; weekly mileage
+  bar chart; predicted race times for 5K / 10K / HM / Marathon.
 - **Workout authoring.** Custom workouts (warmup + repeat groups +
   cooldown) plus six built-in presets — Yasso 800s, Mona Fartlek,
   Cruise Intervals, Ladder, Tempo Run, Easy Recovery.
+- **Appearance.** System-level Auto / Light / Dark override in Settings.
 
 ## Tech stack
 
-| Layer        | Tool                                          |
-| ------------ | --------------------------------------------- |
-| Language     | Swift 6                                       |
-| UI           | SwiftUI                                       |
-| Architecture | The Composable Architecture (TCA) 1.25+       |
-| Persistence  | SQLiteData (pfw)                              |
-| Apple I/O    | HealthKit · WorkoutKit · App Intents          |
-| Min versions | iOS 17 · iPadOS 17 · watchOS 10               |
+| Layer        | Tool                                                      |
+| ------------ | --------------------------------------------------------- |
+| Language     | Swift 6                                                   |
+| UI           | SwiftUI                                                   |
+| Architecture | The Composable Architecture (TCA) 1.25+                   |
+| Persistence  | SQLiteData (pfw)                                          |
+| Apple I/O    | HealthKit · WorkoutKit · App Intents · WidgetKit · ActivityKit |
+| Min versions | iOS 17 · iPadOS 17 · watchOS 10                           |
 
 ## Building
 
@@ -75,6 +90,8 @@ entitlements, `Info.plist`, and `@main` entry point.
 
 ```
 RunCraft/                          App target (Info.plist, entitlements, AppShortcutsProvider)
+RunCraftWatch Watch App/           Watch companion (WorkoutSessionManager, ActiveWorkoutView)
+TodayWidget/                       Widget + Live Activity extension
 RunCraft.xcodeproj/
 RunCraftWorkspace.xcworkspace/
 RunCraftPackage/                   Local SPM package — the bulk of the code
@@ -82,7 +99,7 @@ RunCraftPackage/                   Local SPM package — the bulk of the code
     ├── VDOTEngine/                Jack Daniels formula + pace zones (pure Swift)
     ├── RunCraftModels/            SQLiteData @Table types + migration
     ├── HealthKitClient/           TCA dep wrapping HKHealthStore
-    ├── AppleWatchSync/            TCA dep wrapping WorkoutKit
+    ├── AppleWatchSync/            TCA deps for WCSession, HealthKit Mirroring, and Live Activity
     ├── DesignSystem/              Color tokens + WorkoutCard
     ├── TrainingPlanFeature/       Plan tab
     ├── WorkshopFeature/           Workouts tab (history: was "Workshop")
