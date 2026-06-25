@@ -8,15 +8,17 @@ struct EditRepeatGroupSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Repetitions") {
+                Section {
                     Stepper(value: $store.group.iterations, in: 1...30) {
                         HStack {
-                            Text("Iterations")
+                            Text("Iterations", bundle: .module)
                             Spacer()
                             Text("\(store.group.iterations)×")
                                 .foregroundStyle(Color(red: 0.8, green: 1, blue: 0))
                         }
                     }
+                } header: {
+                    Text("Repetitions", bundle: .module)
                 }
 
                 if !store.availableSteps.isEmpty {
@@ -25,16 +27,16 @@ struct EditRepeatGroupSheet: View {
                             availableStepRow(step)
                         }
                     } header: {
-                        Text("Include from workout")
+                        Text("Include from workout", bundle: .module)
                     } footer: {
-                        Text("Tap to copy an existing step into this repeat. The copy is independent — editing it doesn't change the original.")
+                        Text("Tap to copy an existing step into this repeat. The copy is independent — editing it doesn't change the original.", bundle: .module)
                             .font(.caption)
                     }
                 }
 
                 Section {
                     if store.group.steps.isEmpty {
-                        Text("No steps yet — tap an option above, or add a new step.")
+                        Text("No steps yet — tap an option above, or add a new step.", bundle: .module)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     } else {
@@ -49,7 +51,7 @@ struct EditRepeatGroupSheet: View {
                                 Button(role: .destructive) {
                                     store.send(.deleteStep(id: step.id))
                                 } label: {
-                                    Label("Delete", systemImage: "trash")
+                                    Label { Text("Delete", bundle: .module) } icon: { Image(systemName: "trash") }
                                 }
                                 .tint(.red)
                             }
@@ -59,21 +61,21 @@ struct EditRepeatGroupSheet: View {
                     Button {
                         store.send(.addStepTapped)
                     } label: {
-                        Label("Add step", systemImage: "plus.circle.fill")
+                        Label { Text("Add step", bundle: .module) } icon: { Image(systemName: "plus.circle.fill") }
                             .foregroundStyle(Color(red: 0.8, green: 1, blue: 0))
                     }
                 } header: {
-                    Text("Steps in repeat")
+                    Text("Steps in repeat", bundle: .module)
                 }
             }
-            .navigationTitle("Edit Repeat")
+            .navigationTitle(Text("Edit Repeat", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { store.send(.cancelTapped) }
+                    Button { store.send(.cancelTapped) } label: { Text("Cancel", bundle: .module) }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { store.send(.saveTapped) }.bold()
+                    Button { store.send(.saveTapped) } label: { Text("Save", bundle: .module).bold() }
                 }
             }
             .sheet(item: $store.scope(state: \.editingStep, action: \.editingStep)) { childStore in

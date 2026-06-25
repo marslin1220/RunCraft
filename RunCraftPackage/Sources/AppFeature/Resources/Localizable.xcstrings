@@ -1,6 +1,24 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Appearance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "外観" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "외관" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "外观" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "外觀" } }
+      }
+    },
+    "Auto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "自動" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "자동" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "自动" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "自動" } }
+      }
+    },
     "About" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8,6 +26,33 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "정보" } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关于" } },
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "關於" } }
+      }
+    },
+    "Choose which days of the week you can train and set your preferred long-run day." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "トレーニング可能な曜日を選択し、ロング走の曜日を設定してください。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "훈련 가능한 요일을 선택하고 선호하는 장거리 달리기 요일을 설정하세요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择你可以训练的星期，并设置你偏好的长跑日。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "選擇你可以訓練的星期，並設定你偏好的長跑日。" } }
+      }
+    },
+    "Dark" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ダーク" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "어둡게" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "深色" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "深色" } }
+      }
+    },
+    "Done" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "完了" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "완료" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "完成" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "完成" } }
       }
     },
     "End Workout" : {
@@ -89,6 +134,15 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "RunCraft을 열어 세션을 확인하고 Apple Watch로 전송하세요." } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开 RunCraft 查看你的训练，并派送到 Apple Watch。" } },
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "打開 RunCraft 查看你的訓練，並派送到 Apple Watch。" } }
+      }
+    },
+    "Theme" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "テーマ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "테마" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "主题" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "主題" } }
       }
     },
     "Time" : {
@@ -226,6 +280,15 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "語音優先控制" } }
       }
     },
+    "Workout Complete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワークアウト完了" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "운동 완료" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练完成" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "訓練完成" } }
+      }
+    },
     "Workout" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -271,6 +334,15 @@
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "關於 Jack Daniels VDOT" } }
       }
     },
+    "Light" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ライト" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "밝게" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "浅色" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "淺色" } }
+      }
+    },
     "Insights" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -314,6 +386,24 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "설정" } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "设置" } },
         "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "設定" } }
+      }
+    },
+    "Training Plan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "トレーニングプラン" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "훈련 계획" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练计划" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "訓練計畫" } }
+      }
+    },
+    "Training days" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "トレーニング曜日" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "훈련 요일" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "训练日" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "訓練日" } }
       }
     },
     "Units" : {

@@ -14,19 +14,19 @@ public struct AdjustTrainingDaysView: View {
                 Section {
                     TrainingDaysGrid(store: store.scope(state: \.trainingDaysInput, action: \.trainingDaysInput))
                 } header: {
-                    Text("Training Days")
+                    Text("Training Days", bundle: .module)
                 } footer: {
-                    Text("Changes apply to next week onward — this week's plan stays as-is.")
+                    Text("Changes apply to next week onward — this week's plan stays as-is.", bundle: .module)
                 }
             }
-            .navigationTitle("Adjust Training Days")
+            .navigationTitle(Text("Adjust Training Days", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { store.send(.cancelTapped) }
+                    Button { store.send(.cancelTapped) } label: { Text("Cancel", bundle: .module) }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { store.send(.saveTapped) }
+                    Button { store.send(.saveTapped) } label: { Text("Save", bundle: .module) }
                         .bold()
                         .disabled(!store.hasChanged)
                 }

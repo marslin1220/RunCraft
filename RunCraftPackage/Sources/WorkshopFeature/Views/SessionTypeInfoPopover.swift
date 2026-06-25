@@ -26,7 +26,7 @@ struct SessionTypeInfoPopover: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button { dismiss() } label: { Text("Done", bundle: .module) }
                 }
             }
         }

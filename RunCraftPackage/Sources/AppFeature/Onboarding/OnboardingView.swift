@@ -48,13 +48,13 @@ public struct OnboardingView: View {
             Spacer()
             if page < totalPages - 1 {
                 Button(action: complete) {
-                    Text("Skip")
+                    Text("Skip", bundle: .module)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Color.brand.textSecondary)
                 }
                 .padding(.trailing, 20)
                 .padding(.top, 12)
-                .accessibilityLabel("Skip onboarding")
+                .accessibilityLabel(Text("Skip onboarding", bundle: .module))
             }
         }
         .frame(height: 44)
@@ -65,36 +65,36 @@ public struct OnboardingView: View {
     private var welcomePage: some View {
         OnboardingPage(
             symbol: "figure.run.circle.fill",
-            title: Text("Welcome to RunCraft"),
-            tagline: Text("Train with the science"),
-            body: Text("Periodised plans, real Apple Watch dispatch, and Siri-driven control — everything a serious runner needs in one app.")
+            title: Text("Welcome to RunCraft", bundle: .module),
+            tagline: Text("Train with the science", bundle: .module),
+            body: Text("Periodised plans, real Apple Watch dispatch, and Siri-driven control — everything a serious runner needs in one app.", bundle: .module)
         )
     }
 
     private var vdotPage: some View {
         OnboardingPage(
             symbol: "speedometer",
-            title: Text("Built on VDOT"),
-            tagline: Text("Forty years of Jack Daniels' coaching"),
-            body: Text("Enter a race time — or let HealthKit pull your best — and RunCraft derives your five training pace zones from the Daniels formula.")
+            title: Text("Built on VDOT", bundle: .module),
+            tagline: Text("Forty years of Jack Daniels' coaching", bundle: .module),
+            body: Text("Enter a race time — or let HealthKit pull your best — and RunCraft derives your five training pace zones from the Daniels formula.", bundle: .module)
         )
     }
 
     private var watchPage: some View {
         OnboardingPage(
             symbol: "applewatch.radiowaves.left.and.right",
-            title: Text("One tap to your wrist"),
-            tagline: Text("WorkoutKit handoff"),
-            body: Text("Send any workout to your paired Apple Watch with a single button. Pace alerts run on-wrist — no menu hunting mid-stride.")
+            title: Text("One tap to your wrist", bundle: .module),
+            tagline: Text("WorkoutKit handoff", bundle: .module),
+            body: Text("Send any workout to your paired Apple Watch with a single button. Pace alerts run on-wrist — no menu hunting mid-stride.", bundle: .module)
         )
     }
 
     private var siriPage: some View {
         OnboardingPage(
             symbol: "waveform.circle.fill",
-            title: Text("Just ask Siri"),
-            tagline: Text("Voice-first control"),
-            body: Text("\"What's today's training?\" · \"Start Yasso 800.\" · \"Set my VDOT to 52.\" RunCraft answers, dispatches, and saves.")
+            title: Text("Just ask Siri", bundle: .module),
+            tagline: Text("Voice-first control", bundle: .module),
+            body: Text("\"What's today's training?\" · \"Start Yasso 800.\" · \"Set my VDOT to 52.\" RunCraft answers, dispatches, and saves.", bundle: .module)
         )
     }
 
@@ -115,7 +115,7 @@ public struct OnboardingView: View {
 
     private var primaryButton: some View {
         Button(action: advance) {
-            Text(isLastPage ? "Get started" : "Next")
+            Text(isLastPage ? "Get started" : "Next", bundle: .module)
                 .font(.headline)
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)

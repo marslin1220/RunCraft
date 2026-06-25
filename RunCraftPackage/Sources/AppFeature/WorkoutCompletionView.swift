@@ -35,7 +35,7 @@ struct WorkoutCompletionView: View {
             header
             metricsGrid
             Spacer(minLength: 0)
-            Button("Done", action: onDismiss)
+            Button(action: onDismiss) { Text("Done", bundle: .module) }
                 .buttonStyle(.borderedProminent)
                 .tint(Color.brand.accent)
                 .controlSize(.large)
@@ -51,7 +51,7 @@ struct WorkoutCompletionView: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(Color.brand.accent)
-            Text("Workout Complete")
+            Text("Workout Complete", bundle: .module)
                 .font(.title2.weight(.bold))
                 .foregroundStyle(Color.brand.textPrimary)
         }

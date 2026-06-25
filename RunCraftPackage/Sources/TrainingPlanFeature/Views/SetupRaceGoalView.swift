@@ -15,16 +15,13 @@ public struct SetupRaceGoalView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Goal name (e.g. Sun Moon Lake 29K)", text: $store.goalName)
+                    TextField(text: $store.goalName) { Text("Goal name (e.g. Sun Moon Lake 29K)", bundle: .module) }
                         .submitLabel(.next)
-                    DatePicker(
-                        "Race date",
-                        selection: $store.targetDate,
-                        in: Calendar.current.startOfDay(for: Date())...,
-                        displayedComponents: .date
-                    )
+                    DatePicker(selection: $store.targetDate, in: Calendar.current.startOfDay(for: Date())..., displayedComponents: .date) {
+                        Text("Race date", bundle: .module)
+                    }
                     HStack {
-                        Text("Distance")
+                        Text("Distance", bundle: .module)
                         Spacer()
                         TextField("km", value: $store.distanceKm, format: .number.precision(.fractionLength(0...2)))
                             .keyboardType(.decimalPad)
@@ -32,11 +29,13 @@ public struct SetupRaceGoalView: View {
                             .frame(width: 80)
                         Text(verbatim: "km")
                             .foregroundStyle(.secondary)
-                        Stepper("Distance", value: $store.distanceKm, in: 1...100, step: 1)
-                            .labelsHidden()
+                        Stepper(value: $store.distanceKm, in: 1...100, step: 1) {
+                            Text("Distance", bundle: .module)
+                        }
+                        .labelsHidden()
                     }
                 } header: {
-                    Text("Race Goal")
+                    Text("Race Goal", bundle: .module)
                 } footer: {
                     if !store.canSave {
                         Text(saveBlockerMessage)
@@ -54,19 +53,19 @@ public struct SetupRaceGoalView: View {
                 Section {
                     TrainingDaysGrid(store: store.scope(state: \.trainingDaysInput, action: \.trainingDaysInput))
                 } header: {
-                    Text("Training Days")
+                    Text("Training Days", bundle: .module)
                 } footer: {
-                    Text("Pick the days you can train. We'll place your long run, hard sessions, and rest days around them.")
+                    Text("Pick the days you can train. We'll place your long run, hard sessions, and rest days around them.", bundle: .module)
                 }
             }
-            .navigationTitle(store.editingId == nil ? "New Race Goal" : "Edit Race Goal")
+            .navigationTitle(store.editingId == nil ? Text("New Race Goal", bundle: .module) : Text("Edit Race Goal", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { store.send(.cancelButtonTapped) }
+                    Button { store.send(.cancelButtonTapped) } label: { Text("Cancel", bundle: .module) }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { store.send(.saveButtonTapped) }
+                    Button { store.send(.saveButtonTapped) } label: { Text("Save", bundle: .module) }
                         .disabled(!store.canSave)
                         .bold()
                 }
@@ -78,10 +77,10 @@ public struct SetupRaceGoalView: View {
     /// user isn't left wondering which field is wrong.
     private var saveBlockerMessage: String {
         if store.goalName.isEmpty {
-            return "Enter a goal name to continue."
+            return String(localized: "Enter a goal name to continue.", bundle: .module)
         }
         if store.vdotInput.effectiveVDOT == nil {
-            return "Enter a recent race time, or tap Auto-detect, so we can calculate your VDOT."
+            return String(localized: "Enter a recent race time, or tap Auto-detect, so we can calculate your VDOT.", bundle: .module)
         }
         return ""
     }

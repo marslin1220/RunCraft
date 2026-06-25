@@ -70,7 +70,7 @@ public struct PlanView: View {
                 .padding(.bottom, 24)
             }
             .background(Color.brand.background)
-            .navigationTitle("Plan")
+            .navigationTitle(Text("Plan", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 if let goal = activeGoal {
@@ -80,27 +80,28 @@ public struct PlanView: View {
                                 Button {
                                     store.send(.recalculateVDOTRequested)
                                 } label: {
-                                    Label("Edit goal / recalculate", systemImage: "pencil")
+                                    Label { Text("Edit goal / recalculate", bundle: .module) } icon: { Image(systemName: "pencil") }
                                 }
                             }
                             Button {
                                 store.send(.adjustVDOTRequested)
                             } label: {
-                                Label("Adjust VDOT manually", systemImage: "slider.horizontal.3")
+                                Label { Text("Adjust VDOT manually", bundle: .module) } icon: { Image(systemName: "slider.horizontal.3") }
                             }
                             Button {
                                 store.send(.adjustTrainingDaysRequested(goal))
                             } label: {
-                                Label("Adjust training days", systemImage: "calendar.badge.checkmark")
+                                Label { Text("Adjust training days", bundle: .module) } icon: { Image(systemName: "calendar.badge.checkmark") }
                             }
                             Divider()
                             Button(role: .destructive) {
                                 store.send(.deletePlanRequested(isPlaceholder: goal.isPlaceholder))
                             } label: {
-                                Label(
-                                    goal.isPlaceholder ? "Remove VDOT setup" : "Delete plan",
-                                    systemImage: "trash"
-                                )
+                                Label {
+                                    Text(goal.isPlaceholder ? "Remove VDOT setup" : "Delete plan", bundle: .module)
+                                } icon: {
+                                    Image(systemName: "trash")
+                                }
                             }
                         } label: {
                             Image(systemName: "ellipsis.circle")
@@ -264,7 +265,7 @@ private struct RaceCountdownRing: View {
                     Text("\(max(goal.daysUntilRace, 0))")
                         .font(.system(size: 36, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(Color.brand.textPrimary)
-                    Text("days")
+                    Text("days", bundle: .module)
                         .font(.caption2)
                         .foregroundStyle(Color.brand.textSecondary)
                 }
@@ -279,7 +280,7 @@ private struct RaceCountdownRing: View {
                     .lineLimit(2)
 
                 if let ctx = phaseContext {
-                    Text("Week \(ctx.week) of 16 · \(ctx.phase.displayName)")
+                    Text("Week \(ctx.week) of 16 · \(ctx.phase.displayName)", bundle: .module)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Color.brand.accent)
                 }
@@ -316,12 +317,12 @@ private struct PaceZonesSummaryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Training Paces")
+                Text("Training Paces", bundle: .module)
                     .font(.caption)
                     .foregroundStyle(Color.brand.textSecondary)
                     .textCase(.uppercase)
                 Spacer()
-                Text("tap to build")
+                Text("tap to build", bundle: .module)
                     .font(.caption2)
                     .foregroundStyle(Color.brand.textSecondary)
             }
@@ -427,9 +428,15 @@ private struct WeekSessionsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(week.weekNumber == 0 ? "This Week · Base Training" : "Week \(week.weekNumber) · \(week.phase.displayName)")
-                    .font(.headline)
-                    .foregroundStyle(Color.brand.textPrimary)
+                if week.weekNumber == 0 {
+                    Text("This Week · Base Training", bundle: .module)
+                        .font(.headline)
+                        .foregroundStyle(Color.brand.textPrimary)
+                } else {
+                    Text("Week \(week.weekNumber) · \(week.phase.displayName)", bundle: .module)
+                        .font(.headline)
+                        .foregroundStyle(Color.brand.textPrimary)
+                }
                 Spacer()
                 if adherence.planned > 0 && adherence.completed > 0 {
                     Text("\(adherence.completed)/\(adherence.planned)")
@@ -506,7 +513,7 @@ private struct PrePlanPreviewSection: View {
                 .frame(width: 36, height: 36)
                 .background(Color.brand.caution.opacity(0.15), in: Circle())
             VStack(alignment: .leading, spacing: 2) {
-                Text("Plan starts in \(daysUntilStart) day\(daysUntilStart == 1 ? "" : "s")")
+                Text("Plan starts in \(daysUntilStart) day\(daysUntilStart == 1 ? "" : "s")", bundle: .module)
                     .font(.headline)
                     .foregroundStyle(Color.brand.textPrimary)
                 Text(week.startDate, format: .dateTime.weekday(.wide).month().day())
@@ -526,7 +533,7 @@ private struct PrePlanPreviewSection: View {
 
     private var previewHeader: some View {
         HStack {
-            Text("Week 1 preview · \(week.phase.displayName)")
+            Text("Week 1 preview · \(week.phase.displayName)", bundle: .module)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color.brand.textSecondary)
             Spacer()
@@ -581,7 +588,7 @@ private struct PlanGapBanner: View {
                     .frame(width: 36, height: 36)
                     .background(Color.brand.caution.opacity(0.15), in: Circle())
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Your 16-week plan starts in \(daysUntilStart) day\(daysUntilStart == 1 ? "" : "s")")
+                    Text("Your 16-week plan starts in \(daysUntilStart) day\(daysUntilStart == 1 ? "" : "s")", bundle: .module)
                         .font(.headline)
                         .foregroundStyle(Color.brand.textPrimary)
                     Text(planStartDate, format: .dateTime.weekday(.wide).month().day())
@@ -761,11 +768,11 @@ private struct RestSessionLine: View {
                 .foregroundStyle(Color.brand.textSecondary)
                 .frame(width: 32)
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(dayLabel) · Rest")
+                Text("\(dayLabel) · Rest", bundle: .module)
                     .font(.subheadline)
                     .foregroundStyle(Color.brand.textSecondary)
                 if let actuals {
-                    Text("Logged: \(actuals.displayText(unit: paceUnit))")
+                    Text("Logged: \(actuals.displayText(unit: paceUnit))", bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color.brand.accent)
                 }
@@ -826,10 +833,10 @@ private struct BaseTrainingBanner: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Base Training")
+                Text("Base Training", bundle: .module)
                     .font(.headline)
                     .foregroundStyle(Color.brand.textPrimary)
-                Text("VDOT \(vdot, format: .number.precision(.fractionLength(1))) · no race goal yet")
+                Text("VDOT \(vdot, format: .number.precision(.fractionLength(1))) · no race goal yet", bundle: .module)
                     .font(.subheadline)
                     .foregroundStyle(Color.brand.textSecondary)
             }
@@ -848,7 +855,7 @@ private struct AddRaceGoalLink: View {
     var body: some View {
         Button(action: onTap) {
             HStack {
-                Label("Add a Race Goal", systemImage: "flag.checkered")
+                Label { Text("Add a Race Goal", bundle: .module) } icon: { Image(systemName: "flag.checkered") }
                     .font(.subheadline.weight(.semibold))
                 Spacer()
                 Image(systemName: "chevron.right")
@@ -874,18 +881,18 @@ private struct EmptyPlanPrompt: View {
                 .foregroundStyle(Color.brand.accent)
                 .accessibilityHidden(true)
 
-            Text("No training plan yet")
+            Text("No training plan yet", bundle: .module)
                 .font(.title2)
                 .bold()
                 .foregroundStyle(Color.brand.textPrimary)
 
-            Text("Add a race goal for a personalised 16-week plan, or set up your VDOT for a rolling base training week.")
+            Text("Add a race goal for a personalised 16-week plan, or set up your VDOT for a rolling base training week.", bundle: .module)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.brand.textSecondary)
 
             VStack(spacing: 12) {
                 Button(action: onAddRaceGoal) {
-                    Text("Add Race Goal")
+                    Text("Add Race Goal", bundle: .module)
                         .bold()
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
@@ -895,7 +902,7 @@ private struct EmptyPlanPrompt: View {
                 }
 
                 Button(action: onSetUpVDOT) {
-                    Text("Set Up VDOT")
+                    Text("Set Up VDOT", bundle: .module)
                         .bold()
                         .foregroundStyle(Color.brand.accent)
                         .frame(maxWidth: .infinity)

@@ -262,6 +262,35 @@
         }
       }
     },
+    "Adjust Training Days": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トレーニング日を調整"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "훈련 요일 조정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调整训练日"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "調整訓練日"
+          }
+        }
+      }
+    },
     "Auto-detect from HealthKit": {
       "extractionState": "manual",
       "localizations": {
@@ -407,6 +436,35 @@
         }
       }
     },
+    "Changes apply to next week onward — this week's plan stays as-is.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "変更は来週以降に適用されます — 今週のプランはそのままです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "변경 사항은 다음 주부터 적용됩니다 — 이번 주 계획은 그대로 유지됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "变更将从下周起生效 — 本周计划保持不变。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "變更將從下週起生效 — 本週計劃保持不變。"
+          }
+        }
+      }
+    },
     "Changes by %@%@ from %@.": {
       "extractionState": "manual",
       "localizations": {
@@ -432,6 +490,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "變動 %@%@（原為 %@）。"
+          }
+        }
+      }
+    },
+    "Choose the days you're available to train. The schedule will be built around these days.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トレーニング可能な曜日を選んでください。スケジュールはこれらの曜日に合わせて作成されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "훈련 가능한 요일을 선택하세요. 일정은 이 요일을 기준으로 구성됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择您可以训练的日子。训练计划将围绕这些日子制定。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇您可以訓練的日子。訓練計劃將圍繞這些日子制定。"
           }
         }
       }
@@ -1161,6 +1248,35 @@
         }
       }
     },
+    "Pick the days you can train. We'll place your long run, hard sessions, and rest days around them.": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トレーニングできる曜日を選んでください。ロング走、ハードセッション、休息日をその曜日に合わせて配置します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "훈련 가능한 요일을 선택하세요. 장거리 달리기, 고강도 세션, 휴식일을 해당 요일 주위에 배치합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择您可以训练的日子。我们会在这些日子周围安排长跑、高强度课程和休息日。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇您可以訓練的日子。我們將在這些日子周圍安排長跑、高強度課程和休息日。"
+          }
+        }
+      }
+    },
     "Professional": {
       "extractionState": "manual",
       "localizations": {
@@ -1480,6 +1596,64 @@
         }
       }
     },
+    "Sent": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "送信済み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전송됨"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已传送"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已傳送"
+          }
+        }
+      }
+    },
+    "Weeks %lld–%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %1$lld–%2$lld 週"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld–%2$lld주"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %1$lld–%2$lld 週"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %1$lld–%2$lld 週"
+          }
+        }
+      }
+    },
     "Start": {
       "extractionState": "manual",
       "localizations": {
@@ -1592,6 +1766,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "本週"
+          }
+        }
+      }
+    },
+    "Training Days": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トレーニング日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "훈련 요일"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练日"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訓練日"
           }
         }
       }
@@ -2694,6 +2897,151 @@
           "stringUnit": {
             "state": "translated",
             "value": "基礎期，持續中"
+          }
+        }
+      }
+    },
+    "Adjust training days": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トレーニング日を調整"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "훈련일 조정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调整训练日"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "調整訓練日"
+          }
+        }
+      }
+    },
+    "Remove VDOT setup": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT設定を削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT 설정 제거"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除 VDOT 设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除 VDOT 設定"
+          }
+        }
+      }
+    },
+    "This Week · Base Training": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今週 · ベーストレーニング"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이번 주 · 기본 훈련"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本週 · 基礎訓練"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本週 · 基礎訓練"
+          }
+        }
+      }
+    },
+    "Your 16-week plan starts in %lld day%@": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16週間プランの開始まであと %1$lld 日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16주 계획 시작까지 %1$lld일 남음"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 週計畫將在 %1$lld 天後開始"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 週計畫將在 %1$lld 天後開始"
+          }
+        }
+      }
+    },
+    "VDOT %@ · no race goal yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT %@ · レース目標なし"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT %@ · 레이스 목표 없음"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT %@ · 尚未设定比赛目标"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VDOT %@ · 尚未設定比賽目標"
           }
         }
       }

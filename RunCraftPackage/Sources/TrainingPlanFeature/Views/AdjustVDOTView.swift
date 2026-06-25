@@ -38,35 +38,37 @@ public struct AdjustVDOTView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
                 } header: {
-                    Text("Adjust VDOT")
+                    Text("Adjust VDOT", bundle: .module)
                 } footer: {
                     if store.hasChanged {
                         let delta = store.vdot - store.originalVDOT
                         let sign = delta > 0 ? "+" : ""
-                        Text("Changes by \(sign)\(delta.formatted(.number.precision(.fractionLength(1)))) from \(store.originalVDOT.formatted(.number.precision(.fractionLength(1)))).")
+                        Text("Changes by \(sign)\(delta.formatted(.number.precision(.fractionLength(1)))) from \(store.originalVDOT.formatted(.number.precision(.fractionLength(1)))).", bundle: .module)
                             .font(.caption)
                     } else {
-                        Text("Use the stepper to adjust. Changes only commit when you tap Save.")
+                        Text("Use the stepper to adjust. Changes only commit when you tap Save.", bundle: .module)
                             .font(.caption)
                     }
                 }
 
-                Section("Resulting Paces") {
+                Section {
                     PacePreviewRow(label: "E  Easy",       range: store.paceZones.easy,       unit: paceUnit)
                     PacePreviewRow(label: "M  Marathon",   range: store.paceZones.marathon,   unit: paceUnit)
                     PacePreviewRow(label: "T  Threshold",  range: store.paceZones.threshold,  unit: paceUnit)
                     PacePreviewRow(label: "I  Interval",   range: store.paceZones.interval,   unit: paceUnit)
                     PacePreviewRow(label: "R  Repetition", range: store.paceZones.repetition, unit: paceUnit)
+                } header: {
+                    Text("Resulting Paces", bundle: .module)
                 }
             }
-            .navigationTitle("Adjust VDOT")
+            .navigationTitle(Text("Adjust VDOT", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { store.send(.cancelTapped) }
+                    Button { store.send(.cancelTapped) } label: { Text("Cancel", bundle: .module) }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { store.send(.saveTapped) }
+                    Button { store.send(.saveTapped) } label: { Text("Save", bundle: .module) }
                         .bold()
                         .disabled(!store.hasChanged)
                 }

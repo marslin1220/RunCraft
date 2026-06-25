@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3DC2004F5BC24F4D94D4B4AB /* AppleWatchSync in Frameworks */ = {isa = PBXBuildFile; productRef = 07D2CA2A76374F6284445A88 /* AppleWatchSync */; };
 		A20A67082FDFD1130017A9BA /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20A67072FDFD1130017A9BA /* WidgetKit.framework */; };
 		A20A670A2FDFD1130017A9BA /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20A67092FDFD1130017A9BA /* SwiftUI.framework */; };
 		A20A671B2FDFD1150017A9BA /* TodayWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20A67052FDFD1130017A9BA /* TodayWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		3DC2004F5BC24F4D94D4B4AB /* AppleWatchSync in Frameworks */ = {isa = PBXBuildFile; productRef = 07D2CA2A76374F6284445A88 /* AppleWatchSync */; };
 		A20A67222FDFD1290017A9BA /* RunCraftIntents in Frameworks */ = {isa = PBXBuildFile; productRef = A20A67212FDFD1290017A9BA /* RunCraftIntents */; };
 		A20CBA8E2FE054EE0060F9C3 /* RunCraftWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A20CBA842FE054EC0060F9C3 /* RunCraftWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A20CBA942FE055D10060F9C3 /* AppleWatchSync in Frameworks */ = {isa = PBXBuildFile; productRef = A20CBA932FE055D10060F9C3 /* AppleWatchSync */; };

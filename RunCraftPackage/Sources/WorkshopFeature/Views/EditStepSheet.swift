@@ -17,28 +17,34 @@ struct EditStepSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Type") {
-                    Picker("Step", selection: $store.step.kind) {
+                Section {
+                    Picker(selection: $store.step.kind) {
                         ForEach(StepKind.allCases, id: \.self) { kind in
                             Label(kind.displayName, systemImage: kind.symbolName).tag(kind)
                         }
+                    } label: {
+                        Text("Step", bundle: .module)
                     }
+                } header: {
+                    Text("Type", bundle: .module)
                 }
 
-                Section("Goal") {
-                    Picker("Type", selection: $store.goalUnit) {
+                Section {
+                    Picker(selection: $store.goalUnit) {
                         ForEach(EditStep.State.GoalUnit.allCases, id: \.self) { unit in
                             Text(unit.label).tag(unit)
                         }
+                    } label: {
+                        Text("Type", bundle: .module)
                     }
                     .pickerStyle(.segmented)
 
                     switch store.goalUnit {
                     case .openEnded:
-                        Text("Runs until you tap Lap").foregroundStyle(.secondary)
+                        Text("Runs until you tap Lap", bundle: .module).foregroundStyle(.secondary)
                     case .distance:
                         HStack {
-                            Text("Distance")
+                            Text("Distance", bundle: .module)
                             Spacer()
                             TextField("metres", value: $store.distanceMetres, format: .number)
                                 .keyboardType(.numberPad)
@@ -49,19 +55,23 @@ struct EditStepSheet: View {
                     case .time:
                         TimeWheelPicker(minutes: $store.minutes, seconds: $store.seconds)
                     }
+                } header: {
+                    Text("Goal", bundle: .module)
                 }
 
                 Section {
-                    Picker("Alert", selection: $store.alertKind) {
+                    Picker(selection: $store.alertKind) {
                         ForEach(EditStep.State.AlertKind.allCases, id: \.self) { kind in
                             Text(kind.label).tag(kind)
                         }
+                    } label: {
+                        Text("Alert", bundle: .module)
                     }
                     .pickerStyle(.segmented)
 
                     switch store.alertKind {
                     case .none:
-                        Text("No pace or heart-rate target")
+                        Text("No pace or heart-rate target", bundle: .module)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     case .pace:
@@ -70,23 +80,22 @@ struct EditStepSheet: View {
                         heartRateFields
                     }
                 } header: {
-                    Text("Alert")
+                    Text("Alert", bundle: .module)
                 } footer: {
                     if store.alertKind == .pace {
-                        Text("Tap a zone to fill from your current VDOT (\(Int(currentVDOT.rounded()))).")
+                        Text("Tap a zone to fill from your current VDOT (\(Int(currentVDOT.rounded()))).", bundle: .module)
                             .font(.caption)
                     }
                 }
             }
-            .navigationTitle("Edit Step")
+            .navigationTitle(Text("Edit Step", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { store.send(.cancelTapped) }
+                    Button { store.send(.cancelTapped) } label: { Text("Cancel", bundle: .module) }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { store.send(.saveTapped) }
-                        .bold()
+                    Button { store.send(.saveTapped) } label: { Text("Save", bundle: .module).bold() }
                         .disabled(!store.isValid)
                 }
             }

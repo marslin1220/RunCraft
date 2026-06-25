@@ -17,7 +17,7 @@ public struct SetupVDOTView: View {
         NavigationStack {
             Form {
                 Section {
-                    Text("We'll set up a rolling base training week using your current VDOT — no race goal required.")
+                    Text("We'll set up a rolling base training week using your current VDOT — no race goal required.", bundle: .module)
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
@@ -31,19 +31,19 @@ public struct SetupVDOTView: View {
                 Section {
                     TrainingDaysGrid(store: store.scope(state: \.trainingDaysInput, action: \.trainingDaysInput))
                 } header: {
-                    Text("Training Days")
+                    Text("Training Days", bundle: .module)
                 } footer: {
-                    Text("Choose the days you're available to train. The schedule will be built around these days.")
+                    Text("Choose the days you're available to train. The schedule will be built around these days.", bundle: .module)
                 }
             }
-            .navigationTitle("Set Up VDOT")
+            .navigationTitle(Text("Set Up VDOT", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { store.send(.cancelButtonTapped) }
+                    Button { store.send(.cancelButtonTapped) } label: { Text("Cancel", bundle: .module) }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { store.send(.saveButtonTapped) }
+                    Button { store.send(.saveButtonTapped) } label: { Text("Save", bundle: .module) }
                         .disabled(store.vdotInput.effectiveVDOT == nil)
                         .bold()
                 }

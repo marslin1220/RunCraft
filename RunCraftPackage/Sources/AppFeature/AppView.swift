@@ -27,25 +27,25 @@ public struct AppView: View {
         TabView(selection: $store.selectedTab.sending(\.tabSelected)) {
             PlanView(store: store.scope(state: \.plan, action: \.plan))
                 .tabItem {
-                    Label("Plan", systemImage: "calendar")
+                    Label { Text("Plan", bundle: .module) } icon: { Image(systemName: "calendar") }
                 }
                 .tag(AppFeature.Tab.plan)
 
             WorkshopView(store: store.scope(state: \.workouts, action: \.workouts))
                 .tabItem {
-                    Label("Workouts", systemImage: "figure.run")
+                    Label { Text("Workouts", bundle: .module) } icon: { Image(systemName: "figure.run") }
                 }
                 .tag(AppFeature.Tab.workouts)
 
             InsightsView(store: store.scope(state: \.insights, action: \.insights))
                 .tabItem {
-                    Label("Insights", systemImage: "chart.line.uptrend.xyaxis")
+                    Label { Text("Insights", bundle: .module) } icon: { Image(systemName: "chart.line.uptrend.xyaxis") }
                 }
                 .tag(AppFeature.Tab.insights)
 
             SettingsView(store: store.scope(state: \.settings, action: \.settings))
                 .tabItem {
-                    Label("Settings", systemImage: "gearshape")
+                    Label { Text("Settings", bundle: .module) } icon: { Image(systemName: "gearshape") }
                 }
                 .tag(AppFeature.Tab.settings)
         }

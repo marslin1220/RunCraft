@@ -1,528 +1,694 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "${applicationName} today's session": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} 今日のセッション"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} 오늘 세션"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} 今天的训练"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} 今天的訓練"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "/km" : {
+
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
           }
         }
       }
     },
-    "Adjust ${applicationName} VDOT to \\(\\.$vdot)": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} の VDOT を \\(\\.$vdot) に調整"
+    "%@ · Rest" : {
+
+    },
+    "%lld" : {
+
+    },
+    "+2.9 this plan" : {
+
+    },
+    "+8 ms this month" : {
+
+    },
+    "${applicationName} today's session" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 今日のセッション"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}의 VDOT을 \\(\\.$vdot)으로 조정"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 오늘 세션"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "调整 ${applicationName} 的 VDOT 为 \\(\\.$vdot)"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 今天的训练"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "調整 ${applicationName} 的 VDOT 為 \\(\\.$vdot)"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 今天的訓練"
           }
         }
       }
     },
-    "Log a completed run in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} で完了したランを記録"
+    "3/7 done" : {
+
+    },
+    "4:52" : {
+
+    },
+    "4:59 avg" : {
+
+    },
+    "4.8 km" : {
+
+    },
+    "5:22 /km" : {
+
+    },
+    "5:58 /km" : {
+
+    },
+    "8:47" : {
+
+    },
+    "10 km" : {
+
+    },
+    "18 weeks" : {
+
+    },
+    "18:24" : {
+
+    },
+    "52.4" : {
+
+    },
+    "62" : {
+
+    },
+    "147 bpm" : {
+
+    },
+    "163 bpm" : {
+
+    },
+    "164" : {
+
+    },
+    "Adjust ${applicationName} VDOT to \\(\\.$vdot)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} の VDOT を \\(\\.$vdot) に調整"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}에서 완료된 러닝 기록"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}의 VDOT을 \\(\\.$vdot)으로 조정"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 记录一笔完成的跑步"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "调整 ${applicationName} 的 VDOT 为 \\(\\.$vdot)"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 記錄一筆完成的跑步"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "調整 ${applicationName} 的 VDOT 為 \\(\\.$vdot)"
           }
         }
       }
     },
-    "Log a run in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} でランを記録"
+    "Base" : {
+
+    },
+    "bpm" : {
+
+    },
+    "Build phase · 62 km this week" : {
+
+    },
+    "Dist" : {
+
+    },
+    "Goal: 1000 m" : {
+
+    },
+    "HR" : {
+
+    },
+    "HRV Trend" : {
+
+    },
+    "I · 4:45–5:05 /km" : {
+
+    },
+    "Insights" : {
+
+    },
+    "Interval · 10 reps" : {
+
+    },
+    "Interval Run" : {
+
+    },
+    "Lactate Threshold" : {
+
+    },
+    "Log a completed run in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} で完了したランを記録"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}에서 러닝 기록"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}에서 완료된 러닝 기록"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 记录一笔跑步"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 记录一笔完成的跑步"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 記錄一筆跑步"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 記錄一筆完成的跑步"
           }
         }
       }
     },
-    "Log Run": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ランを記録"
+    "Log a run in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} でランを記録"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "러닝 기록"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}에서 러닝 기록"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "记录跑步"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 记录一笔跑步"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "記錄跑步"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 記錄一筆跑步"
           }
         }
       }
     },
-    "Record a run in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} でランを記録"
+    "Log Run" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ランを記録"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}에서 러닝 기록"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "러닝 기록"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 记录跑步"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记录跑步"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 記錄跑步"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記錄跑步"
           }
         }
       }
     },
-    "Run \\(\\.$workout) in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} で \\(\\.$workout) を走る"
+    "LT1 — Aerobic" : {
+
+    },
+    "LT2 — Anaerobic" : {
+
+    },
+    "Monday, June 16" : {
+
+    },
+    "ms" : {
+
+    },
+    "Pace" : {
+
+    },
+    "Plan" : {
+
+    },
+    "Race Predictions" : {
+
+    },
+    "Record a run in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} でランを記録"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}에서 \\(\\.$workout) 달리기"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}에서 러닝 기록"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 跑 \\(\\.$workout)"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 记录跑步"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 跑 \\(\\.$workout)"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 記錄跑步"
           }
         }
       }
     },
-    "Send \\(\\.$workout) to my Watch in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} から \\(\\.$workout) を Apple Watch に送信"
+    "Rep 3/5 · Run" : {
+
+    },
+    "Run \\(\\.$workout) in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} で \\(\\.$workout) を走る"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}에서 \\(\\.$workout)을 Apple Watch로 보내기"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}에서 \\(\\.$workout) 달리기"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "把 \\(\\.$workout) 从 ${applicationName} 传到我的 Apple Watch"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 跑 \\(\\.$workout)"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "把 \\(\\.$workout) 從 ${applicationName} 傳到我的 Apple Watch"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 跑 \\(\\.$workout)"
           }
         }
       }
     },
-    "Set my VDOT to \\(\\.$vdot) in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} の VDOT を \\(\\.$vdot) に設定"
+    "Send \\(\\.$workout) to my Watch in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} から \\(\\.$workout) を Apple Watch に送信"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}의 VDOT을 \\(\\.$vdot)으로 설정"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}에서 \\(\\.$workout)을 Apple Watch로 보내기"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "把 ${applicationName} 的 VDOT 设为 \\(\\.$vdot)"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把 \\(\\.$workout) 从 ${applicationName} 传到我的 Apple Watch"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "把 ${applicationName} 的 VDOT 設為 \\(\\.$vdot)"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把 \\(\\.$workout) 從 ${applicationName} 傳到我的 Apple Watch"
           }
         }
       }
     },
-    "Set VDOT": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "VDOT を設定"
+    "Send to Watch" : {
+
+    },
+    "Set my VDOT to \\(\\.$vdot) in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} の VDOT を \\(\\.$vdot) に設定"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "VDOT 설정"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}의 VDOT을 \\(\\.$vdot)으로 설정"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "设定 VDOT"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把 ${applicationName} 的 VDOT 设为 \\(\\.$vdot)"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設定 VDOT"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把 ${applicationName} 的 VDOT 設為 \\(\\.$vdot)"
           }
         }
       }
     },
-    "Show today's run in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} で今日のランを表示"
+    "Set VDOT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VDOT を設定"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}에서 오늘의 러닝 보기"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VDOT 설정"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "显示 ${applicationName} 今天的跑步"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设定 VDOT"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "顯示 ${applicationName} 今天的跑步"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定 VDOT"
           }
         }
       }
     },
-    "Start \\(\\.$workout) in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} で \\(\\.$workout) を開始"
+    "Show today's run in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} で今日のランを表示"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}에서 \\(\\.$workout) 시작"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}에서 오늘의 러닝 보기"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 开始 \\(\\.$workout)"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示 ${applicationName} 今天的跑步"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 開始 \\(\\.$workout)"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示 ${applicationName} 今天的跑步"
           }
         }
       }
     },
-    "Start \\(\\.$workout) workout in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} で \\(\\.$workout) ワークアウトを開始"
+    "Start" : {
+
+    },
+    "Start \\(\\.$workout) in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} で \\(\\.$workout) を開始"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}에서 \\(\\.$workout) 운동 시작"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}에서 \\(\\.$workout) 시작"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 开始 \\(\\.$workout) 训练"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 开始 \\(\\.$workout)"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 ${applicationName} 開始 \\(\\.$workout) 訓練"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 開始 \\(\\.$workout)"
           }
         }
       }
     },
-    "Start Workout": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ワークアウトを開始"
+    "Start \\(\\.$workout) workout in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} で \\(\\.$workout) ワークアウトを開始"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "운동 시작"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}에서 \\(\\.$workout) 운동 시작"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "开始训练"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 开始 \\(\\.$workout) 训练"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "開始訓練"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 ${applicationName} 開始 \\(\\.$workout) 訓練"
           }
         }
       }
     },
-    "Today's Training": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今日のトレーニング"
+    "Start Workout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトを開始"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오늘의 훈련"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 시작"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今天的训练"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始训练"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今天的訓練"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始訓練"
           }
         }
       }
     },
-    "Update ${applicationName} VDOT to \\(\\.$vdot)": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} の VDOT を \\(\\.$vdot) に更新"
+    "T-pace" : {
+
+    },
+    "Taipei Marathon · Nov 23" : {
+
+    },
+    "Today's Training" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日のトレーニング"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}의 VDOT을 \\(\\.$vdot)으로 업데이트"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘의 훈련"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "更新 ${applicationName} 的 VDOT 为 \\(\\.$vdot)"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的训练"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "更新 ${applicationName} 的 VDOT 為 \\(\\.$vdot)"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的訓練"
           }
         }
       }
     },
-    "What's today's ${applicationName} training": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} 今日のトレーニングは"
+    "Update ${applicationName} VDOT to \\(\\.$vdot)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} の VDOT を \\(\\.$vdot) に更新"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오늘의 ${applicationName} 훈련은"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}의 VDOT을 \\(\\.$vdot)으로 업데이트"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今天的 ${applicationName} 训练是什么"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新 ${applicationName} 的 VDOT 为 \\(\\.$vdot)"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今天的 ${applicationName} 訓練是什麼"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新 ${applicationName} 的 VDOT 為 \\(\\.$vdot)"
           }
         }
       }
     },
-    "What's today's training in ${applicationName}": {
-      "extractionState": "manual",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} 今日のトレーニングは"
+    "VDOT" : {
+
+    },
+    "VDOT 52" : {
+
+    },
+    "VO₂max" : {
+
+    },
+    "Week" : {
+
+    },
+    "Week 9 of 16" : {
+
+    },
+    "What's today's ${applicationName} training" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 今日のトレーニングは"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName}에서 오늘의 훈련은"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘의 ${applicationName} 훈련은"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} 今天的训练是什么"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的 ${applicationName} 训练是什么"
           }
         },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "${applicationName} 今天的訓練是什麼"
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天的 ${applicationName} 訓練是什麼"
           }
         }
       }
+    },
+    "What's today's training in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 今日のトレーニングは"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName}에서 오늘의 훈련은"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 今天的训练是什么"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${applicationName} 今天的訓練是什麼"
+          }
+        }
+      }
+    },
+    "Yasso 800s" : {
+
+    },
+    "Z4" : {
+
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

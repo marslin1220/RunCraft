@@ -71,61 +71,76 @@ public struct SettingsView: View {
     public var body: some View {
         NavigationStack {
             Form {
-                Section("Units") {
-                    Picker("Pace", selection: paceUnit) {
+                Section {
+                    Picker(selection: paceUnit) {
                         ForEach(PaceUnit.allCases, id: \.self) { unit in
                             Text(unit.displayName).tag(unit)
                         }
+                    } label: {
+                        Text("Pace", bundle: .module)
                     }
                     .pickerStyle(.segmented)
-                }
-
-                Section("Appearance") {
-                    Picker("Theme", selection: appearanceOverride) {
-                        ForEach(AppearanceOverride.allCases, id: \.self) { option in
-                            Text(option.displayName).tag(option)
-                        }
-                    }
-                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Units", bundle: .module)
                 }
 
                 Section {
-                    Toggle("Daily training reminder", isOn: Binding(
+                    Picker(selection: appearanceOverride) {
+                        ForEach(AppearanceOverride.allCases, id: \.self) { option in
+                            Text(LocalizedStringKey(option.displayName), bundle: .module).tag(option)
+                        }
+                    } label: {
+                        Text("Theme", bundle: .module)
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Appearance", bundle: .module)
+                }
+
+                Section {
+                    Toggle(isOn: Binding(
                         get: { reminderEnabled },
                         set: { newValue in
                             reminderEnabled = newValue
                             Task { await applyReminderState(enabled: newValue) }
                         }
-                    ))
+                    )) {
+                        Text("Daily training reminder", bundle: .module)
+                    }
                     if reminderEnabled {
                         DatePicker(
-                            "Time",
                             selection: reminderTime,
                             displayedComponents: .hourAndMinute
-                        )
+                        ) {
+                            Text("Time", bundle: .module)
+                        }
                     }
                 } header: {
-                    Text("Notifications")
+                    Text("Notifications", bundle: .module)
                 } footer: {
-                    Text("Daily nudge at the time you pick. Tap to open RunCraft and dispatch today's session to Apple Watch.")
+                    Text("Daily nudge at the time you pick. Tap to open RunCraft and dispatch today's session to Apple Watch.", bundle: .module)
                 }
 
                 Section {
                     Button {
                         store.send(.delegate(.openTrainingDays))
                     } label: {
-                        Label("Training days", systemImage: "calendar.badge.checkmark")
-                            .foregroundStyle(.primary)
+                        Label {
+                            Text("Training days", bundle: .module)
+                        } icon: {
+                            Image(systemName: "calendar.badge.checkmark")
+                        }
+                        .foregroundStyle(.primary)
                     }
                 } header: {
-                    Text("Training Plan")
+                    Text("Training Plan", bundle: .module)
                 } footer: {
-                    Text("Choose which days of the week you can train and set your preferred long-run day.")
+                    Text("Choose which days of the week you can train and set your preferred long-run day.", bundle: .module)
                 }
 
-                Section("About") {
+                Section {
                     HStack {
-                        Text("Version")
+                        Text("Version", bundle: .module)
                         Spacer()
                         Text("\(appVersion) (\(buildNumber))")
                             .foregroundStyle(.secondary)
@@ -133,15 +148,25 @@ public struct SettingsView: View {
                     }
 
                     Link(destination: URL(string: "https://vdoto2.com")!) {
-                        Label("About Jack Daniels VDOT", systemImage: "info.circle.fill")
+                        Label {
+                            Text("About Jack Daniels VDOT", bundle: .module)
+                        } icon: {
+                            Image(systemName: "info.circle.fill")
+                        }
                     }
 
                     Link(destination: URL(string: "https://marslin1220.github.io/RunCraft/privacy/")!) {
-                        Label("Privacy Policy", systemImage: "lock.shield")
+                        Label {
+                            Text("Privacy Policy", bundle: .module)
+                        } icon: {
+                            Image(systemName: "lock.shield")
+                        }
                     }
+                } header: {
+                    Text("About", bundle: .module)
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle(Text("Settings", bundle: .module))
         }
     }
 

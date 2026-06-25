@@ -20,7 +20,7 @@ public struct VDOTInputSections: View {
             Section {
             } header: {
                 HStack(spacing: 6) {
-                    Text("Fitness Level (VDOT)")
+                    Text("Fitness Level (VDOT)", bundle: .module)
                     Button {
                         showVDOTInfo = true
                     } label: {
@@ -38,10 +38,12 @@ public struct VDOTInputSections: View {
             }
             Section {
                 // Distance picker
-                Picker("Distance", selection: $store.manualDistance) {
+                Picker(selection: $store.manualDistance) {
                     ForEach(RaceDistanceQuery.allCases, id: \.self) { d in
                         Text(d.displayName).tag(d)
                     }
+                } label: {
+                    Text("Distance", bundle: .module)
                 }
                 .pickerStyle(.segmented)
                 .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
@@ -50,7 +52,7 @@ public struct VDOTInputSections: View {
                 // with the Workshop edit-step sheet, avoids the
                 // tiny number-pad TextFields that were mis-tap-prone.
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Finish time")
+                    Text("Finish time", bundle: .module)
                         .foregroundStyle(.primary)
                     TimeWheelPicker(
                         minutes: $store.manualMinutes,
@@ -63,7 +65,7 @@ public struct VDOTInputSections: View {
                 // Live VDOT result from manual entry
                 if store.detectedVDOT == nil, let vdot = store.calculatedVDOT {
                     HStack {
-                        Text("Your VDOT")
+                        Text("Your VDOT", bundle: .module)
                             .foregroundStyle(.secondary)
                         Spacer()
                         Text(vdot, format: .number.precision(.fractionLength(1)))
@@ -80,7 +82,7 @@ public struct VDOTInputSections: View {
                     store.send(.detectVDOTTapped)
                 } label: {
                     HStack {
-                        Label("Auto-detect from HealthKit", systemImage: "heart.fill")
+                        Label { Text("Auto-detect from HealthKit", bundle: .module) } icon: { Image(systemName: "heart.fill") }
                         Spacer()
                         if store.isDetectingVDOT { ProgressView() }
                     }
@@ -90,7 +92,7 @@ public struct VDOTInputSections: View {
                 if let vdot = store.detectedVDOT {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Best detected VDOT")
+                            Text("Best detected VDOT", bundle: .module)
                                 .foregroundStyle(.secondary)
                                 .font(.caption)
                             Text(vdot, format: .number.precision(.fractionLength(1)))
@@ -108,9 +110,9 @@ public struct VDOTInputSections: View {
                     }
                 }
             } header: {
-                Text("Or auto-detect")
+                Text("Or auto-detect", bundle: .module)
             } footer: {
-                Text("Scans your HealthKit running history for a best 5K, 10K or half marathon time.")
+                Text("Scans your HealthKit running history for a best 5K, 10K or half marathon time.", bundle: .module)
                     .font(.caption)
             }
         }
@@ -128,12 +130,14 @@ public struct PaceZonesPreviewSection: View {
     }
 
     public var body: some View {
-        Section("Your Training Paces") {
+        Section {
             PaceZoneRow(label: "E  Easy",       pace: zones.easy.formatted(unit: paceUnit),       color: Color(hex: "#4CAF50"))
             PaceZoneRow(label: "M  Marathon",   pace: zones.marathon.formatted(unit: paceUnit),   color: Color(hex: "#2196F3"))
             PaceZoneRow(label: "T  Threshold",  pace: zones.threshold.formatted(unit: paceUnit),  color: Color(hex: "#FFC107"))
             PaceZoneRow(label: "I  Interval",   pace: zones.interval.formatted(unit: paceUnit),   color: Color(hex: "#FF5722"))
             PaceZoneRow(label: "R  Repetition", pace: zones.repetition.formatted(unit: paceUnit), color: Color(hex: "#F44336"))
+        } header: {
+            Text("Your Training Paces", bundle: .module)
         }
     }
 }
@@ -146,48 +150,48 @@ struct VDOTInfoPopover: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Group {
-                        Text("What is VDOT?")
+                        Text("What is VDOT?", bundle: .module)
                             .font(.headline)
-                        Text("VDOT is a number that represents your current running fitness, developed by coach Jack Daniels. It is calculated from a recent race result and reflects the effective VO₂max you demonstrated on race day.")
+                        Text("VDOT is a number that represents your current running fitness, developed by coach Jack Daniels. It is calculated from a recent race result and reflects the effective VO₂max you demonstrated on race day.", bundle: .module)
                     }
 
                     Divider()
 
                     Group {
-                        Text("How is it calculated?")
+                        Text("How is it calculated?", bundle: .module)
                             .font(.headline)
-                        Text("Enter a recent race time (e.g. 5K in 25 min) and the app uses the Jack Daniels formula to derive your VDOT. A faster race time = higher VDOT.")
+                        Text("Enter a recent race time (e.g. 5K in 25 min) and the app uses the Jack Daniels formula to derive your VDOT. A faster race time = higher VDOT.", bundle: .module)
                     }
 
                     Divider()
 
                     Group {
-                        Text("Typical VDOT ranges")
+                        Text("Typical VDOT ranges", bundle: .module)
                             .font(.headline)
                         VStack(alignment: .leading, spacing: 6) {
-                            RangeRow(range: "30 – 39", label: "Beginner")
-                            RangeRow(range: "40 – 49", label: "Recreational")
-                            RangeRow(range: "50 – 59", label: "Competitive club")
-                            RangeRow(range: "60 – 75", label: "Elite amateur")
-                            RangeRow(range: "76+",     label: "Professional")
+                            RangeRow(range: "30 – 39", label: String(localized: "Beginner", bundle: .module))
+                            RangeRow(range: "40 – 49", label: String(localized: "Recreational", bundle: .module))
+                            RangeRow(range: "50 – 59", label: String(localized: "Competitive club", bundle: .module))
+                            RangeRow(range: "60 – 75", label: String(localized: "Elite amateur", bundle: .module))
+                            RangeRow(range: "76+",     label: String(localized: "Professional", bundle: .module))
                         }
                     }
 
                     Divider()
 
                     Group {
-                        Text("Why does it matter?")
+                        Text("Why does it matter?", bundle: .module)
                             .font(.headline)
-                        Text("RunCraft uses your VDOT to set your five training pace zones — Easy, Marathon, Threshold, Interval, and Repetition — so every session targets the right physiological adaptation.")
+                        Text("RunCraft uses your VDOT to set your five training pace zones — Easy, Marathon, Threshold, Interval, and Repetition — so every session targets the right physiological adaptation.", bundle: .module)
                     }
                 }
                 .padding()
             }
-            .navigationTitle("About VDOT")
+            .navigationTitle(Text("About VDOT", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button { dismiss() } label: { Text("Done", bundle: .module) }
                 }
             }
         }
