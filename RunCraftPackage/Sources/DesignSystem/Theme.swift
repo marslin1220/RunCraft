@@ -165,6 +165,21 @@ public extension Color {
     }
 }
 
+// MARK: - Glass card helper
+
+public extension View {
+    /// Applies the iOS 26 Liquid Glass material to a card shape, falling back
+    /// to a `Color.brand.surface` fill on earlier OS versions.
+    @ViewBuilder
+    func glassCard(cornerRadius: CGFloat = 16) -> some View {
+        if #available(iOS 26, macOS 26, tvOS 26, watchOS 26, *) {
+            self.glassEffect(in: RoundedRectangle(cornerRadius: cornerRadius))
+        } else {
+            self.background(Color.brand.surface, in: RoundedRectangle(cornerRadius: cornerRadius))
+        }
+    }
+}
+
 /// Convenience hex initializer for the few cases tokens don't yet cover.
 /// Prefer the `Color.brand.*` tokens for anything design-system related.
 public extension Color {

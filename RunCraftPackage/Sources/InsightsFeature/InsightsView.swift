@@ -36,7 +36,13 @@ public struct InsightsView: View {
                 .padding(.vertical, 12)
             }
             .navigationTitle(Text("Insights", bundle: .module))
-            .background(Color.brand.background)
+            .background(
+                LinearGradient(
+                    colors: [Color.brand.accent.opacity(0.07), Color.brand.background],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
         }
         .task { await store.send(.onAppear).finish() }
         .sheet(item: $activeInfoPresentation) { presentation in
@@ -807,10 +813,7 @@ public struct InsightsView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.brand.surface)
-        )
+        .glassCard(cornerRadius: 12)
     }
 
     @ViewBuilder

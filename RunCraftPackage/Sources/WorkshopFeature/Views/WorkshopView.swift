@@ -18,7 +18,13 @@ public struct WorkshopView: View {
                 segmentPicker
                 content
             }
-            .background(Color.brand.background)
+            .background(
+                LinearGradient(
+                    colors: [Color.brand.accent.opacity(0.07), Color.brand.background],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
             .navigationTitle(Text("Workouts", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -298,7 +304,7 @@ private struct HistorySegment: View {
                                     }
                                 }
                             }
-                            .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 16))
+                            .glassCard(cornerRadius: 16)
                             .padding(.horizontal, 16)
                             .padding(.bottom, 16)
                         } header: {
@@ -571,7 +577,7 @@ private struct MetricTile: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+        .glassCard(cornerRadius: 14)
     }
 }
 

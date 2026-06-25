@@ -41,12 +41,14 @@ public struct LiveWorkoutView: View {
         }
         .interactiveDismissDisabled()
         .confirmationDialog(
-            Text("End Workout?"),
+            Text("End Workout?", bundle: .module),
             isPresented: $showEndConfirmation,
             titleVisibility: .visible
         ) {
-            Button("End Workout", role: .destructive) {
+            Button(role: .destructive) {
                 store.send(.endWorkoutTapped)
+            } label: {
+                Text("End Workout", bundle: .module)
             }
             Button("Cancel", role: .cancel) {}
         }
@@ -56,7 +58,7 @@ public struct LiveWorkoutView: View {
 
     private var headerBar: some View {
         HStack {
-            Label("On Apple Watch", systemImage: "applewatch")
+            Label { Text("On Apple Watch", bundle: .module) } icon: { Image(systemName: "applewatch") }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Spacer()
@@ -75,7 +77,7 @@ public struct LiveWorkoutView: View {
 
     private var stepCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(display.message.stepName.isEmpty ? "Workout" : display.message.stepName)
+            Text(display.message.stepName.isEmpty ? String(localized: "Workout", bundle: .module) : display.message.stepName)
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(Color.brand.accent)
                 .lineLimit(2)
@@ -90,7 +92,7 @@ public struct LiveWorkoutView: View {
             }
         }
         .padding()
-        .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 16))
+        .glassCard(cornerRadius: 16)
     }
 
     // MARK: - Metrics grid
@@ -171,7 +173,7 @@ public struct LiveWorkoutView: View {
                 Button {
                     store.send(.resumeWorkoutTapped)
                 } label: {
-                    Text("Resume")
+                    Text("Resume", bundle: .module)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -180,7 +182,7 @@ public struct LiveWorkoutView: View {
                 Button {
                     store.send(.pauseWorkoutTapped)
                 } label: {
-                    Text("Pause")
+                    Text("Pause", bundle: .module)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
@@ -189,7 +191,7 @@ public struct LiveWorkoutView: View {
             Button {
                 showEndConfirmation = true
             } label: {
-                Text("End Workout")
+                Text("End Workout", bundle: .module)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
@@ -233,7 +235,7 @@ private struct MetricTile: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(Color.brand.surface, in: RoundedRectangle(cornerRadius: 14))
+        .glassCard(cornerRadius: 14)
     }
 }
 
