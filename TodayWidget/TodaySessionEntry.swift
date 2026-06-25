@@ -39,6 +39,16 @@ enum WeatherConditionGroup: Equatable, Sendable {
         }
     }
 
+    /// Xcstrings key shown on training-day widget for notable conditions (rain/storm/snow).
+    var trainingTipKey: String {
+        switch self {
+        case .rainy:  "weather.training.rainy"
+        case .stormy: "weather.training.stormy"
+        case .snow:   "weather.training.snow"
+        default:      ""
+        }
+    }
+
     init(from condition: WeatherCondition) {
         switch condition {
         case .clear, .mostlyClear, .hot:

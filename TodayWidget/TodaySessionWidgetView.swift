@@ -97,7 +97,7 @@ private struct MediumSessionView: View {
         Group {
             if let session, session.sessionType != .rest {
                 Button(intent: StartTodaysSessionIntent()) {
-                    MediumWorkoutDayContent(session: session, weekProgress: weekProgress)
+                    MediumWorkoutDayContent(session: session, weekProgress: weekProgress, weather: weather)
                 }
                 .buttonStyle(.plain)
             } else if let session {
@@ -113,6 +113,15 @@ private struct MediumSessionView: View {
 private struct MediumWorkoutDayContent: View {
     let session: TodaySessionEntity
     let weekProgress: WeekProgressData
+    let weather: WeatherSnapshot?
+
+    private var showWeatherAlert: Bool {
+        guard let condition = weather?.condition else { return false }
+        switch condition {
+        case .rainy, .stormy, .snow: return true
+        default: return false
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -142,6 +151,16 @@ private struct MediumWorkoutDayContent: View {
             .font(.subheadline.monospacedDigit())
             .foregroundStyle(Color.brand.textSecondary)
             .padding(.top, 2)
+
+            if showWeatherAlert, let weather {
+                HStack(spacing: 4) {
+                    Image(systemName: weather.condition.sfSymbol)
+                    Text(LocalizedStringKey(weather.condition.trainingTipKey))
+                }
+                .font(.caption)
+                .foregroundStyle(Color.brand.caution)
+                .padding(.top, 4)
+            }
 
             Spacer(minLength: 0)
             WeekProgressBar(progress: weekProgress)
