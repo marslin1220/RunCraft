@@ -21,13 +21,17 @@ struct TodaySessionWidgetView: View {
     private var content: some View {
         switch family {
         case .systemSmall:
-            SmallSessionView(session: entry.session)
+            SmallSessionView(session: entry.session, weather: entry.weather)
         case .accessoryRectangular:
             RectangularSessionView(session: entry.session)
         case .accessoryCircular:
             CircularSessionView(session: entry.session)
         default:
-            MediumSessionView(session: entry.session)
+            MediumSessionView(
+                session: entry.session,
+                weekProgress: entry.weekProgress,
+                weather: entry.weather
+            )
         }
     }
 
@@ -42,31 +46,41 @@ struct TodaySessionWidgetView: View {
     }
 }
 
-// MARK: - Home Screen
+// MARK: - Home Screen / Small
 
 private struct SmallSessionView: View {
     let session: TodaySessionEntity?
+    let weather: WeatherSnapshot?
 
     var body: some View {
         Group {
             if let session, session.sessionType != .rest {
-                VStack(alignment: .leading, spacing: 8) {
-                    Image(systemName: session.sessionType.symbolName)
-                        .font(.title2)
-                        .foregroundStyle(Color.brand.accent)
-                    Text(session.sessionTitle)
-                        .font(.headline)
-                        .foregroundStyle(Color.brand.textPrimary)
-                        .lineLimit(2)
-                    Spacer(minLength: 0)
-                    if let line = SessionDisplay.metricsLine(for: session) {
-                        Text(line)
-                            .font(.subheadline.monospacedDigit())
-                            .foregroundStyle(Color.brand.textSecondary)
+                Button(intent: StartTodaysSessionIntent()) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .top) {
+                            Image(systemName: session.sessionType.symbolName)
+                                .font(.title2)
+                                .foregroundStyle(Color.brand.accent)
+                            Spacer(minLength: 0)
+                            Image(systemName: "play.circle.fill")
+                                .font(.callout)
+                                .foregroundStyle(Color.brand.accent.opacity(0.7))
+                        }
+                        Text(session.sessionTitle)
+                            .font(.headline)
+                            .foregroundStyle(Color.brand.textPrimary)
+                            .lineLimit(2)
+                        Spacer(minLength: 0)
+                        if let line = SessionDisplay.metricsLine(for: session) {
+                            Text(line)
+                                .font(.subheadline.monospacedDigit())
+                                .foregroundStyle(Color.brand.textSecondary)
+                        }
                     }
                 }
+                .buttonStyle(.plain)
             } else if let session {
-                RestDayView(session: session)
+                SmallRestDayView(session: session, weather: weather)
             } else {
                 EmptyStateView()
             }
@@ -75,14 +89,18 @@ private struct SmallSessionView: View {
     }
 }
 
+// MARK: - Home Screen / Medium
+
 private struct MediumSessionView: View {
     let session: TodaySessionEntity?
+    let weekProgress: WeekProgressData
+    let weather: WeatherSnapshot?
 
     var body: some View {
         Group {
             if let session, session.sessionType != .rest {
                 HStack(alignment: .top, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 8) {
                             Image(systemName: session.sessionType.symbolName)
                                 .font(.title3)
@@ -101,19 +119,17 @@ private struct MediumSessionView: View {
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(Color.brand.textSecondary)
                         }
+                        Spacer(minLength: 0)
+                        WeekProgressBar(progress: weekProgress)
                     }
-                    Spacer(minLength: 0)
                     Button(intent: StartTodaysSessionIntent()) {
-                        Text("Send to Watch")
+                        Label("Start", systemImage: "play.circle.fill")
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(Color.brand.accent)
                 }
             } else if let session {
-                HStack {
-                    RestDayView(session: session)
-                    Spacer(minLength: 0)
-                }
+                MediumRestDayView(session: session, weekProgress: weekProgress, weather: weather)
             } else {
                 HStack {
                     EmptyStateView()
@@ -125,6 +141,113 @@ private struct MediumSessionView: View {
     }
 }
 
+// MARK: - Rest day views
+
+private struct SmallRestDayView: View {
+    let session: TodaySessionEntity
+    let weather: WeatherSnapshot?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: session.sessionType.symbolName)
+                    .foregroundStyle(Color.brand.accent)
+                Text("Rest day")
+                    .font(.headline)
+                    .foregroundStyle(Color.brand.textPrimary)
+            }
+            if let weather {
+                HStack(alignment: .top, spacing: 4) {
+                    Image(systemName: weather.condition.sfSymbol)
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.accent)
+                    Text(LocalizedStringKey(weather.condition.tipKey))
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.textSecondary)
+                        .lineLimit(3)
+                }
+            } else {
+                Text(LocalizedStringKey("rest.recovery.fallback"))
+                    .font(.caption)
+                    .foregroundStyle(Color.brand.textSecondary)
+                    .lineLimit(3)
+            }
+        }
+    }
+}
+
+private struct MediumRestDayView: View {
+    let session: TodaySessionEntity
+    let weekProgress: WeekProgressData
+    let weather: WeatherSnapshot?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: session.sessionType.symbolName)
+                    .font(.title3)
+                    .foregroundStyle(Color.brand.accent)
+                Text("Rest day")
+                    .font(.headline)
+                    .foregroundStyle(Color.brand.textPrimary)
+            }
+            if let weather {
+                HStack(alignment: .top, spacing: 6) {
+                    Image(systemName: weather.condition.sfSymbol)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.brand.accent)
+                    Text(LocalizedStringKey(weather.condition.tipKey))
+                        .font(.caption)
+                        .foregroundStyle(Color.brand.textSecondary)
+                        .lineLimit(2)
+                }
+            } else {
+                Text(LocalizedStringKey("rest.recovery.fallback"))
+                    .font(.caption)
+                    .foregroundStyle(Color.brand.textSecondary)
+                    .lineLimit(2)
+            }
+            Spacer(minLength: 0)
+            WeekProgressBar(progress: weekProgress)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Week progress bar
+
+private struct WeekProgressBar: View {
+    let progress: WeekProgressData
+
+    private var sessionText: String {
+        String(
+            format: String(localized: "week.progress.sessions"),
+            progress.sessionsDone, progress.sessionsPlanned
+        )
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            ProgressView(value: progress.ratio)
+                .tint(Color.brand.accent)
+                .progressViewStyle(.linear)
+            HStack {
+                if progress.kmTarget > 0 {
+                    Text(String(format: "%.1f / %.0f km", progress.kmDone, progress.kmTarget))
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(Color.brand.textSecondary)
+                }
+                Spacer()
+                Text(sessionText)
+                    .font(.caption2)
+                    .foregroundStyle(Color.brand.textSecondary)
+            }
+        }
+    }
+}
+
+// MARK: - Empty state
+
 private struct EmptyStateView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -132,25 +255,6 @@ private struct EmptyStateView: View {
                 .font(.headline)
                 .foregroundStyle(Color.brand.textPrimary)
             Text("Open RunCraft to set up a plan")
-                .font(.caption)
-                .foregroundStyle(Color.brand.textSecondary)
-        }
-    }
-}
-
-private struct RestDayView: View {
-    let session: TodaySessionEntity
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 8) {
-                Image(systemName: session.sessionType.symbolName)
-                    .foregroundStyle(Color.brand.accent)
-                Text("Rest day")
-                    .font(.headline)
-                    .foregroundStyle(Color.brand.textPrimary)
-            }
-            Text("No run scheduled today")
                 .font(.caption)
                 .foregroundStyle(Color.brand.textSecondary)
         }
@@ -224,7 +328,6 @@ private struct CircularSessionView: View {
 // MARK: - Shared formatting
 
 private enum SessionDisplay {
-    /// "8 km" / "45 min" — the headline metric for a session.
     static func metricsLine(for session: TodaySessionEntity) -> String? {
         if let km = session.targetDistanceKm {
             return PaceFormatting.distance(metres: km * 1_000, unit: .current)
@@ -234,7 +337,6 @@ private enum SessionDisplay {
         return nil
     }
 
-    /// "T · 5:30 – 6:00 /km" — pace zone letter plus its target range.
     static func paceLine(for session: TodaySessionEntity) -> String? {
         guard let zone = session.paceZone,
               let lower = session.paceLowerSecPerKm,
@@ -244,8 +346,6 @@ private enum SessionDisplay {
         return "\(zone.letter) · \(range.formatted(unit: .current))"
     }
 
-    /// A bare number for the accessory-circular family, which has no room
-    /// for a unit suffix.
     static func shortLabel(for session: TodaySessionEntity) -> String? {
         if let km = session.targetDistanceKm {
             let value = PaceFormatting.distanceValue(metres: km * 1_000, unit: .current)

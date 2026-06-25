@@ -2,22 +2,178 @@
   "sourceLanguage" : "en",
   "strings" : {
     "%@ avg" : {
-
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 平均"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 평균"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 平均"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 平均"
+          }
+        }
+      }
     },
     "avg" : {
-
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "평균"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均"
+          }
+        }
+      }
     },
     "bpm" : {
-
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bpm"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bpm"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bpm"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bpm"
+          }
+        }
+      }
     },
     "Dist" : {
-
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "距離"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "거리"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "距离"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "距離"
+          }
+        }
+      }
     },
     "Goal: %@" : {
-
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目標：%@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "목표：%@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目标：%@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目標：%@"
+          }
+        }
+      }
     },
     "HR" : {
-
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "심박수"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心率"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心率"
+          }
+        }
+      }
     },
     "No plan yet" : {
       "extractionState" : "manual",
@@ -107,7 +263,33 @@
       }
     },
     "Pace" : {
-
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ペース"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "페이스"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "配速"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "配速"
+          }
+        }
+      }
     },
     "Rest day" : {
       "extractionState" : "manual",
@@ -194,6 +376,135 @@
             "value" : "傳送到 Apple Watch"
           }
         }
+      }
+    },
+    "Start" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始"
+          }
+        }
+      }
+    },
+    "week.progress.sessions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%1$d/%2$d sessions" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%1$d/%2$d 回" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "%1$d/%2$d 회" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%1$d/%2$d 次" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "%1$d/%2$d 次" } }
+      }
+    },
+    "weather.tip.sunny" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sunshine ahead — a walk or light jog is perfect for recovery." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "晴れ！軽いウォーキングで回復を促しましょう。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "맑은 날씨! 가벼운 산책으로 회복을 도와보세요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "阳光正好，出门走走让身体恢复得更快。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "陽光正好，出門散散步讓身體恢復得更快。" } }
+      }
+    },
+    "weather.tip.partlyCloudy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pleasant clouds and comfortable temperature — great for a stroll." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "過ごしやすい天気。軽く外を歩いて体をほぐしましょう。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "쾌적한 날씨예요. 가볍게 걸어 몸을 풀어보세요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "云量适中、气温舒适，很适合出门轻松散步。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "雲量適中、氣溫舒適，很適合出門輕鬆散步。" } }
+      }
+    },
+    "weather.tip.cloudy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cloudy today — 15 minutes of stretching will do wonders." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "曇り空。15分のストレッチで筋肉をリフレッシュしましょう。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "흐린 날씨. 15분 스트레칭으로 근육을 풀어보세요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天多云，做个 15 分钟拉伸，让肌肉好好放松。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天多雲，做個 15 分鐘拉伸，讓肌肉好好放鬆。" } }
+      }
+    },
+    "weather.tip.rainy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rainy day — ideal time for indoor core work or yoga." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "雨の日は室内でコアトレーニングやヨガをしましょう。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "비 오는 날, 실내 코어 운동이나 요가하기 좋아요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "下雨天，正是在家做核心训练或瑜伽的好时机。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "下雨天，正是在家做核心訓練或瑜珈的好時機。" } }
+      }
+    },
+    "weather.tip.stormy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Storm outside — staying home and resting well is the smartest move." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "嵐の日は家でゆっくり休むのが最高の回復法です。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "폭풍우 날씨엔 집에서 충분히 쉬는 것이 최선이에요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "风雨交加，待在家好好休息就是最棒的恢复方式。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "風雨交加，待在家好好休息就是最棒的恢復方式。" } }
+      }
+    },
+    "weather.tip.snow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Snow day — stay warm and keep any movement gentle indoors." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "雪の日。暖かくして室内で軽く体を動かしましょう。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "눈 오는 날, 따뜻하게 있으며 실내에서 가볍게 움직여요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天下雪，注意保暖，在室内做轻度活动即可。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天下雪，注意保暖，在室內做輕度活動即可。" } }
+      }
+    },
+    "weather.tip.windy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Windy out there — yoga or indoor stretching is ideal today." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "風が強い日は室内でヨガかストレッチをしましょう。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "바람이 강해요. 실내에서 요가나 스트레칭이 안성맞춤이에요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天风很大，在家做瑜伽或拉伸是个好选择。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天風很大，在家做瑜珈或拉伸是個好選擇。" } }
+      }
+    },
+    "weather.tip.foggy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Foggy today — take it easy indoors and let your body repair." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今日は霧があります。屋外の激しい運動は避けて室内で休養を。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "안개 낀 날씨. 실내에서 가볍게 쉬며 회복하는 것이 좋아요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "今天有雾，避免户外剧烈活动，在室内轻松恢复最安心。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "今天有霧，避免戶外劇烈活動，在室內輕鬆恢復最安心。" } }
+      }
+    },
+    "rest.recovery.fallback" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Recharge and let your body repair — great workout ahead." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "しっかり回復して、次のトレーニングに備えましょう。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "충분히 쉬고 다음 훈련을 준비하세요." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "好好充电，让身体修复，下次训练会更好。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "好好充電，讓身體修復，下次訓練會更好。" } }
       }
     },
     "Today's Run" : {
